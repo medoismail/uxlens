@@ -48,36 +48,62 @@ export async function POST(request: Request) {
       );
     }
 
-    // 3. Fetch the target page HTML
+    // 3. Fetch the target page HTML (with retry)
     let html: string;
-    try {
+    const fetchHeaders = {
+      "User-Agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+      "Accept-Language": "en-US,en;q=0.9",
+      "Accept-Encoding": "gzip, deflate, br",
+      "Cache-Control": "no-cache",
+      Pragma: "no-cache",
+      "Sec-Fetch-Dest": "document",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-Site": "none",
+      "Sec-Fetch-User": "?1",
+      "Upgrade-Insecure-Requests": "1",
+    };
+
+    async function fetchPage(timeoutMs: number): Promise<Response> {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 10000);
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const res = await fetch(url, {
+          signal: controller.signal,
+          headers: fetchHeaders,
+          redirect: "follow",
+        });
+        return res;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
 
-      const res = await fetch(url, {
-        signal: controller.signal,
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-          Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-          "Accept-Language": "en-US,en;q=0.9",
-        },
-        redirect: "follow",
-      });
-
-      clearTimeout(timeout);
+    try {
+      // First attempt with 15s timeout
+      let res: Response;
+      try {
+        res = await fetchPage(15000);
+      } catch {
+        // Retry once with 20s timeout
+        console.log(`[Analyze] First fetch failed for ${url}, retrying...`);
+        res = await fetchPage(20000);
+      }
 
       if (!res.ok) {
+        console.error(`[Analyze] HTTP ${res.status} for ${url}`);
         return errorResponse(
-          "We couldn't read this page. The server returned an error.",
+          `We couldn't read this page. The server returned HTTP ${res.status}.`,
           "FETCH_FAILED"
         );
       }
 
       html = await res.text();
-    } catch {
+    } catch (fetchErr) {
+      console.error(`[Analyze] Fetch failed for ${url}:`, fetchErr);
       return errorResponse(
-        "We couldn't reach this page. It may block automated analysis or be unavailable.",
+        "We couldn't reach this page. It may block automated analysis, be behind a firewall, or be temporarily unavailable. Try again in a moment.",
         "FETCH_FAILED"
       );
     }
