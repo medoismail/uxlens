@@ -2,9 +2,9 @@ import OpenAI from "openai";
 import type { ExtractedContent, UXAuditResult } from "./types";
 import { uxAuditSchema } from "./schemas";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+function getClient() {
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+}
 
 /**
  * Multi-role UX audit system prompt.
@@ -108,7 +108,7 @@ Return JSON in this exact shape:
 export async function generateUXAudit(
   content: ExtractedContent
 ): Promise<UXAuditResult> {
-  const response = await openai.chat.completions.create({
+  const response = await getClient().chat.completions.create({
     model: "gpt-4o-mini",
     response_format: { type: "json_object" },
     temperature: 0.4,
