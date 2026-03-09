@@ -8,6 +8,7 @@ import {
   Flame, Brain, HelpCircle, Heart, LogOut,
   X, AlertTriangle, Check,
 } from "lucide-react";
+import { Footer } from "@/components/footer";
 import type { UXAuditResult, AuditSection, Finding, PlanTier } from "@/lib/types";
 
 interface ResultsReportProps {
@@ -398,9 +399,7 @@ export function ResultsReport({
         </button>
       </div>
 
-      <footer className="text-center pb-8 text-[11px] text-foreground/20 font-mono">
-        Built with UXLens — 9-Layer Diagnostic Engine
-      </footer>
+      <Footer />
     </div>
   );
 }

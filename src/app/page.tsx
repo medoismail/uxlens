@@ -8,6 +8,7 @@ import { ErrorState } from "@/components/error-state";
 import { LimitReached } from "@/components/limit-reached";
 import { ResultsReport } from "@/components/results-report";
 import { HumanAuditConfirmation } from "@/components/human-audit-confirmation";
+import { Footer } from "@/components/footer";
 import { normalizeUrl } from "@/lib/validate-url";
 import { useSubscription } from "@/hooks/use-subscription";
 import type { AnalysisResult, UXAuditResult, UsageCheck } from "@/lib/types";
@@ -109,11 +110,7 @@ export default function Home() {
           />
         )}
       </main>
-      {state.status === "idle" && (
-        <footer className="border-t py-8 text-center text-[11px] text-foreground/20 font-mono relative z-[1]" style={{ borderColor: "var(--border)" }}>
-          UXLens &mdash; 9-Layer Diagnostic Engine
-        </footer>
-      )}
+      {state.status === "idle" && <Footer />}
     </div>
   );
 }

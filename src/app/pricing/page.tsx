@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight, Check, Loader2, Sparkles, User, Zap } from "lucide-react";
 import { Header } from "@/components/header";
 import { PricingCards } from "@/components/pricing-cards";
+import { Footer } from "@/components/footer";
 
 export default function PricingPage() {
   const [email, setEmail] = useState("");
@@ -178,9 +179,7 @@ export default function PricingPage() {
         </div>
       </main>
 
-      <footer className="border-t py-8 text-center text-[11px] text-foreground/20 font-mono relative z-[1]" style={{ borderColor: "var(--border)" }}>
-        UXLens &mdash; 9-Layer Diagnostic Engine
-      </footer>
+      <Footer />
     </div>
   );
 }

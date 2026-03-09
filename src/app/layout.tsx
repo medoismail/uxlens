@@ -15,10 +15,140 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+const SITE_URL = "https://www.uxlens.pro";
+
 export const metadata: Metadata = {
-  title: "UXLens — 9-Layer UX Diagnostic Engine",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "UXLens — Free AI UX Audit Tool | Instant Website Analysis",
+    template: "%s | UXLens",
+  },
   description:
-    "The most advanced AI-powered UX audit: multi-stage analysis, self-critique loop, contradiction detection, and rewrite synthesis.",
+    "Analyze any landing page in seconds with UXLens, the AI-powered UX audit tool. Get a 9-layer diagnostic: conversion killers, trust signals, confusion detection, hero rewrite, and actionable fixes.",
+  keywords: [
+    "ux audit tool",
+    "website ux analysis",
+    "ai ux review",
+    "landing page audit",
+    "conversion optimization tool",
+    "ux diagnostic",
+    "website analysis tool",
+    "free ux audit",
+    "landing page analyzer",
+    "conversion rate optimization",
+    "ux review tool",
+    "website audit tool",
+    "ai website analyzer",
+    "ux score checker",
+    "landing page optimization",
+    "trust signal analysis",
+    "hero section optimizer",
+    "cognitive load analysis",
+    "website conversion audit",
+    "ux feedback tool",
+  ],
+  authors: [{ name: "UXLens" }],
+  creator: "UXLens",
+  publisher: "UXLens",
+  robots: {
+    index: true,
+    follow: true,
+    "max-image-preview": "large",
+    "max-snippet": -1,
+    "max-video-preview": -1,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  alternates: {
+    canonical: SITE_URL,
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: SITE_URL,
+    siteName: "UXLens",
+    title: "UXLens — Free AI UX Audit Tool | Instant Website Analysis",
+    description:
+      "Paste any URL and get a full 9-layer UX audit in seconds. Conversion killers, trust signals, confusion detection, hero rewrite, and actionable fixes — powered by AI.",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "UXLens — AI-Powered UX Audit Tool",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "UXLens — Free AI UX Audit Tool",
+    description:
+      "Paste any URL. Get a full 9-layer UX audit in seconds: conversion killers, trust score, hero rewrite, and fixes.",
+    images: ["/opengraph-image"],
+  },
+  category: "technology",
+};
+
+/* JSON-LD Structured Data */
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "UXLens",
+  url: SITE_URL,
+  description:
+    "AI-powered UX audit tool that analyzes landing pages across 9 diagnostic layers including conversion architecture, trust signals, confusion detection, and hero rewrite synthesis.",
+  applicationCategory: "DesignApplication",
+  operatingSystem: "Web",
+  offers: [
+    {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+      name: "Free",
+      description: "5 audits per month",
+    },
+    {
+      "@type": "Offer",
+      price: "12",
+      priceCurrency: "USD",
+      name: "Starter",
+      description: "50 audits per month with full report access",
+    },
+    {
+      "@type": "Offer",
+      price: "29",
+      priceCurrency: "USD",
+      name: "Pro",
+      description: "200 audits per month with full report access",
+    },
+    {
+      "@type": "Offer",
+      price: "79",
+      priceCurrency: "USD",
+      name: "Agency",
+      description: "1,000 audits per month for teams and agencies",
+    },
+  ],
+  featureList: [
+    "9-Layer UX Diagnostic",
+    "AI-Powered Conversion Killer Detection",
+    "Trust Signal Matrix",
+    "Confusion Detection Map",
+    "Hero Section Rewrite",
+    "Cognitive Load Analysis",
+    "Quick Win Recommendations",
+    "Detailed Findings & Fixes",
+  ],
+  creator: {
+    "@type": "Organization",
+    name: "UXLens",
+    url: SITE_URL,
+  },
 };
 
 export default function RootLayout({
@@ -28,6 +158,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         className={`${interTight.variable} ${jetbrainsMono.variable} antialiased`}
       >
