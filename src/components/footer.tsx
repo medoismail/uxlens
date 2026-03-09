@@ -8,10 +8,14 @@ export function Footer() {
   const [count, setCount] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch("/api/views", { method: "POST" })
+    const controller = new AbortController();
+    fetch("/api/views", { method: "POST", signal: controller.signal })
       .then((r) => r.json())
-      .then((d) => setCount(d.count))
+      .then((d) => {
+        if (typeof d.count === "number") setCount(d.count);
+      })
       .catch(() => {});
+    return () => controller.abort();
   }, []);
 
   return (
@@ -25,8 +29,8 @@ export function Footer() {
           UXLens &mdash; 9-Layer Diagnostic Engine
         </span>
 
-        {/* Counter */}
-        {count !== null && count > 0 && (
+        {/* Counter — always show once loaded */}
+        {count !== null && (
           <div className="flex items-center gap-1.5 text-[11px] text-foreground/25 font-mono animate-fade-in">
             <Users className="h-3 w-3" />
             <span>
@@ -54,22 +58,23 @@ function AnimatedNumber({ value }: { value: number }) {
   const [display, setDisplay] = useState(0);
 
   useEffect(() => {
-    if (value === 0) return;
+    if (value <= 0) { setDisplay(value); return; }
     const duration = 1200;
     const start = Math.max(0, value - 50);
     const range = value - start;
     const startTime = performance.now();
 
+    let raf: number;
     function tick(now: number) {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // ease-out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setDisplay(Math.round(start + range * eased));
-      if (progress < 1) requestAnimationFrame(tick);
+      if (progress < 1) raf = requestAnimationFrame(tick);
     }
 
-    requestAnimationFrame(tick);
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, [value]);
 
   return <>{display.toLocaleString()}</>;
