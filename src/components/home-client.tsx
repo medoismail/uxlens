@@ -29,12 +29,15 @@ export function HomeClient() {
   async function handleAnalyze(rawUrl: string) {
     setState({ status: "loading" });
 
+    const normalizedUrl = normalizeUrl(rawUrl);
+
     try {
+      // Step 1: Run the AI audit (fast — no screenshot)
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          url: normalizeUrl(rawUrl),
+          url: normalizedUrl,
           ...(subscriberEmail && { email: subscriberEmail }),
         }),
       });
@@ -42,16 +45,16 @@ export function HomeClient() {
       const result: AnalysisResult = await res.json();
 
       if (result.success) {
+        // Show the report immediately (without screenshot)
         setState({
           status: "success",
           data: result.data,
           url: result.url,
           auditId: result.auditId,
-          screenshotUrl: result.screenshotUrl,
-          heatmapZones: result.heatmapZones,
-          pageHeight: result.pageHeight,
-          viewportWidth: result.viewportWidth,
         });
+
+        // Step 2: Capture screenshot in the background (separate request)
+        fetchScreenshot(result.url, result.auditId);
       } else if (result.code === "USAGE_LIMIT" && result.usage) {
         if (result.usage.audits_remaining === 0 && result.usage.upgrade_suggestion) {
           setState({ status: "limit_reached", usage: result.usage });
@@ -66,6 +69,37 @@ export function HomeClient() {
         status: "error",
         message: "Something went wrong. Please check your connection and try again.",
       });
+    }
+  }
+
+  /** Fire-and-forget: capture screenshot and update state when it arrives */
+  async function fetchScreenshot(url: string, auditId?: string) {
+    try {
+      const res = await fetch("/api/screenshot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url, auditId }),
+      });
+
+      if (!res.ok) return;
+      const data = await res.json();
+
+      if (data.screenshotUrl) {
+        // Merge screenshot data into the current state
+        setState((prev) => {
+          if (prev.status !== "success") return prev;
+          return {
+            ...prev,
+            screenshotUrl: data.screenshotUrl,
+            heatmapZones: data.heatmapZones,
+            pageHeight: data.pageHeight,
+            viewportWidth: data.viewportWidth,
+          };
+        });
+      }
+    } catch {
+      // Screenshot is optional — silently ignore failures
+      console.log("Screenshot capture skipped (non-critical)");
     }
   }
 

@@ -202,13 +202,23 @@ export function ResultsReport({
       </div>
 
       {/* ─── Screenshot + Heatmap (all tiers) ─── */}
-      {screenshotUrl && heatmapZones && pageHeight && viewportWidth && (
+      {screenshotUrl && heatmapZones && pageHeight && viewportWidth ? (
         <ScreenshotSection
           screenshotUrl={screenshotUrl}
           heatmapZones={heatmapZones}
           pageHeight={pageHeight}
           viewportWidth={viewportWidth}
         />
+      ) : (
+        <div
+          className="rounded-xl border p-5 mb-4 flex items-center justify-center"
+          style={{ borderColor: "var(--border)", background: "var(--s1)", minHeight: "120px" }}
+        >
+          <div className="flex items-center gap-2.5 text-[12px] text-foreground/30">
+            <div className="h-4 w-4 border-2 border-foreground/15 border-t-foreground/40 rounded-full animate-spin" />
+            Capturing screenshot & generating heatmap...
+          </div>
+        </div>
       )}
 
       {/* ─── Category Grid (all tiers) ─── */}

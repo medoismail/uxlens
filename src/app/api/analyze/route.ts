@@ -7,10 +7,9 @@ import { generateUXAudit } from "@/lib/openai";
 import { checkServerUsage, incrementServerUsage } from "@/lib/server-usage";
 import { getUserByClerkId, upsertUser } from "@/lib/db/users";
 import { saveAudit } from "@/lib/db/audits";
-import { getSupabase } from "@/lib/supabase";
 import type { AnalysisError } from "@/lib/types";
 
-// Allow up to 60s on Vercel Pro, 10s on Hobby (default)
+// Keep generous for Vercel Pro; Hobby caps at 10s regardless
 export const maxDuration = 60;
 
 function errorResponse(error: string, code: AnalysisError["code"], status = 400) {
@@ -51,53 +50,35 @@ export async function POST(request: Request) {
       );
     }
 
-    // 3. Fetch the target page HTML (with retry)
+    // 3. Fetch the target page HTML (tight timeout for Vercel Hobby)
     let html: string;
-    const fetchHeaders = {
-      "User-Agent":
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-      Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-      "Accept-Language": "en-US,en;q=0.9",
-      "Accept-Encoding": "gzip, deflate, br",
-      "Cache-Control": "no-cache",
-      Pragma: "no-cache",
-      "Sec-Fetch-Dest": "document",
-      "Sec-Fetch-Mode": "navigate",
-      "Sec-Fetch-Site": "none",
-      "Sec-Fetch-User": "?1",
-      "Upgrade-Insecure-Requests": "1",
-    };
-
-    async function fetchPage(timeoutMs: number): Promise<Response> {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), timeoutMs);
-      try {
-        const res = await fetch(url, {
-          signal: controller.signal,
-          headers: fetchHeaders,
-          redirect: "follow",
-        });
-        return res;
-      } finally {
-        clearTimeout(timer);
-      }
-    }
-
     try {
-      // First attempt with 15s timeout
-      let res: Response;
-      try {
-        res = await fetchPage(15000);
-      } catch {
-        // Retry once with 20s timeout
-        console.log(`[Analyze] First fetch failed for ${url}, retrying...`);
-        res = await fetchPage(20000);
-      }
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 7000);
+
+      const res = await fetch(url, {
+        signal: controller.signal,
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+          Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          "Accept-Language": "en-US,en;q=0.9",
+          "Accept-Encoding": "gzip, deflate, br",
+          "Sec-Fetch-Dest": "document",
+          "Sec-Fetch-Mode": "navigate",
+          "Sec-Fetch-Site": "none",
+          "Sec-Fetch-User": "?1",
+          "Upgrade-Insecure-Requests": "1",
+        },
+        redirect: "follow",
+      });
+
+      clearTimeout(timer);
 
       if (!res.ok) {
         console.error(`[Analyze] HTTP ${res.status} for ${url}`);
         return errorResponse(
-          `We couldn't read this page. The server returned HTTP ${res.status}.`,
+          `We couldn't read this page (HTTP ${res.status}).`,
           "FETCH_FAILED"
         );
       }
@@ -106,7 +87,7 @@ export async function POST(request: Request) {
     } catch (fetchErr) {
       console.error(`[Analyze] Fetch failed for ${url}:`, fetchErr);
       return errorResponse(
-        "We couldn't reach this page. It may block automated analysis, be behind a firewall, or be temporarily unavailable. Try again in a moment.",
+        "We couldn't reach this page. It may block automated analysis or be temporarily unavailable.",
         "FETCH_FAILED"
       );
     }
@@ -121,59 +102,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // 5. Run screenshot capture and UX audit in parallel
-    // Screenshot is non-blocking — if it fails, audit still returns
-    let screenshotUrl: string | undefined;
-    let heatmapZones: unknown[] | undefined;
-    let pageHeight: number | undefined;
-    let viewportWidth: number | undefined;
-
-    const [audit, screenshotResult] = await Promise.all([
-      // UX audit (required)
-      generateUXAudit(content).catch(() => null),
-      // Screenshot (optional, non-blocking)
-      (async () => {
-        try {
-          const { captureScreenshot } = await import("@/lib/screenshot");
-          const { generateHeatmapZones } = await import("@/lib/heatmap");
-          const result = await captureScreenshot(url);
-          const zones = generateHeatmapZones(
-            result.elements,
-            result.pageHeight,
-            result.viewportHeight
-          );
-
-          // Upload screenshot to Supabase Storage
-          const sb = getSupabase();
-          if (sb) {
-            const filename = `${Date.now()}-${encodeURIComponent(new URL(url).hostname)}.jpg`;
-            const { error: uploadError } = await sb.storage
-              .from("screenshots")
-              .upload(filename, result.buffer, {
-                contentType: "image/jpeg",
-                cacheControl: "31536000",
-              });
-
-            if (!uploadError) {
-              const { data: publicUrl } = sb.storage
-                .from("screenshots")
-                .getPublicUrl(filename);
-              return {
-                screenshotUrl: publicUrl.publicUrl,
-                heatmapZones: zones,
-                pageHeight: result.pageHeight,
-                viewportWidth: result.viewportWidth,
-              };
-            }
-          }
-
-          return null;
-        } catch (e) {
-          console.error("Screenshot capture failed (non-blocking):", e);
-          return null;
-        }
-      })(),
-    ]);
+    // 5. Run AI audit only (screenshot is handled by a separate endpoint)
+    const audit = await generateUXAudit(content);
 
     if (!audit) {
       return errorResponse(
@@ -183,14 +113,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Extract screenshot data if available
-    if (screenshotResult) {
-      screenshotUrl = screenshotResult.screenshotUrl;
-      heatmapZones = screenshotResult.heatmapZones;
-      pageHeight = screenshotResult.pageHeight;
-      viewportWidth = screenshotResult.viewportWidth;
-    }
-
     // 6. Increment usage after successful audit
     await incrementServerUsage(request, email, clerkUserId);
 
@@ -198,7 +120,6 @@ export async function POST(request: Request) {
     let auditId: string | undefined;
     if (clerkUserId) {
       try {
-        // Try to find user, or lazily create them if Clerk webhook hasn't fired yet
         let dbUser = await getUserByClerkId(clerkUserId);
         if (!dbUser) {
           const clerkUser = await currentUser();
@@ -211,27 +132,20 @@ export async function POST(request: Request) {
             userId: dbUser.id,
             url,
             result: audit,
-            screenshotPath: screenshotUrl,
-            heatmapZones,
           });
           if (id) auditId = id;
         }
       } catch {
-        // Don't fail the audit if save fails
         console.error("Failed to save audit to Supabase");
       }
     }
 
-    // 8. Return successful result
+    // 8. Return result — client will call /api/screenshot separately
     return NextResponse.json({
       success: true,
       data: audit,
       url,
       ...(auditId && { auditId }),
-      ...(screenshotUrl && { screenshotUrl }),
-      ...(heatmapZones && { heatmapZones }),
-      ...(pageHeight && { pageHeight }),
-      ...(viewportWidth && { viewportWidth }),
     });
   } catch {
     return errorResponse(
