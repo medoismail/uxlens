@@ -5,10 +5,10 @@ import { UrlForm } from "@/components/url-form";
 
 const ROTATING_WORDS = [
   "conversion killer",
-  "trust gap",
-  "UX friction point",
   "missed opportunity",
   "broken promise",
+  "trust gap",
+  "UX blind spot",
 ];
 
 const ROTATE_INTERVAL = 2800;
@@ -32,14 +32,14 @@ function RotatingText() {
 
   return (
     <span
-      className="inline-flex overflow-hidden align-bottom"
-      style={{ height: "1.15em" }}
+      className="block overflow-hidden"
+      style={{ height: "1.2em" }}
     >
       <span
         key={index}
         className={animState === "enter" ? "word-enter" : "word-exit"}
         style={{
-          display: "inline-block",
+          display: "block",
           color: "var(--brand)",
         }}
       >
@@ -71,11 +71,12 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
         </span>
       </div>
 
-      {/* Headline with rotating word */}
-      <h1 className="animate-slide-up text-[clamp(34px,5.5vw,56px)] font-bold tracking-[-1.5px] leading-[1.08] max-w-[720px] text-foreground">
+      {/* Headline — 3 lines, rotating word isolated on line 3 */}
+      <h1 className="animate-slide-up text-[clamp(34px,5.5vw,56px)] font-bold tracking-[-1.5px] leading-[1.15] max-w-[720px] text-foreground">
         Instant website analysis
         <br />
-        to find every <RotatingText />
+        to find every
+        <RotatingText />
       </h1>
 
       {/* Subheadline */}
