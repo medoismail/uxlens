@@ -1,14 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Check, Sparkles, User } from "lucide-react";
+import { ArrowRight, Check, Sparkles, User, Crown } from "lucide-react";
 import { Show, useAuth } from "@clerk/nextjs";
 import { Header } from "@/components/header";
 import { PricingCards } from "@/components/pricing-cards";
 import { Footer } from "@/components/footer";
+import type { PlanTier } from "@/lib/types";
 
-export function PricingClient() {
+interface PricingClientProps {
+  currentPlan?: PlanTier;
+  auditsUsed?: number;
+  monthlyLimit?: number;
+}
+
+export function PricingClient({
+  currentPlan = "free",
+  auditsUsed = 0,
+  monthlyLimit = 5,
+}: PricingClientProps) {
   const { isSignedIn } = useAuth();
+
+  const planLabel = currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1);
+  const usagePercent = monthlyLimit > 0 ? Math.min(100, Math.round((auditsUsed / monthlyLimit) * 100)) : 0;
+  const auditsRemaining = Math.max(0, monthlyLimit - auditsUsed);
 
   function handleHumanAudit() {
     const baseUrl = process.env.NEXT_PUBLIC_LS_CHECKOUT_HUMAN_AUDIT || "#";
@@ -42,10 +57,75 @@ export function PricingClient() {
           </p>
         </div>
 
+        {/* Current Plan & Usage Banner (signed-in users only) */}
+        {isSignedIn && (
+          <div
+            className="rounded-xl border p-4 mb-6 flex flex-col sm:flex-row sm:items-center gap-4"
+            style={{ borderColor: "var(--brand-glow)", background: "var(--brand-dim)" }}
+          >
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div
+                className="flex h-9 w-9 items-center justify-center rounded-lg shrink-0"
+                style={{ background: "var(--brand)" }}
+              >
+                <Crown className="h-4 w-4" style={{ color: "var(--brand-fg)" }} />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-[13px] font-semibold text-foreground">
+                    {planLabel} Plan
+                  </p>
+                  <span
+                    className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider"
+                    style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
+                  >
+                    Current
+                  </span>
+                </div>
+                <p className="text-[12px] text-foreground/50 mt-0.5">
+                  {auditsRemaining} audits remaining this month
+                </p>
+              </div>
+            </div>
+
+            {/* Usage bar */}
+            <div className="flex items-center gap-3 sm:w-[200px]">
+              <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: "var(--border)" }}>
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{
+                    width: `${usagePercent}%`,
+                    background: usagePercent > 80 ? "#ef4444" : "var(--brand)",
+                  }}
+                />
+              </div>
+              <span className="text-[11px] font-medium text-foreground/50 shrink-0 tabular-nums">
+                {auditsUsed}/{monthlyLimit}
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Free tier + Paid plans */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 w-full">
           {/* Free Card */}
-          <div className="relative rounded-xl border p-5 border-border/40 bg-card/50 hover:border-border/60 transition-all duration-200">
+          <div
+            className={`relative rounded-xl border p-5 transition-all duration-200 ${
+              isSignedIn && currentPlan === "free"
+                ? "border-foreground/20 shadow-elevation-1 bg-card"
+                : "border-border/40 bg-card/50 hover:border-border/60"
+            }`}
+          >
+            {isSignedIn && currentPlan === "free" && (
+              <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
+                <span
+                  className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider"
+                  style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
+                >
+                  Current Plan
+                </span>
+              </div>
+            )}
             <p className="text-[13px] font-semibold text-foreground">Free</p>
             <div className="mt-2 flex items-baseline gap-0.5">
               <span className="text-2xl font-bold tracking-tight text-foreground">$0</span>
@@ -69,17 +149,26 @@ export function PricingClient() {
               ))}
             </ul>
 
-            <Link
-              href="/"
-              className="flex items-center justify-center w-full mt-5 rounded-lg py-2 text-[13px] font-medium border border-border/50 bg-background text-foreground hover:border-border hover:shadow-elevation-1 transition-all duration-150 active:scale-[0.98]"
-            >
-              Get Started Free
-            </Link>
+            {isSignedIn && currentPlan === "free" ? (
+              <div
+                className="flex items-center justify-center w-full mt-5 rounded-lg py-2 text-[13px] font-medium border"
+                style={{ borderColor: "var(--brand-glow)", color: "var(--brand)", background: "var(--brand-dim)" }}
+              >
+                Your Current Plan
+              </div>
+            ) : (
+              <Link
+                href="/"
+                className="flex items-center justify-center w-full mt-5 rounded-lg py-2 text-[13px] font-medium border border-border/50 bg-background text-foreground hover:border-border hover:shadow-elevation-1 transition-all duration-150 active:scale-[0.98]"
+              >
+                Get Started Free
+              </Link>
+            )}
           </div>
 
           {/* Paid Plans */}
           <div className="sm:col-span-3">
-            <PricingCards />
+            <PricingCards currentPlan={isSignedIn ? currentPlan : undefined} />
           </div>
         </div>
 

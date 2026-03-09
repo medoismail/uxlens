@@ -213,6 +213,28 @@ export async function checkServerUsage(
   }
 }
 
+/**
+ * Get usage count for a known user (for pricing page display).
+ * Lighter than checkServerUsage — no rate limiting, no request needed.
+ */
+export async function getUserUsage(
+  clerkUserId: string,
+  plan: PlanTier
+): Promise<{ auditsUsed: number; monthlyLimit: number }> {
+  const limit = PLAN_LIMITS[plan];
+  const r = getRedis();
+  if (!r) return { auditsUsed: 0, monthlyLimit: limit };
+
+  try {
+    const month = getCurrentMonth();
+    const monthlyKey = `uxlens:usage:${clerkUserId}:${month}`;
+    const count = (await r.get<number>(monthlyKey)) || 0;
+    return { auditsUsed: count, monthlyLimit: limit };
+  } catch {
+    return { auditsUsed: 0, monthlyLimit: limit };
+  }
+}
+
 /** Increment usage after a successful audit. Accepts resolved plan to avoid double-lookup. */
 export async function incrementServerUsage(
   request: Request,
