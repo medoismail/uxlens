@@ -215,15 +215,54 @@ export function ResultsReport({
           viewportWidth={viewportWidth}
         />
       ) : screenshotStatus === "loading" ? (
-        <div
-          className="rounded-xl border p-5 mb-4 flex items-center justify-center"
-          style={{ borderColor: "var(--border)", background: "var(--s1)", minHeight: "120px" }}
+        <section
+          className="rounded-xl border p-5 mb-4"
+          style={{ borderColor: "var(--border)", background: "var(--s1)" }}
         >
-          <div className="flex items-center gap-2.5 text-[12px] text-foreground/30">
-            <div className="h-4 w-4 border-2 border-foreground/15 border-t-foreground/40 rounded-full animate-spin" />
-            Capturing screenshot & generating heatmap...
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-[14px] font-semibold text-foreground">
+              Page Screenshot & Attention Heatmap
+            </h3>
           </div>
-        </div>
+          {/* Skeleton preview */}
+          <div
+            className="rounded-xl border overflow-hidden"
+            style={{ borderColor: "var(--border)", background: "var(--s2)" }}
+          >
+            <div className="relative" style={{ paddingBottom: "50%" }}>
+              {/* Wireframe skeleton */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                {/* Shimmer effect */}
+                <div className="absolute inset-0 overflow-hidden">
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background: "linear-gradient(90deg, transparent 0%, var(--brand-dim) 50%, transparent 100%)",
+                      animation: "shimmer 1.8s ease-in-out infinite",
+                    }}
+                  />
+                </div>
+                {/* Skeleton wireframe lines */}
+                <div className="relative flex flex-col items-center gap-2 opacity-30">
+                  <div className="h-2 w-32 rounded bg-foreground/10" />
+                  <div className="h-4 w-56 rounded bg-foreground/15" />
+                  <div className="h-2 w-40 rounded bg-foreground/10" />
+                  <div className="h-8 w-28 rounded-lg bg-foreground/10 mt-2" />
+                </div>
+                {/* Status message */}
+                <div className="relative flex items-center gap-2.5 mt-2">
+                  <div className="h-4 w-4 border-2 border-foreground/15 border-t-foreground/40 rounded-full animate-spin" />
+                  <span className="text-[12px] text-foreground/35 font-medium">
+                    Generating screenshot & attention heatmap...
+                  </span>
+                </div>
+                <p className="relative text-[11px] text-foreground/20">
+                  This usually takes 10–20 seconds
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
       ) : screenshotStatus === "failed" ? (
         <div
           className="rounded-xl border p-5 mb-4 flex items-center justify-center"
