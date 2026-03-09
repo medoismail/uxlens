@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { getUserByClerkId } from "@/lib/db/users";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import { getUserByClerkId, upsertUser } from "@/lib/db/users";
 import { getAuditsByUser } from "@/lib/db/audits";
 
 /**
@@ -17,9 +17,16 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
 
-    const dbUser = await getUserByClerkId(userId);
+    // Try to find user, or lazily create them if Clerk webhook hasn't fired yet
+    let dbUser = await getUserByClerkId(userId);
     if (!dbUser) {
-      return NextResponse.json({ audits: [], total: 0, page });
+      const clerkUser = await currentUser();
+      if (clerkUser?.emailAddresses?.[0]?.emailAddress) {
+        dbUser = await upsertUser(userId, clerkUser.emailAddresses[0].emailAddress);
+      }
+      if (!dbUser) {
+        return NextResponse.json({ audits: [], total: 0, page });
+      }
     }
 
     const { audits, total } = await getAuditsByUser(dbUser.id, page);

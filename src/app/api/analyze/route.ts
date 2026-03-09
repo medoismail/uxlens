@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { analyzeRequestSchema } from "@/lib/schemas";
 import { normalizeUrl } from "@/lib/validate-url";
 import { extractPageContent, hasEnoughContent } from "@/lib/extract-page-content";
 import { generateUXAudit } from "@/lib/openai";
 import { checkServerUsage, incrementServerUsage } from "@/lib/server-usage";
-import { getUserByClerkId } from "@/lib/db/users";
+import { getUserByClerkId, upsertUser } from "@/lib/db/users";
 import { saveAudit } from "@/lib/db/audits";
 import { getSupabase } from "@/lib/supabase";
 import type { AnalysisError } from "@/lib/types";
@@ -169,7 +169,14 @@ export async function POST(request: Request) {
     let auditId: string | undefined;
     if (clerkUserId) {
       try {
-        const dbUser = await getUserByClerkId(clerkUserId);
+        // Try to find user, or lazily create them if Clerk webhook hasn't fired yet
+        let dbUser = await getUserByClerkId(clerkUserId);
+        if (!dbUser) {
+          const clerkUser = await currentUser();
+          if (clerkUser?.emailAddresses?.[0]?.emailAddress) {
+            dbUser = await upsertUser(clerkUserId, clerkUser.emailAddresses[0].emailAddress);
+          }
+        }
         if (dbUser) {
           const id = await saveAudit({
             userId: dbUser.id,
