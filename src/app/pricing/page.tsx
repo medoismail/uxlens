@@ -89,7 +89,7 @@ export default function PricingPage() {
             <p className="text-[12px] text-muted-foreground/60 mt-1">5 audits/month</p>
 
             <ul className="mt-4 space-y-2">
-              {["Full UX audit", "Score breakdown", "Conversion issues", "Hero rewrite", "Confusion score"].map((f) => (
+              {["Overall UX score & grade", "6 category breakdowns", "Top 3 conversion killers", "2 quick wins", "Confusion metric scores"].map((f) => (
                 <li key={f} className="flex items-start gap-2 text-[12px] text-muted-foreground">
                   <Check className="h-3 w-3 text-foreground/30 mt-0.5 shrink-0" />
                   {f}
