@@ -40,14 +40,14 @@ export function Footer() {
         )}
 
         {/* Links */}
-        <div className="flex items-center gap-4 text-[11px] text-foreground/25 font-mono">
+        <nav aria-label="Footer navigation" className="flex items-center gap-4 text-[11px] text-foreground/25 font-mono">
           <Link href="/" className="hover:text-foreground/40 transition-colors">
             Home
           </Link>
           <Link href="/pricing" className="hover:text-foreground/40 transition-colors">
             Pricing
           </Link>
-        </div>
+        </nav>
       </div>
     </footer>
   );

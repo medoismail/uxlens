@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     template: "%s | UXLens",
   },
   description:
-    "Analyze any landing page in seconds with UXLens, the AI-powered UX audit tool. Get a 9-layer diagnostic: conversion killers, trust signals, confusion detection, hero rewrite, and actionable fixes.",
+    "Free AI-powered UX audit tool. Paste any URL for a 9-layer diagnostic: conversion killers, trust signals, and actionable fixes in seconds.",
   keywords: [
     "ux audit tool",
     "website ux analysis",
@@ -74,7 +74,7 @@ export const metadata: Metadata = {
     siteName: "UXLens",
     title: "UXLens — Free AI UX Audit Tool | Instant Website Analysis",
     description:
-      "Paste any URL and get a full 9-layer UX audit in seconds. Conversion killers, trust signals, confusion detection, hero rewrite, and actionable fixes — powered by AI.",
+      "Free AI UX audit tool. Paste any URL for a 9-layer diagnostic: conversion killers, trust signals, and actionable fixes.",
     images: [
       {
         url: "/opengraph-image",
@@ -88,7 +88,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "UXLens — Free AI UX Audit Tool",
     description:
-      "Paste any URL. Get a full 9-layer UX audit in seconds: conversion killers, trust score, hero rewrite, and fixes.",
+      "Free AI UX audit tool. 9-layer diagnostic: conversion killers, trust signals, and actionable fixes.",
     images: ["/opengraph-image"],
   },
   category: "technology",
@@ -168,6 +168,13 @@ export default function RootLayout({
         className={`${interTight.variable} ${jetbrainsMono.variable} antialiased`}
       >
         {children}
+        <noscript>
+          <div style={{ padding: "2rem", textAlign: "center", fontFamily: "system-ui, sans-serif" }}>
+            <h1>UXLens — AI-Powered UX Audit Tool</h1>
+            <p>Analyze any landing page with our 9-layer UX diagnostic. Get conversion killers, trust signal analysis, confusion detection, and actionable fixes.</p>
+            <p>Please enable JavaScript to use UXLens.</p>
+          </div>
+        </noscript>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-PS3F3M5Q7D"
           strategy="afterInteractive"
