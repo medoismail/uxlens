@@ -13,18 +13,18 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
       {/* Badge — pill frame like old design */}
       <div className="animate-fade-in mb-6">
         <span className="inline-flex items-center rounded-full border px-3.5 py-1.5 text-[11px] font-medium tracking-wide uppercase" style={{ borderColor: "var(--border2)", background: "var(--brand-dim)", color: "var(--brand)" }}>
-          9-Layer Structured UX Audit
+          Free AI UX Audit Tool
         </span>
       </div>
 
       {/* Headline */}
       <h1 className="animate-slide-up text-[clamp(34px,5.5vw,56px)] font-bold tracking-[-1.5px] leading-[1.08] max-w-[640px] text-foreground">
-        Find every reason<br />your page <span style={{ color: "var(--brand)" }}>fails to convert</span>
+        Instant website analysis<br />to <span style={{ color: "var(--brand)" }}>find every conversion killer</span>
       </h1>
 
       {/* Subheadline */}
       <p className="animate-slide-up mt-4 text-[12px] leading-relaxed text-foreground/45 max-w-[520px] font-mono" style={{ animationDelay: "60ms" }}>
-        The most advanced UX diagnostic algorithm: multi-stage analysis, self-critique loop, contradiction detection, and rewrite synthesis.
+        Free AI-powered UX audit tool that finds every reason your page fails to convert. 9-layer diagnostic with trust signals, confusion detection, and actionable fixes.
       </p>
 
       {/* Form */}

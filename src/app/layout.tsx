@@ -74,7 +74,7 @@ export const metadata: Metadata = {
     siteName: "UXLens",
     title: "UXLens — Free AI UX Audit Tool | Instant Website Analysis",
     description:
-      "Free AI UX audit tool. Paste any URL for a 9-layer diagnostic: conversion killers, trust signals, and actionable fixes.",
+      "Free AI UX audit tool that finds every reason your page fails to convert. 9-layer diagnostic: conversion killers, trust signals, and actionable fixes.",
     images: [
       {
         url: "/opengraph-image",
