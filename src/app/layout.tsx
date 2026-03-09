@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Inter_Tight, JetBrains_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { InstallBanner } from "@/components/install-banner";
 import "./globals.css";
 
 const interTight = Inter_Tight({
@@ -94,6 +95,15 @@ export const metadata: Metadata = {
     images: ["/opengraph-image"],
   },
   category: "technology",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "UXLens",
+    statusBarStyle: "black-translucent",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 /* JSON-LD Structured Data */
@@ -164,6 +174,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="theme-color" content="#6d28d9" />
+        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -202,6 +215,7 @@ export default function RootLayout({
           src="https://app.lemonsqueezy.com/js/lemon.js"
           strategy="lazyOnload"
         />
+        <InstallBanner />
       </body>
     </html>
   );

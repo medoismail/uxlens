@@ -68,6 +68,9 @@
  */
 
 :root {
+  /* ── Safe area for notched devices (iPhone home indicator) ── */
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+
   /* ── Backgrounds — pure white / neutral ── */
   --background: #ffffff;
   --foreground: oklch(0.145 0.004 285);
