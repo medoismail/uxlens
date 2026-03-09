@@ -99,7 +99,7 @@ export function HomeSEOContent() {
     <div className="relative z-[1]">
       {/* How It Works */}
       <section className="max-w-[960px] mx-auto px-7 pt-8 pb-16">
-        <div className="flex items-center gap-4 mb-10 text-foreground/15 text-[9px] uppercase tracking-[2px]">
+        <div className="flex items-center gap-4 mb-10 text-foreground/15 text-[16px] uppercase tracking-[2px]">
           <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
           How it works
           <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
@@ -109,15 +109,15 @@ export function HomeSEOContent() {
           {STEPS.map((step) => (
             <div key={step.num} className="space-y-3">
               <span
-                className="inline-block text-[11px] font-mono font-bold px-2 py-0.5 rounded"
+                className="inline-block text-[16px] font-mono font-bold px-2 py-0.5 rounded"
                 style={{ background: "var(--brand-dim)", color: "var(--brand)" }}
               >
                 {step.num}
               </span>
-              <h3 className="text-[15px] font-semibold text-foreground tracking-tight">
+              <h3 className="text-[16px] font-semibold text-foreground tracking-tight">
                 {step.title}
               </h3>
-              <p className="text-[12px] text-foreground/40 leading-relaxed">
+              <p className="text-[16px] text-foreground/40 leading-relaxed">
                 {step.desc}
               </p>
             </div>
@@ -131,7 +131,7 @@ export function HomeSEOContent() {
           <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
             9 layers of instant UX analysis
           </h2>
-          <p className="mt-2 text-[12px] text-foreground/40 max-w-lg mx-auto leading-relaxed">
+          <p className="mt-2 text-[16px] text-foreground/40 max-w-lg mx-auto leading-relaxed">
             Every free audit runs your landing page through nine diagnostic layers — the most comprehensive AI-powered website analysis tool available. Find every reason your page fails to convert.
           </p>
         </div>
@@ -144,10 +144,10 @@ export function HomeSEOContent() {
               style={{ borderColor: "var(--border)", background: "var(--s1)" }}
             >
               <layer.icon className="h-4 w-4 mb-3" style={{ color: "var(--brand)" }} />
-              <h3 className="text-[13px] font-semibold text-foreground mb-1">
+              <h3 className="text-[16px] font-semibold text-foreground mb-1">
                 {layer.title}
               </h3>
-              <p className="text-[11px] text-foreground/35 leading-relaxed">
+              <p className="text-[16px] text-foreground/35 leading-relaxed">
                 {layer.desc}
               </p>
             </div>
@@ -161,7 +161,7 @@ export function HomeSEOContent() {
           <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
             Built for teams that ship
           </h2>
-          <p className="mt-2 text-[12px] text-foreground/40 max-w-lg mx-auto leading-relaxed">
+          <p className="mt-2 text-[16px] text-foreground/40 max-w-lg mx-auto leading-relaxed">
             Whether you are a solo founder or an agency managing dozens of websites, UXLens is the free AI audit tool that helps you find and fix conversion issues instantly.
           </p>
         </div>
@@ -174,10 +174,10 @@ export function HomeSEOContent() {
               style={{ borderColor: "var(--border)", background: "var(--s1)" }}
             >
               <uc.icon className="h-4 w-4 mb-3" style={{ color: "var(--brand)" }} />
-              <h3 className="text-[14px] font-semibold text-foreground mb-1.5">
+              <h3 className="text-[16px] font-semibold text-foreground mb-1.5">
                 {uc.title}
               </h3>
-              <p className="text-[12px] text-foreground/35 leading-relaxed">
+              <p className="text-[16px] text-foreground/35 leading-relaxed">
                 {uc.desc}
               </p>
             </div>
@@ -194,12 +194,12 @@ export function HomeSEOContent() {
           <h2 className="text-[20px] font-bold tracking-tight text-foreground mb-2">
             Ready to find every reason your page fails to convert?
           </h2>
-          <p className="text-[12px] text-foreground/40 mb-5 max-w-md mx-auto leading-relaxed">
+          <p className="text-[16px] text-foreground/40 mb-5 max-w-md mx-auto leading-relaxed">
             Run your free AI-powered UX audit now — paste any website URL and get your full instant analysis report in under 30 seconds.
           </p>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-[13px] font-bold transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+            className="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-[16px] font-bold transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
             style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
           >
             Start Free Website Audit
@@ -219,10 +219,10 @@ export function HomeSEOContent() {
         <div className="max-w-2xl mx-auto space-y-6">
           {FAQS.map((faq) => (
             <div key={faq.q}>
-              <h3 className="text-[14px] font-semibold text-foreground mb-2">
+              <h3 className="text-[16px] font-semibold text-foreground mb-2">
                 {faq.q}
               </h3>
-              <p className="text-[12px] text-foreground/40 leading-relaxed">
+              <p className="text-[16px] text-foreground/40 leading-relaxed">
                 {faq.a}
                 {faq.q.includes("free") && (
                   <>
@@ -242,7 +242,7 @@ export function HomeSEOContent() {
 
         {/* Additional context + external link for SEO */}
         <div className="max-w-2xl mx-auto mt-10 pt-8" style={{ borderTop: "1px solid var(--border)" }}>
-          <p className="text-[11px] text-foreground/25 leading-relaxed text-center">
+          <p className="text-[16px] text-foreground/25 leading-relaxed text-center">
             UXLens applies{" "}
             <a
               href="https://www.nngroup.com/articles/ten-usability-heuristics/"

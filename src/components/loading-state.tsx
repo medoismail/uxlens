@@ -33,13 +33,13 @@ export function LoadingState() {
       {/* Title */}
       <div className="flex items-center gap-2.5 mb-2">
         <div className="h-2 w-2 rounded-full" style={{ background: "var(--brand)", animation: "blink-dot 1.8s ease-in-out infinite" }} />
-        <p className="text-[10px] font-mono uppercase tracking-[2.5px] text-foreground/30">
+        <p className="text-[16px] font-mono uppercase tracking-[2.5px] text-foreground/30">
           Diagnostic pipeline running
         </p>
       </div>
 
       <h2 className="text-lg font-semibold tracking-tight text-foreground mb-1">Analyzing your page</h2>
-      <p className="text-[12px] text-foreground/40 font-mono mb-8">
+      <p className="text-[16px] text-foreground/40 font-mono mb-8">
         9-layer structured audit — usually takes 15-25 seconds
       </p>
 
@@ -60,7 +60,7 @@ export function LoadingState() {
             >
               {/* Number circle */}
               <div
-                className="w-9 h-9 rounded-full border grid place-items-center text-[11px] font-mono font-medium transition-all duration-300"
+                className="w-9 h-9 rounded-full border grid place-items-center text-[16px] font-mono font-medium transition-all duration-300"
                 style={{
                   borderColor: isActive
                     ? "var(--brand)"
@@ -85,12 +85,12 @@ export function LoadingState() {
 
               {/* Info */}
               <div>
-                <div className="text-[12px] font-medium text-foreground">{step.name}</div>
-                <div className="text-[10px] text-foreground/35 leading-snug">{step.desc}</div>
+                <div className="text-[16px] font-medium text-foreground">{step.name}</div>
+                <div className="text-[16px] text-foreground/35 leading-snug">{step.desc}</div>
               </div>
 
               {/* Status */}
-              <div className="text-[10px]">
+              <div className="text-[16px]">
                 {isDone && <Check className="h-3.5 w-3.5" style={{ color: "var(--score-high)" }} />}
                 {isActive && (
                   <span className="inline-flex gap-[3px] items-center">

@@ -25,13 +25,13 @@ export function Footer() {
     >
       <div className="max-w-[960px] mx-auto px-7 flex flex-col sm:flex-row items-center justify-between gap-3">
         {/* Brand */}
-        <span className="text-[11px] text-foreground/20 font-mono">
+        <span className="text-[16px] text-foreground/20 font-mono">
           UXLens &mdash; 9-Layer Diagnostic Engine
         </span>
 
         {/* Counter — always show once loaded */}
         {count !== null && (
-          <div className="flex items-center gap-1.5 text-[11px] text-foreground/25 font-mono animate-fade-in">
+          <div className="flex items-center gap-1.5 text-[16px] text-foreground/25 font-mono animate-fade-in">
             <Users className="h-3 w-3" />
             <span>
               <AnimatedNumber value={count} /> users
@@ -40,7 +40,7 @@ export function Footer() {
         )}
 
         {/* Links */}
-        <nav aria-label="Footer navigation" className="flex items-center gap-4 text-[11px] text-foreground/25 font-mono">
+        <nav aria-label="Footer navigation" className="flex items-center gap-4 text-[16px] text-foreground/25 font-mono">
           <Link href="/" className="hover:text-foreground/40 transition-colors">
             Home
           </Link>

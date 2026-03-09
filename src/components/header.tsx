@@ -12,7 +12,7 @@ export function Header() {
             className="flex items-center gap-2.5 transition-opacity hover:opacity-70"
             aria-label="UXLens — Home"
           >
-            <div className="w-[34px] h-[34px] rounded-[7px] grid place-items-center text-[13px] font-extrabold" style={{ background: "var(--brand)", color: "var(--brand-fg)" }}>
+            <div className="w-[34px] h-[34px] rounded-[7px] grid place-items-center text-[16px] font-extrabold" style={{ background: "var(--brand)", color: "var(--brand-fg)" }}>
               UX
             </div>
             <span className="text-[18px] font-bold tracking-tight">
@@ -21,12 +21,12 @@ export function Header() {
           </Link>
           <Link
             href="/pricing"
-            className="text-[12px] font-medium text-foreground/40 hover:text-foreground/70 transition-colors duration-150"
+            className="text-[16px] font-medium text-foreground/40 hover:text-foreground/70 transition-colors duration-150"
           >
             Pricing
           </Link>
         </div>
-        <div className="flex items-center gap-1.5 text-[10px] border rounded-full px-3 py-1 tracking-wider" style={{ color: "var(--brand)", background: "var(--brand-dim)", borderColor: "var(--brand-glow)" }}>
+        <div className="flex items-center gap-1.5 text-[16px] border rounded-full px-3 py-1 tracking-wider" style={{ color: "var(--brand)", background: "var(--brand-dim)", borderColor: "var(--brand-glow)" }}>
           <span className="w-[5px] h-[5px] rounded-full" style={{ background: "var(--brand)", animation: "blink-dot 1.8s ease-in-out infinite" }} />
           DIAGNOSTIC ENGINE v3
         </div>

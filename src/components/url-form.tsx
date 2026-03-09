@@ -42,19 +42,19 @@ export function UrlForm({ onSubmit, isLoading }: UrlFormProps) {
               if (error) setError("");
             }}
             disabled={isLoading}
-            className="flex-1 bg-transparent text-[12px] font-mono text-foreground/40 placeholder:text-foreground/20 focus:outline-none disabled:opacity-50 ml-2"
+            className="flex-1 bg-transparent text-[16px] font-mono text-foreground/40 placeholder:text-foreground/20 focus:outline-none disabled:opacity-50 ml-2"
           />
         </div>
 
         {/* Action bar */}
         <div className="flex items-center justify-between px-5 py-3 gap-4" style={{ background: "oklch(0 0 0 / 4%)" }}>
-          <p className="text-[10px] font-mono text-foreground/25 tracking-wide hidden sm:block">
+          <p className="text-[16px] font-mono text-foreground/25 tracking-wide hidden sm:block">
             Paste your URL and run the full 9-layer audit
           </p>
           <button
             type="submit"
             disabled={isLoading || !url.trim()}
-            className="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-[13px] font-bold transition-all duration-200 hover:translate-y-[-1px] active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none disabled:translate-y-0 disabled:shadow-none shrink-0 sm:ml-auto"
+            className="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-[16px] font-bold transition-all duration-200 hover:translate-y-[-1px] active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none disabled:translate-y-0 disabled:shadow-none shrink-0 sm:ml-auto"
             style={{ background: "var(--brand)", color: "var(--brand-fg)", boxShadow: "none" }}
             onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 6px 20px var(--brand-glow)"}
             onMouseLeave={(e) => e.currentTarget.style.boxShadow = "none"}
@@ -72,7 +72,7 @@ export function UrlForm({ onSubmit, isLoading }: UrlFormProps) {
       </div>
 
       {error && (
-        <p className="mt-2.5 text-[12px] text-destructive animate-fade-in pl-1 font-mono">{error}</p>
+        <p className="mt-2.5 text-[16px] text-destructive animate-fade-in pl-1 font-mono">{error}</p>
       )}
     </form>
   );
