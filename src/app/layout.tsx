@@ -21,11 +21,11 @@ const SITE_URL = "https://www.uxlens.pro";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "UXLens — Free AI UX Audit Tool | Instant Website Analysis",
+    default: "UXLens — AI UX Audit Platform | Heatmaps, Dashboard & PDF Export",
     template: "%s | UXLens",
   },
   description:
-    "Free AI-powered UX audit tool. Paste any URL for a 9-layer diagnostic: conversion killers, trust signals, and actionable fixes in seconds.",
+    "AI-powered UX audit platform with screenshot heatmaps, 9-layer diagnostic, trust analysis, and actionable fixes. Save audits to your dashboard, export PDF reports, and chat with AI.",
   keywords: [
     "ux audit tool",
     "website ux analysis",
@@ -40,11 +40,12 @@ export const metadata: Metadata = {
     "ux review tool",
     "website audit tool",
     "ai website analyzer",
-    "ux score checker",
-    "landing page optimization",
-    "trust signal analysis",
-    "hero section optimizer",
-    "cognitive load analysis",
+    "ux heatmap tool",
+    "attention heatmap",
+    "website screenshot analysis",
+    "ux audit dashboard",
+    "pdf ux report",
+    "ai ux chat",
     "website conversion audit",
     "ux feedback tool",
   ],
@@ -73,9 +74,9 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: SITE_URL,
     siteName: "UXLens",
-    title: "UXLens — Free AI UX Audit Tool | Instant Website Analysis",
+    title: "UXLens — AI UX Audit Platform | Heatmaps, Dashboard & PDF Export",
     description:
-      "Free AI UX audit tool that finds every reason your page fails to convert. 9-layer diagnostic: conversion killers, trust signals, and actionable fixes.",
+      "AI UX audit platform with screenshot heatmaps, 9-layer diagnostic, and actionable fixes. Save audits, export PDFs, and chat with AI about your findings.",
     images: [
       {
         url: "/opengraph-image",
@@ -87,9 +88,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "UXLens — Free AI UX Audit Tool",
+    title: "UXLens — AI UX Audit Platform",
     description:
-      "Free AI UX audit tool. 9-layer diagnostic: conversion killers, trust signals, and actionable fixes.",
+      "AI UX audit platform with screenshot heatmaps, 9-layer diagnostic, dashboard, PDF export, and AI chat.",
     images: ["/opengraph-image"],
   },
   category: "technology",
@@ -102,7 +103,7 @@ const jsonLd = {
   name: "UXLens",
   url: SITE_URL,
   description:
-    "AI-powered UX audit tool that analyzes landing pages across 9 diagnostic layers including conversion architecture, trust signals, confusion detection, and hero rewrite synthesis.",
+    "AI-powered UX audit platform with screenshot heatmaps, 9-layer diagnostic, audit dashboard, PDF export, and AI chat assistant for discussing findings.",
   applicationCategory: "DesignApplication",
   operatingSystem: "Web",
   offers: [

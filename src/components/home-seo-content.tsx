@@ -16,23 +16,68 @@ import {
   Users,
   Briefcase,
   PenTool,
+  Camera,
+  BarChart3,
+  MessageSquare,
+  Download,
+  History,
+  LogIn,
 } from "lucide-react";
 
 const STEPS = [
   {
     num: "01",
     title: "Paste any website URL",
-    desc: "Enter any landing page or website URL into the UXLens analysis tool. No account creation required — your first audit is completely free. Our AI instantly begins capturing and processing your page.",
+    desc: "Enter any landing page or website URL into the UXLens analysis tool. No account needed for your first audit — or sign in with Google or GitHub to save every report to your personal dashboard.",
   },
   {
     num: "02",
-    title: "AI runs an instant 9-layer audit",
-    desc: "Our diagnostic engine analyzes every reason your page might fail to convert visitors into customers. It examines conversion architecture, trust signals, confusion patterns, cognitive load, and five additional critical UX layers — all in seconds.",
+    title: "AI runs a 9-layer audit with screenshot",
+    desc: "Our diagnostic engine captures a full-page screenshot with attention heatmap, then analyzes every reason your page might fail to convert — examining conversion architecture, trust signals, confusion patterns, cognitive load, and five additional critical UX layers.",
   },
   {
     num: "03",
-    title: "Get a full analysis with actionable fixes",
-    desc: "Receive a prioritized website analysis report with specific, implementable recommendations for every issue found. Each fix includes what to change and why — not generic optimization advice, but fixes tailored to your page.",
+    title: "Get your full report with fixes",
+    desc: "Receive a prioritized report with heatmap visualization, conversion killers, trust matrix, and actionable recommendations. Export as PDF, discuss findings with the AI chat assistant, or revisit any audit from your dashboard.",
+  },
+];
+
+const PLATFORM_FEATURES = [
+  {
+    icon: Camera,
+    title: "Screenshot + Attention Heatmap",
+    desc: "Every audit captures a full-page screenshot overlaid with an AI-generated attention heatmap. See exactly where visitors focus — based on F-pattern analysis, CTA placement, and visual hierarchy.",
+    tier: "All plans",
+  },
+  {
+    icon: History,
+    title: "Audit History Dashboard",
+    desc: "Every audit you run is saved to your personal dashboard. Revisit past reports anytime, track improvements over time, and compare audits across different pages.",
+    tier: "All plans",
+  },
+  {
+    icon: BarChart3,
+    title: "Strategic Fixes & Hero Rewrite",
+    desc: "Go beyond diagnostics. Get strategic fixes prioritized by impact, and an AI-optimized rewrite of your hero section — headline, subheadline, and CTA — ready to copy and deploy.",
+    tier: "Starter+",
+  },
+  {
+    icon: Download,
+    title: "PDF Export",
+    desc: "Download your complete audit report as a professionally formatted PDF. Share with your team, attach to client deliverables, or archive for your records.",
+    tier: "Starter+",
+  },
+  {
+    icon: MessageSquare,
+    title: "AI Chat Assistant",
+    desc: "Discuss your audit findings in real-time with an AI assistant that knows your page inside out. Ask follow-up questions, get implementation guidance, or brainstorm improvements.",
+    tier: "Pro+",
+  },
+  {
+    icon: LogIn,
+    title: "Google & GitHub Sign-In",
+    desc: "Create your account in seconds with Google or GitHub. All your audits, chat history, and exports are tied to your account and accessible from any device.",
+    tier: "All plans",
   },
 ];
 
@@ -52,45 +97,49 @@ const USE_CASES = [
   {
     icon: Target,
     title: "Startup Founders",
-    desc: "Find every conversion issue before your next launch. Use our free AI audit tool to instantly analyze your landing page and fix what fails to convert — before spending on ads.",
+    desc: "Find every conversion issue before your next launch. Get a screenshot heatmap showing where visitors focus, pinpoint conversion killers, and fix what fails to convert — before spending on ads.",
   },
   {
     icon: PenTool,
     title: "UX Designers & Freelancers",
-    desc: "Run a professional website analysis for every client project. UXLens gives you an instant, structured UX audit that saves hours of manual review and strengthens every design recommendation.",
+    desc: "Run professional UX audits for every client project. Export polished PDF reports, discuss findings with the AI assistant, and save every audit to your dashboard for easy access.",
   },
   {
     icon: Briefcase,
     title: "Marketing Teams & Agencies",
-    desc: "Audit landing pages at scale with our AI-powered analysis tool. Find conversion killers across your entire website portfolio and deliver measurable improvements to your clients.",
+    desc: "Audit landing pages at scale with your team. Track all audits in a shared dashboard, export PDF reports for client presentations, and use AI chat to brainstorm optimization strategies.",
   },
   {
     icon: Users,
     title: "Product Managers",
-    desc: "Get data-driven UX insights without waiting for a full research cycle. Our free website audit tool helps you identify and prioritize the page improvements that matter most for conversion.",
+    desc: "Get data-driven UX insights without waiting for a full research cycle. Visualize attention patterns with heatmaps, identify high-impact fixes, and share PDF reports with stakeholders.",
   },
 ];
 
 const FAQS = [
   {
     q: "What is a UX audit and why does it matter for conversion?",
-    a: "A UX audit is a systematic evaluation of your website's user experience that helps you find every reason visitors fail to convert. It identifies usability issues, conversion barriers, trust gaps, and areas where users struggle or abandon your page. Regular UX audits using a tool like UXLens help improve conversion rates, reduce bounce rates, and ensure your landing page effectively communicates your value proposition to turn visitors into customers.",
+    a: "A UX audit is a systematic evaluation of your website's user experience that helps you find every reason visitors fail to convert. It identifies usability issues, conversion barriers, trust gaps, and areas where users struggle or abandon your page. UXLens automates this with a 9-layer AI diagnostic, attention heatmap, and actionable recommendations — delivering results in seconds rather than days.",
   },
   {
     q: "How does the AI-powered website analysis work?",
-    a: "UXLens uses a multi-stage AI diagnostic algorithm to deliver instant website analysis. It captures your page, runs it through 9 specialized audit layers, executes a self-critique loop to catch contradictions, and synthesizes actionable recommendations. The AI engine evaluates everything from conversion architecture to trust signals to cognitive load — delivering a comprehensive, free UX analysis report in seconds, not days.",
+    a: "UXLens captures a full-page screenshot of your URL, generates an attention heatmap from the page layout, then runs the content through 9 specialized audit layers with a self-critique loop to catch contradictions. The result is a comprehensive report with scores, conversion killers, trust matrix, confusion map, and AI-optimized copy suggestions — all generated in under 30 seconds.",
   },
   {
     q: "Is UXLens free to use as a UX audit tool?",
-    a: "Yes! The free plan includes 5 website audits per month. You get your overall UX score, 6 category breakdowns, top 3 conversion killers, and 2 quick wins — completely free. For deeper analysis including detailed section-by-section audits, the full trust signal matrix, AI hero rewrites, and strategic fixes, explore our affordable paid plans.",
+    a: "Yes! The free plan includes 5 audits per month with full scores, screenshot heatmaps, all conversion killers, quick wins, trust matrix, confusion map, and a personal audit dashboard. Paid plans unlock strategic fixes, AI hero rewrites, PDF export, and an AI chat assistant for discussing your audit findings.",
+  },
+  {
+    q: "What does the attention heatmap show?",
+    a: "The attention heatmap overlays your page screenshot with color-coded zones showing where visitors are most likely to focus. It uses F-pattern reading analysis, CTA detection, headline placement, and visual weight to predict attention distribution — helping you see if your key messages and buttons are in the right spots.",
+  },
+  {
+    q: "Can I save and revisit my audit reports?",
+    a: "Yes. Sign in with Google or GitHub and every audit is automatically saved to your personal dashboard. You can revisit any past report, view the full analysis with heatmap, and track how your pages improve over time. Paid plans also let you export any report as a PDF.",
   },
   {
     q: "What makes UXLens different from other website audit tools?",
-    a: "Unlike basic screenshot analyzers or generic checklist tools, UXLens runs a structured 9-layer diagnostic with built-in self-critique and contradiction detection powered by AI. Each audit delivers specific, actionable fixes tailored to your page — not generic optimization advice. The tool helps you find every reason your landing page fails to convert, from trust signal gaps to cognitive load issues, with instant analysis results.",
-  },
-  {
-    q: "Can I audit any website or landing page?",
-    a: "Yes, UXLens can analyze any publicly accessible website URL. Whether it is a SaaS landing page, an e-commerce product page, a portfolio website, or a marketing campaign page — our AI audit tool provides a thorough analysis of every page you submit. Simply paste your URL and receive your full UX diagnostic report instantly.",
+    a: "UXLens combines visual analysis (screenshot heatmaps) with a structured 9-layer AI diagnostic and built-in self-critique. Each audit delivers specific fixes tailored to your page, not generic advice. Plus, with a dashboard, PDF export, and AI chat assistant, it is a complete UX audit platform rather than a one-off analysis tool.",
   },
 ];
 
@@ -125,6 +174,44 @@ export function HomeSEOContent() {
         </div>
       </section>
 
+      {/* Platform Features */}
+      <section className="max-w-[960px] mx-auto px-7 pb-16">
+        <div className="text-center mb-10">
+          <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
+            A complete UX audit platform
+          </h2>
+          <p className="mt-2 text-[12px] text-foreground/40 max-w-lg mx-auto leading-relaxed">
+            More than a one-off analysis tool. Screenshot heatmaps, a personal dashboard, PDF reports, and an AI chat assistant to discuss your findings.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {PLATFORM_FEATURES.map((feat) => (
+            <div
+              key={feat.title}
+              className="rounded-xl border p-5 transition-all duration-200 hover:shadow-elevation-1"
+              style={{ borderColor: "var(--border)", background: "var(--s1)" }}
+            >
+              <div className="flex items-center gap-2.5 mb-3">
+                <feat.icon className="h-4 w-4" style={{ color: "var(--brand)" }} />
+                <span
+                  className="text-[12px] font-mono px-1.5 py-0.5 rounded tracking-wide"
+                  style={{ color: "var(--brand)", background: "var(--brand-dim)", fontSize: "10px" }}
+                >
+                  {feat.tier}
+                </span>
+              </div>
+              <h3 className="text-[13px] font-semibold text-foreground mb-1.5">
+                {feat.title}
+              </h3>
+              <p className="text-[12px] text-foreground/35 leading-relaxed">
+                {feat.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* 9 Diagnostic Layers */}
       <section className="max-w-[960px] mx-auto px-7 pb-16">
         <div className="text-center mb-10">
@@ -132,7 +219,7 @@ export function HomeSEOContent() {
             9 layers of instant UX analysis
           </h2>
           <p className="mt-2 text-[12px] text-foreground/40 max-w-lg mx-auto leading-relaxed">
-            Every free audit runs your landing page through nine diagnostic layers — the most comprehensive AI-powered website analysis tool available. Find every reason your page fails to convert.
+            Every audit runs your page through nine diagnostic layers — the most comprehensive AI-powered website analysis tool available. Find every reason your page fails to convert.
           </p>
         </div>
 
@@ -162,7 +249,7 @@ export function HomeSEOContent() {
             Built for teams that ship
           </h2>
           <p className="mt-2 text-[12px] text-foreground/40 max-w-lg mx-auto leading-relaxed">
-            Whether you are a solo founder or an agency managing dozens of websites, UXLens is the free AI audit tool that helps you find and fix conversion issues instantly.
+            Whether you are a solo founder or an agency managing dozens of websites, UXLens gives you heatmaps, AI diagnostics, and a dashboard to find and fix conversion issues fast.
           </p>
         </div>
 
@@ -195,7 +282,7 @@ export function HomeSEOContent() {
             Ready to find every reason your page fails to convert?
           </h2>
           <p className="text-[12px] text-foreground/40 mb-5 max-w-md mx-auto leading-relaxed">
-            Run your free AI-powered UX audit now — paste any website URL and get your full instant analysis report in under 30 seconds.
+            Run your AI-powered UX audit now — get a screenshot heatmap, 9-layer diagnostic, and actionable fixes in under 30 seconds.
           </p>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}

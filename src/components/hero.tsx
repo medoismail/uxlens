@@ -13,7 +13,7 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
       {/* Badge — pill frame like old design */}
       <div className="animate-fade-in mb-6">
         <span className="inline-flex items-center rounded-full border px-3.5 py-1.5 text-[12px] font-medium tracking-wide uppercase" style={{ borderColor: "var(--border2)", background: "var(--brand-dim)", color: "var(--brand)" }}>
-          Free AI UX Audit Tool
+          AI-Powered UX Audit Platform
         </span>
       </div>
 
@@ -24,7 +24,7 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
 
       {/* Subheadline */}
       <p className="animate-slide-up mt-4 text-[12px] leading-relaxed text-foreground/45 max-w-[520px] font-mono" style={{ animationDelay: "60ms" }}>
-        Free AI-powered UX audit tool that finds every reason your page fails to convert. 9-layer diagnostic with trust signals, confusion detection, and actionable fixes.
+        AI-powered UX audit with screenshot heatmaps, 9-layer diagnostic, trust analysis, and actionable fixes. Save every audit to your dashboard and export as PDF.
       </p>
 
       {/* Form */}
@@ -34,7 +34,7 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
 
       {/* Algo badges */}
       <div className="animate-fade-in mt-6 flex flex-wrap justify-center gap-1.5" style={{ animationDelay: "250ms" }}>
-        {["9 LAYERS", "SELF-CRITIQUE", "CONTRADICTION SCAN", "REWRITE ENGINE"].map((badge) => (
+        {["9 LAYERS", "ATTENTION HEATMAP", "CONTRADICTION SCAN", "AI CHAT", "PDF EXPORT"].map((badge) => (
           <span key={badge} className="text-[12px] font-mono px-2 py-0.5 rounded border text-foreground/30 tracking-wide" style={{ borderColor: "var(--border)" }}>
             {badge}
           </span>
