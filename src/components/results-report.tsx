@@ -11,6 +11,7 @@ import {
 import { Footer } from "@/components/footer";
 import { ScreenshotSection } from "@/components/screenshot-section";
 import { PdfExportButton } from "@/components/pdf-export-button";
+import { ChatWidget } from "@/components/chat-widget";
 import { PLAN_FEATURES } from "@/lib/types";
 import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone } from "@/lib/types";
 
@@ -131,7 +132,7 @@ function LockedOverlay({ message }: { message: string }) {
 
 export function ResultsReport({
   data, url, onReset, onHumanAuditRequested, plan,
-  screenshotUrl, heatmapZones, pageHeight, viewportWidth,
+  auditId, screenshotUrl, heatmapZones, pageHeight, viewportWidth,
 }: ResultsReportProps) {
   const features = PLAN_FEATURES[plan];
   let domain = url;
@@ -413,6 +414,11 @@ export function ResultsReport({
       </div>
 
       <Footer />
+
+      {/* ─── AI Chat Widget (Pro+ only) ─── */}
+      {features.aiChat && auditId && (
+        <ChatWidget auditId={auditId} plan={plan} />
+      )}
     </div>
   );
 }
