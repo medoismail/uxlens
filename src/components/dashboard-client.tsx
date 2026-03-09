@@ -5,7 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import { FileText, ExternalLink, ChevronLeft, ChevronRight, BarChart3 } from "lucide-react";
+import { FileText, ExternalLink, ChevronLeft, ChevronRight, BarChart3, Crown, ArrowUpRight } from "lucide-react";
+import type { PlanTier } from "@/lib/types";
 
 interface AuditItem {
   id: string;
@@ -16,10 +17,115 @@ interface AuditItem {
   createdAt: string;
 }
 
+interface PlanInfo {
+  plan: PlanTier;
+  planLimit: number;
+  features: {
+    pdfExport: boolean;
+    aiChat: boolean;
+    improvements: boolean;
+  };
+}
+
 function scoreColor(s: number) {
   if (s >= 75) return "var(--score-high)";
   if (s >= 50) return "var(--score-mid)";
   return "var(--score-low)";
+}
+
+const PLAN_DISPLAY: Record<string, { label: string; color: string; bg: string; border: string }> = {
+  free: { label: "Free", color: "var(--foreground)", bg: "var(--s2)", border: "var(--border)" },
+  starter: { label: "Starter", color: "#2563eb", bg: "#eff6ff", border: "#bfdbfe" },
+  pro: { label: "Pro", color: "#7c3aed", bg: "#f5f3ff", border: "#c4b5fd" },
+  agency: { label: "Agency", color: "#db2777", bg: "#fdf2f8", border: "#f9a8d4" },
+};
+
+function PlanCard({ planInfo, totalAudits }: { planInfo: PlanInfo; totalAudits: number }) {
+  const config = PLAN_DISPLAY[planInfo.plan] || PLAN_DISPLAY.free;
+  const usagePercent = planInfo.planLimit > 0
+    ? Math.min(100, Math.round((totalAudits / planInfo.planLimit) * 100))
+    : 0;
+  const isNearLimit = usagePercent >= 80;
+  const nextPlan = planInfo.plan === "free" ? "Starter" : planInfo.plan === "starter" ? "Pro" : planInfo.plan === "pro" ? "Agency" : null;
+
+  return (
+    <div
+      className="rounded-xl border p-4 mb-6"
+      style={{ borderColor: config.border, background: config.bg }}
+    >
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        {/* Plan info */}
+        <div className="flex items-center gap-3">
+          <div
+            className="w-9 h-9 rounded-lg grid place-items-center"
+            style={{ background: config.color + "18" }}
+          >
+            <Crown className="w-4 h-4" style={{ color: config.color }} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span
+                className="text-[13px] font-bold"
+                style={{ color: config.color }}
+              >
+                {config.label} Plan
+              </span>
+              {planInfo.features.pdfExport && (
+                <span className="text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded" style={{ background: config.color + "15", color: config.color }}>
+                  PDF
+                </span>
+              )}
+              {planInfo.features.aiChat && (
+                <span className="text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded" style={{ background: config.color + "15", color: config.color }}>
+                  AI Chat
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-foreground/40 mt-0.5">
+              {totalAudits} of {planInfo.planLimit} audits this month
+            </p>
+          </div>
+        </div>
+
+        {/* Usage bar + upgrade */}
+        <div className="flex items-center gap-4">
+          {/* Progress bar */}
+          <div className="w-32 hidden sm:block">
+            <div
+              className="h-1.5 rounded-full overflow-hidden"
+              style={{ background: config.color + "15" }}
+            >
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${usagePercent}%`,
+                  background: isNearLimit ? "var(--score-low)" : config.color,
+                }}
+              />
+            </div>
+            <p className="text-[10px] text-foreground/30 mt-1 text-right">
+              {usagePercent}% used
+            </p>
+          </div>
+
+          {nextPlan && (
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-1 text-[11px] font-medium px-3 py-1.5 rounded-lg border transition-all hover:opacity-80"
+              style={{
+                borderColor: "var(--brand-glow)",
+                color: "var(--brand)",
+                background: "var(--brand-dim)",
+              }}
+            >
+              Upgrade
+              <ArrowUpRight className="w-3 h-3" />
+            </Link>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function DashboardClient() {
@@ -27,6 +133,7 @@ export function DashboardClient() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [planInfo, setPlanInfo] = useState<PlanInfo | null>(null);
   const perPage = 12;
 
   useEffect(() => {
@@ -40,6 +147,13 @@ export function DashboardClient() {
       const data = await res.json();
       setAudits(data.audits || []);
       setTotal(data.total || 0);
+      if (data.plan) {
+        setPlanInfo({
+          plan: data.plan,
+          planLimit: data.planLimit,
+          features: data.features,
+        });
+      }
     } catch {
       setAudits([]);
     } finally {
@@ -53,7 +167,7 @@ export function DashboardClient() {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
       <main className="flex-1 w-full max-w-[960px] mx-auto px-7 py-10">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-xl font-bold tracking-tight text-foreground">
               Your Audits
@@ -70,6 +184,9 @@ export function DashboardClient() {
             New Audit
           </Link>
         </div>
+
+        {/* Plan info card */}
+        {planInfo && <PlanCard planInfo={planInfo} totalAudits={total} />}
 
         {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { getUserByClerkId, upsertUser } from "@/lib/db/users";
 import { getAuditsByUser } from "@/lib/db/audits";
+import { PLAN_LIMITS, PLAN_FEATURES } from "@/lib/types";
+import type { PlanTier } from "@/lib/types";
 
 /**
  * GET /api/audits?page=1
@@ -30,6 +32,8 @@ export async function GET(request: Request) {
     }
 
     const { audits, total } = await getAuditsByUser(dbUser.id, page);
+    const plan = (dbUser.plan || "free") as PlanTier;
+    const features = PLAN_FEATURES[plan];
 
     return NextResponse.json({
       audits: audits.map((a) => ({
@@ -42,6 +46,13 @@ export async function GET(request: Request) {
       })),
       total,
       page,
+      plan,
+      planLimit: PLAN_LIMITS[plan],
+      features: {
+        pdfExport: features.pdfExport,
+        aiChat: features.aiChat,
+        improvements: features.improvements,
+      },
     });
   } catch (error) {
     console.error("Error fetching audits:", error);

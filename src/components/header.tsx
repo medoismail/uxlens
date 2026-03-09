@@ -2,6 +2,36 @@
 
 import Link from "next/link";
 import { Show, UserButton, SignInButton } from "@clerk/nextjs";
+import { useSubscription } from "@/hooks/use-subscription";
+
+const PLAN_LABELS: Record<string, { label: string; color: string; bg: string; border: string }> = {
+  free: { label: "Free", color: "var(--foreground)", bg: "var(--s2)", border: "var(--border)" },
+  starter: { label: "Starter", color: "#2563eb", bg: "#eff6ff", border: "#bfdbfe" },
+  pro: { label: "Pro", color: "#7c3aed", bg: "#f5f3ff", border: "#c4b5fd" },
+  agency: { label: "Agency", color: "#db2777", bg: "#fdf2f8", border: "#f9a8d4" },
+};
+
+function PlanBadge() {
+  const { plan, isVerifying } = useSubscription();
+
+  if (isVerifying) return null;
+
+  const config = PLAN_LABELS[plan] || PLAN_LABELS.free;
+
+  return (
+    <Link
+      href={plan === "free" ? "/pricing" : "/dashboard"}
+      className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md border transition-all hover:opacity-80"
+      style={{
+        color: config.color,
+        background: config.bg,
+        borderColor: config.border,
+      }}
+    >
+      {config.label}
+    </Link>
+  );
+}
 
 export function Header() {
   return (
@@ -51,6 +81,7 @@ export function Header() {
           </Show>
 
           <Show when="signed-in">
+            <PlanBadge />
             <UserButton
               appearance={{
                 elements: {
