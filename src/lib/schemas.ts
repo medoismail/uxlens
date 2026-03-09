@@ -36,36 +36,78 @@ export const urlSchema = z
     { message: "Only public URLs are supported" }
   );
 
-/** Schema for the new multi-role AI audit response */
+const findingSchema = z.object({
+  type: z.enum(["issue", "warning", "positive"]),
+  title: z.string(),
+  desc: z.string(),
+  impact: z.enum(["high", "medium", "low"]),
+});
+
+const sectionSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  icon: z.string(),
+  score: z.number().min(0).max(100),
+  subtitle: z.string(),
+  findings: z.array(findingSchema),
+  recommendations: z.array(z.string()),
+});
+
+const categoryScoreSchema = z.object({
+  score: z.number().min(0).max(100),
+  note: z.string(),
+});
+
+/** Schema for the 9-Layer Diagnostic Engine response */
 export const uxAuditSchema = z.object({
-  offer_detection: z.object({
-    offer_detected: z.string(),
-    target_user_guess: z.string(),
-    outcome_guess: z.string(),
-    confidence: z.number().min(0).max(100),
+  overallScore: z.number().min(0).max(100),
+  grade: z.string(),
+  executiveSummary: z.string(),
+  conversionKillers: z.array(z.string()),
+  quickWins: z.array(z.string()),
+  strategicFixes: z.array(z.string()),
+  flags: z.array(z.string()),
+  categories: z.object({
+    messageClarity: categoryScoreSchema,
+    cognitiveLoad: categoryScoreSchema,
+    conversionArch: categoryScoreSchema,
+    trustSignals: categoryScoreSchema,
+    contradictions: categoryScoreSchema,
+    firstScreen: categoryScoreSchema,
   }),
-  scores: z.object({
-    first_screen_clarity: z.number().min(0).max(100),
-    cta_strength: z.number().min(0).max(100),
-    trust_first_screen: z.number().min(0).max(100),
-    message_clarity_score: z.number().min(0).max(100),
-    conversion_structure_score: z.number().min(0).max(100),
-    confusion_score: z.number().min(0).max(100),
-    ux_score: z.number().min(0).max(100),
+  sections: z.array(sectionSchema),
+  firstScreenAnalysis: z.object({
+    immediateUnderstanding: z.string(),
+    unansweredQuestion: z.string(),
+    dominantEmotion: z.string(),
+    exitReason: z.string(),
+    clarityConfidence: z.number().min(0).max(100),
   }),
-  major_issues: z.array(z.string()),
-  missing_conversion_elements: z.array(z.string()),
-  confusing_phrases: z.array(z.string()),
-  hero_rewrite: z.object({
-    headline: z.string(),
-    subheadline: z.string(),
-    cta: z.string(),
+  confusionMap: z.object({
+    jargonScore: z.number().min(0).max(100),
+    densityScore: z.number().min(0).max(100),
+    frictionWords: z.number().min(0).max(100),
+    decisionParalysis: z.number().min(0).max(100),
   }),
-  quick_fixes: z.array(z.string()),
-  audit_quality_score: z.number().min(0).max(100),
+  trustMatrix: z.array(
+    z.object({
+      label: z.string(),
+      score: z.number().min(0).max(100),
+    })
+  ),
+  rewrite: z.object({
+    beforeHeadline: z.string(),
+    beforeSubheadline: z.string(),
+    beforeCTA: z.string(),
+    afterHeadline: z.string(),
+    afterSubheadline: z.string(),
+    afterCTA: z.string(),
+    rewriteRationale: z.string(),
+  }),
 });
 
 /** API request body schema */
 export const analyzeRequestSchema = z.object({
   url: urlSchema,
+  email: z.string().email().optional(),
 });

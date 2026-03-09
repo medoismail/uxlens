@@ -27,29 +27,43 @@ export function UrlForm({ onSubmit, isLoading }: UrlFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <div className="focus-glow relative flex items-center rounded-2xl border border-border/60 bg-background shadow-elevation-1 transition-all duration-200">
-        <input
-          type="text"
-          placeholder="https://your-landing-page.com"
-          value={url}
-          onChange={(e) => {
-            setUrl(e.target.value);
-            if (error) setError("");
-          }}
-          disabled={isLoading}
-          className="h-[52px] flex-1 rounded-2xl bg-transparent px-5 text-[15px] text-foreground placeholder:text-muted-foreground/60 focus:outline-none disabled:opacity-50"
-        />
-        <div className="pr-1.5">
+      <div className="focus-glow relative overflow-hidden rounded-[14px] border transition-all duration-300" style={{ background: "var(--s1)", borderColor: "var(--border2)" }}>
+        {/* Browser dots */}
+        <div className="flex items-center gap-2.5 px-5 py-3 border-b" style={{ borderColor: "var(--border)" }}>
+          <div className="w-[10px] h-[10px] rounded-full" style={{ background: "#ff5f57" }} />
+          <div className="w-[10px] h-[10px] rounded-full" style={{ background: "#ffbd2e" }} />
+          <div className="w-[10px] h-[10px] rounded-full" style={{ background: "#28c840" }} />
+          <input
+            type="text"
+            placeholder="https://your-landing-page.com"
+            value={url}
+            onChange={(e) => {
+              setUrl(e.target.value);
+              if (error) setError("");
+            }}
+            disabled={isLoading}
+            className="flex-1 bg-transparent text-[12px] font-mono text-foreground/40 placeholder:text-foreground/20 focus:outline-none disabled:opacity-50 ml-2"
+          />
+        </div>
+
+        {/* Action bar */}
+        <div className="flex items-center justify-between px-5 py-3 gap-4" style={{ background: "oklch(0 0 0 / 4%)" }}>
+          <p className="text-[10px] font-mono text-foreground/25 tracking-wide hidden sm:block">
+            Paste your URL and run the full 9-layer audit
+          </p>
           <button
             type="submit"
             disabled={isLoading || !url.trim()}
-            className="inline-flex h-10 items-center gap-2 rounded-xl bg-foreground px-5 text-[13px] font-medium text-background transition-all duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none"
+            className="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-[13px] font-bold transition-all duration-200 hover:translate-y-[-1px] active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none disabled:translate-y-0 disabled:shadow-none shrink-0 sm:ml-auto"
+            style={{ background: "var(--brand)", color: "var(--brand-fg)", boxShadow: "none" }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 6px 20px var(--brand-glow)"}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = "none"}
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <>
-                Analyze
+                Run Full Audit
                 <ArrowRight className="h-3.5 w-3.5" />
               </>
             )}
@@ -58,12 +72,8 @@ export function UrlForm({ onSubmit, isLoading }: UrlFormProps) {
       </div>
 
       {error && (
-        <p className="mt-2.5 text-[13px] text-destructive animate-fade-in pl-1">{error}</p>
+        <p className="mt-2.5 text-[12px] text-destructive animate-fade-in pl-1 font-mono">{error}</p>
       )}
-
-      <p className="mt-4 text-[12px] text-muted-foreground/70 text-center">
-        Free &middot; No signup &middot; Takes 15 seconds
-      </p>
     </form>
   );
 }

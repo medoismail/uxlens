@@ -3,6 +3,7 @@ import { analyzeRequestSchema } from "@/lib/schemas";
 import { normalizeUrl } from "@/lib/validate-url";
 import { extractPageContent, hasEnoughContent } from "@/lib/extract-page-content";
 import { generateUXAudit } from "@/lib/openai";
+import { checkServerUsage, incrementServerUsage } from "@/lib/server-usage";
 import type { AnalysisError } from "@/lib/types";
 
 function errorResponse(error: string, code: AnalysisError["code"], status = 400) {
@@ -13,7 +14,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // 1. Validate input URL
+    // 1. Validate input
     const parsed = analyzeRequestSchema.safeParse(body);
     if (!parsed.success) {
       return errorResponse(
@@ -23,8 +24,18 @@ export async function POST(request: Request) {
     }
 
     const url = normalizeUrl(parsed.data.url);
+    const email = parsed.data.email;
 
-    // 2. Fetch the target page HTML
+    // 2. Check server-side usage limits
+    const usage = await checkServerUsage(request, email);
+    if (!usage.audit_allowed) {
+      return NextResponse.json(
+        { success: false, error: usage.reason, code: "USAGE_LIMIT", usage } satisfies AnalysisError,
+        { status: 429 }
+      );
+    }
+
+    // 3. Fetch the target page HTML
     let html: string;
     try {
       const controller = new AbortController();
@@ -58,7 +69,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 3. Extract structured content from HTML
+    // 4. Extract structured content from HTML
     const content = extractPageContent(html, url);
 
     if (!hasEnoughContent(content)) {
@@ -68,7 +79,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 4. Generate UX audit via OpenAI
+    // 5. Generate UX audit via OpenAI
     let audit;
     try {
       audit = await generateUXAudit(content);
@@ -80,7 +91,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // 5. Return successful result
+    // 6. Increment usage after successful audit
+    await incrementServerUsage(request, email);
+
+    // 7. Return successful result
     return NextResponse.json({
       success: true,
       data: audit,

@@ -1,37 +1,78 @@
-/** Core types for the UXLens analysis pipeline */
+/** Core types for the UXLens 9-Layer Diagnostic Engine */
 
-export interface OfferDetection {
-  offer_detected: string;
-  target_user_guess: string;
-  outcome_guess: string;
-  confidence: number;
+export interface CategoryScore {
+  score: number;
+  note: string;
 }
 
-export interface AuditScores {
-  first_screen_clarity: number;
-  cta_strength: number;
-  trust_first_screen: number;
-  message_clarity_score: number;
-  conversion_structure_score: number;
-  confusion_score: number;
-  ux_score: number;
+export interface Finding {
+  type: "issue" | "warning" | "positive";
+  title: string;
+  desc: string;
+  impact: "high" | "medium" | "low";
 }
 
-export interface HeroRewrite {
-  headline: string;
-  subheadline: string;
-  cta: string;
+export interface AuditSection {
+  id: string;
+  name: string;
+  icon: string;
+  score: number;
+  subtitle: string;
+  findings: Finding[];
+  recommendations: string[];
+}
+
+export interface FirstScreenAnalysis {
+  immediateUnderstanding: string;
+  unansweredQuestion: string;
+  dominantEmotion: string;
+  exitReason: string;
+  clarityConfidence: number;
+}
+
+export interface ConfusionMap {
+  jargonScore: number;
+  densityScore: number;
+  frictionWords: number;
+  decisionParalysis: number;
+}
+
+export interface TrustMatrixItem {
+  label: string;
+  score: number;
+}
+
+export interface Rewrite {
+  beforeHeadline: string;
+  beforeSubheadline: string;
+  beforeCTA: string;
+  afterHeadline: string;
+  afterSubheadline: string;
+  afterCTA: string;
+  rewriteRationale: string;
 }
 
 export interface UXAuditResult {
-  offer_detection: OfferDetection;
-  scores: AuditScores;
-  major_issues: string[];
-  missing_conversion_elements: string[];
-  confusing_phrases: string[];
-  hero_rewrite: HeroRewrite;
-  quick_fixes: string[];
-  audit_quality_score: number;
+  overallScore: number;
+  grade: string;
+  executiveSummary: string;
+  conversionKillers: string[];
+  quickWins: string[];
+  strategicFixes: string[];
+  flags: string[];
+  categories: {
+    messageClarity: CategoryScore;
+    cognitiveLoad: CategoryScore;
+    conversionArch: CategoryScore;
+    trustSignals: CategoryScore;
+    contradictions: CategoryScore;
+    firstScreen: CategoryScore;
+  };
+  sections: AuditSection[];
+  firstScreenAnalysis: FirstScreenAnalysis;
+  confusionMap: ConfusionMap;
+  trustMatrix: TrustMatrixItem[];
+  rewrite: Rewrite;
 }
 
 export interface ExtractedContent {
@@ -57,6 +98,7 @@ export interface AnalysisError {
   success: false;
   error: string;
   code: "INVALID_URL" | "FETCH_FAILED" | "CONTENT_TOO_WEAK" | "AI_FAILED" | "PARSE_FAILED" | "USAGE_LIMIT";
+  usage?: UsageCheck;
 }
 
 export type AnalysisResult = AnalysisResponse | AnalysisError;

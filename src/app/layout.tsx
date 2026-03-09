@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Inter_Tight } from "next/font/google";
-import { Geist_Mono } from "next/font/google";
+import { Inter_Tight, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 const interTight = Inter_Tight({
@@ -10,16 +9,16 @@ const interTight = Inter_Tight({
   display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "UXLens — Instant UX Audits for Landing Pages",
+  title: "UXLens — 9-Layer UX Diagnostic Engine",
   description:
-    "Get instant AI-powered UX feedback on your landing page. Spot weak messaging, unclear CTAs, and conversion blockers in seconds.",
+    "The most advanced AI-powered UX audit: multi-stage analysis, self-critique loop, contradiction detection, and rewrite synthesis.",
 };
 
 export default function RootLayout({
@@ -30,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${interTight.variable} ${geistMono.variable} antialiased`}
+        className={`${interTight.variable} ${jetbrainsMono.variable} antialiased`}
       >
         {children}
         <Script

@@ -9,22 +9,22 @@ interface HeroProps {
 
 export function Hero({ onSubmit, isLoading }: HeroProps) {
   return (
-    <section className="flex flex-col items-center text-center px-6 pt-24 pb-20">
-      {/* Badge */}
+    <section className="flex flex-col items-center text-center px-6 pt-16 pb-16 relative z-[1]">
+      {/* Badge — pill frame like old design */}
       <div className="animate-fade-in mb-6">
-        <span className="inline-flex items-center rounded-full border border-border/60 bg-muted/40 px-3 py-1 text-[11px] font-medium text-muted-foreground tracking-wide uppercase">
-          AI-Powered UX Analysis
+        <span className="inline-flex items-center rounded-full border px-3.5 py-1.5 text-[11px] font-medium tracking-wide uppercase" style={{ borderColor: "var(--border2)", background: "var(--brand-dim)", color: "var(--brand)" }}>
+          9-Layer Structured UX Audit
         </span>
       </div>
 
       {/* Headline */}
-      <h1 className="animate-slide-up text-[2.5rem] sm:text-[3.25rem] font-bold tracking-[-0.03em] leading-[1.1] max-w-[640px] text-foreground">
-        Instant UX feedback for your landing page
+      <h1 className="animate-slide-up text-[clamp(34px,5.5vw,56px)] font-bold tracking-[-1.5px] leading-[1.08] max-w-[640px] text-foreground">
+        Find every reason<br />your page <span style={{ color: "var(--brand)" }}>fails to convert</span>
       </h1>
 
       {/* Subheadline */}
-      <p className="animate-slide-up mt-5 text-[17px] leading-relaxed text-muted-foreground max-w-[440px]" style={{ animationDelay: "60ms" }}>
-        Spot weak messaging, unclear CTAs, and conversion blockers — in seconds.
+      <p className="animate-slide-up mt-4 text-[12px] leading-relaxed text-foreground/45 max-w-[520px] font-mono" style={{ animationDelay: "60ms" }}>
+        The most advanced UX diagnostic algorithm: multi-stage analysis, self-critique loop, contradiction detection, and rewrite synthesis.
       </p>
 
       {/* Form */}
@@ -32,18 +32,13 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
         <UrlForm onSubmit={onSubmit} isLoading={isLoading} />
       </div>
 
-      {/* How it works */}
-      <div className="animate-fade-in mt-24 w-full max-w-md" style={{ animationDelay: "300ms" }}>
-        <div className="flex items-center justify-center gap-8 sm:gap-12">
-          {["Paste URL", "AI analyzes", "Get insights"].map((step, i) => (
-            <div key={step} className="flex items-center gap-3">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-foreground/[0.06] text-[10px] font-semibold text-muted-foreground">
-                {i + 1}
-              </span>
-              <span className="text-[13px] text-muted-foreground">{step}</span>
-            </div>
-          ))}
-        </div>
+      {/* Algo badges */}
+      <div className="animate-fade-in mt-6 flex flex-wrap justify-center gap-1.5" style={{ animationDelay: "250ms" }}>
+        {["9 LAYERS", "SELF-CRITIQUE", "CONTRADICTION SCAN", "REWRITE ENGINE"].map((badge) => (
+          <span key={badge} className="text-[9px] font-mono px-2 py-0.5 rounded border text-foreground/30 tracking-wide" style={{ borderColor: "var(--border)" }}>
+            {badge}
+          </span>
+        ))}
       </div>
     </section>
   );

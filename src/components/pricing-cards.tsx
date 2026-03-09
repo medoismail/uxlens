@@ -2,6 +2,14 @@
 
 import { Check } from "lucide-react";
 
+/* Next.js inlines NEXT_PUBLIC_ vars at build time via static analysis.
+   Dynamic access like process.env[key] does NOT work — must be literal. */
+const CHECKOUT_URLS: Record<string, string> = {
+  starter: process.env.NEXT_PUBLIC_LS_CHECKOUT_STARTER || "",
+  pro: process.env.NEXT_PUBLIC_LS_CHECKOUT_PRO || "",
+  agency: process.env.NEXT_PUBLIC_LS_CHECKOUT_AGENCY || "",
+};
+
 const PLANS = [
   {
     name: "Starter",
@@ -9,7 +17,7 @@ const PLANS = [
     period: "/mo",
     audits: "50 audits/month",
     features: ["Full UX audit", "Score breakdown", "Conversion issues", "Hero rewrite", "Confusion score"],
-    checkoutEnv: "NEXT_PUBLIC_LS_CHECKOUT_STARTER",
+    checkoutKey: "starter",
     popular: false,
   },
   {
@@ -18,7 +26,7 @@ const PLANS = [
     period: "/mo",
     audits: "200 audits/month",
     features: ["Everything in Starter", "Offer detection", "Confusing phrase analysis", "Quick fixes", "Detailed suggestions"],
-    checkoutEnv: "NEXT_PUBLIC_LS_CHECKOUT_PRO",
+    checkoutKey: "pro",
     popular: true,
   },
   {
@@ -27,7 +35,7 @@ const PLANS = [
     period: "/mo",
     audits: "1,000 audits/month",
     features: ["Everything in Pro", "Agency scale usage", "Extended recommendations", "Priority analysis"],
-    checkoutEnv: "NEXT_PUBLIC_LS_CHECKOUT_AGENCY",
+    checkoutKey: "agency",
     popular: false,
   },
 ];
@@ -37,9 +45,9 @@ interface PricingCardsProps {
 }
 
 export function PricingCards({ email }: PricingCardsProps) {
-  function handleSelect(checkoutEnv: string) {
-    const baseUrl = process.env[checkoutEnv] || "#";
-    if (baseUrl === "#") return;
+  function handleSelect(checkoutKey: string) {
+    const baseUrl = CHECKOUT_URLS[checkoutKey];
+    if (!baseUrl) return;
     const url = new URL(baseUrl);
     if (email) url.searchParams.set("checkout[email]", email);
 
@@ -88,7 +96,7 @@ export function PricingCards({ email }: PricingCardsProps) {
           </ul>
 
           <button
-            onClick={() => handleSelect(plan.checkoutEnv)}
+            onClick={() => handleSelect(plan.checkoutKey)}
             className={`w-full mt-5 rounded-lg py-2 text-[13px] font-medium transition-all duration-150 active:scale-[0.98] ${
               plan.popular
                 ? "bg-foreground text-background hover:opacity-90"
