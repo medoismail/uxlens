@@ -28,6 +28,7 @@ interface ResultsReportProps {
   heatmapZones?: HeatmapZone[];
   pageHeight?: number;
   viewportWidth?: number;
+  screenshotStatus?: "loading" | "done" | "failed";
 }
 
 /* ── Helpers ── */
@@ -132,7 +133,7 @@ function LockedOverlay({ message }: { message: string }) {
 
 export function ResultsReport({
   data, url, onReset, onHumanAuditRequested, plan,
-  auditId, screenshotUrl, heatmapZones, pageHeight, viewportWidth,
+  auditId, screenshotUrl, heatmapZones, pageHeight, viewportWidth, screenshotStatus,
 }: ResultsReportProps) {
   const features = PLAN_FEATURES[plan];
   let domain = url;
@@ -209,7 +210,7 @@ export function ResultsReport({
           pageHeight={pageHeight}
           viewportWidth={viewportWidth}
         />
-      ) : (
+      ) : screenshotStatus === "loading" ? (
         <div
           className="rounded-xl border p-5 mb-4 flex items-center justify-center"
           style={{ borderColor: "var(--border)", background: "var(--s1)", minHeight: "120px" }}
@@ -219,7 +220,7 @@ export function ResultsReport({
             Capturing screenshot & generating heatmap...
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* ─── Category Grid (all tiers) ─── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-5 stagger-children">

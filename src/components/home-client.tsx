@@ -19,7 +19,7 @@ type AppState =
   | { status: "loading" }
   | { status: "error"; message: string }
   | { status: "limit_reached"; usage: UsageCheck }
-  | { status: "success"; data: UXAuditResult; url: string; auditId?: string; screenshotUrl?: string; heatmapZones?: HeatmapZone[]; pageHeight?: number; viewportWidth?: number }
+  | { status: "success"; data: UXAuditResult; url: string; auditId?: string; screenshotUrl?: string; heatmapZones?: HeatmapZone[]; pageHeight?: number; viewportWidth?: number; screenshotStatus?: "loading" | "done" | "failed" }
   | { status: "human_audit_requested"; url: string; email: string };
 
 export function HomeClient() {
@@ -51,6 +51,7 @@ export function HomeClient() {
           data: result.data,
           url: result.url,
           auditId: result.auditId,
+          screenshotStatus: "loading",
         });
 
         // Step 2: Capture screenshot in the background (separate request)
@@ -81,11 +82,18 @@ export function HomeClient() {
         body: JSON.stringify({ url, auditId }),
       });
 
-      if (!res.ok) return;
+      if (!res.ok) {
+        // Mark screenshot as failed so spinner stops
+        setState((prev) => {
+          if (prev.status !== "success") return prev;
+          return { ...prev, screenshotStatus: "failed" };
+        });
+        return;
+      }
+
       const data = await res.json();
 
       if (data.screenshotUrl) {
-        // Merge screenshot data into the current state
         setState((prev) => {
           if (prev.status !== "success") return prev;
           return {
@@ -94,12 +102,20 @@ export function HomeClient() {
             heatmapZones: data.heatmapZones,
             pageHeight: data.pageHeight,
             viewportWidth: data.viewportWidth,
+            screenshotStatus: "done",
           };
+        });
+      } else {
+        setState((prev) => {
+          if (prev.status !== "success") return prev;
+          return { ...prev, screenshotStatus: "failed" };
         });
       }
     } catch {
-      // Screenshot is optional — silently ignore failures
-      console.log("Screenshot capture skipped (non-critical)");
+      setState((prev) => {
+        if (prev.status !== "success") return prev;
+        return { ...prev, screenshotStatus: "failed" };
+      });
     }
   }
 
@@ -147,6 +163,7 @@ export function HomeClient() {
             heatmapZones={state.heatmapZones}
             pageHeight={state.pageHeight}
             viewportWidth={state.viewportWidth}
+            screenshotStatus={state.screenshotStatus}
           />
         )}
         {state.status === "human_audit_requested" && (

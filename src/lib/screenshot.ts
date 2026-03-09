@@ -23,17 +23,28 @@ export interface ScreenshotResult {
  * Uses puppeteer-core + @sparticuz/chromium for Vercel serverless.
  */
 export async function captureScreenshot(url: string): Promise<ScreenshotResult> {
+  // Disable GPU/WebGL for serverless environment
+  chromium.setGraphicsMode = false;
+
+  const executablePath = await chromium.executablePath();
+
   const browser = await puppeteer.launch({
-    args: chromium.args,
+    args: [
+      ...chromium.args,
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu",
+      "--single-process",
+    ],
     defaultViewport: { width: 1280, height: 800 },
-    executablePath: await chromium.executablePath(),
+    executablePath,
     headless: true,
   });
 
   try {
     const page = await browser.newPage();
 
-    // Set a realistic user agent
     await page.setUserAgent(
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     );
