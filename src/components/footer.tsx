@@ -47,6 +47,9 @@ export function Footer() {
           <Link href="/pricing" className="hover:text-foreground/40 transition-colors">
             Pricing
           </Link>
+          <Link href="/dashboard" className="hover:text-foreground/40 transition-colors">
+            Dashboard
+          </Link>
         </nav>
       </div>
     </footer>
