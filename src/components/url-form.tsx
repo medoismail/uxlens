@@ -48,7 +48,7 @@ export function UrlForm({ onSubmit, isLoading }: UrlFormProps) {
 
         {/* Action bar */}
         <div className="flex items-center justify-between px-5 py-3 gap-4" style={{ background: "oklch(0 0 0 / 4%)" }}>
-          <p className="text-[12px] font-mono text-foreground/25 tracking-wide hidden sm:block">
+          <p className="text-[10px] font-mono text-foreground/25 tracking-wide hidden sm:block">
             Paste your URL and run the full 9-layer audit
           </p>
           <button
