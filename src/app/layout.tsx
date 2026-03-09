@@ -169,6 +169,18 @@ export default function RootLayout({
       >
         {children}
         <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-PS3F3M5Q7D"
+          strategy="afterInteractive"
+        />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-PS3F3M5Q7D');
+          `}
+        </Script>
+        <Script
           src="https://app.lemonsqueezy.com/js/lemon.js"
           strategy="lazyOnload"
         />
