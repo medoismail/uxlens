@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { getRedis } from "@/lib/server-usage";
+import { updateUserPlan } from "@/lib/db/users";
 import type { PlanTier } from "@/lib/types";
 
 /**
@@ -67,6 +68,8 @@ export async function POST(request: Request) {
           // Active subscription — cache the plan for 7 days
           await r.set(cacheKey, plan, { ex: 60 * 60 * 24 * 7 });
           console.log(`[Webhook] Cached ${plan} plan for ${email}`);
+          // Also update Supabase
+          await updateUserPlan(email, plan);
         } else if (
           eventName === "subscription_cancelled" ||
           eventName === "subscription_expired" ||
@@ -75,6 +78,8 @@ export async function POST(request: Request) {
           // Inactive — set to free
           await r.set(cacheKey, "free", { ex: 60 * 60 * 24 * 7 });
           console.log(`[Webhook] Set ${email} to free (${eventName})`);
+          // Also update Supabase
+          await updateUserPlan(email, "free");
         }
       }
     }

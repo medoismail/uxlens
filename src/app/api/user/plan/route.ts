@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { getRedis } from "@/lib/server-usage";
+import { getUserPlan } from "@/lib/db/users";
 import type { PlanTier } from "@/lib/types";
 
 /**
@@ -40,7 +41,18 @@ export async function GET() {
       }
     }
 
-    // If email found, check LemonSqueezy directly
+    // Check Supabase for plan
+    const dbPlan = await getUserPlan(userId);
+    if (dbPlan !== "free") {
+      // Cache in Redis for fast lookups
+      if (r) {
+        const clerkCacheKey = `uxlens:sub:clerk:${userId}`;
+        await r.set(clerkCacheKey, dbPlan, { ex: 60 * 60 * 24 * 7 });
+      }
+      return NextResponse.json({ plan: dbPlan });
+    }
+
+    // If email found, check LemonSqueezy directly as final fallback
     if (email) {
       try {
         const { checkSubscriptionByEmail } = await import("@/lib/lemonsqueezy");

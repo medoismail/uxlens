@@ -5,6 +5,8 @@ import { normalizeUrl } from "@/lib/validate-url";
 import { extractPageContent, hasEnoughContent } from "@/lib/extract-page-content";
 import { generateUXAudit } from "@/lib/openai";
 import { checkServerUsage, incrementServerUsage } from "@/lib/server-usage";
+import { getUserByClerkId } from "@/lib/db/users";
+import { saveAudit } from "@/lib/db/audits";
 import type { AnalysisError } from "@/lib/types";
 
 function errorResponse(error: string, code: AnalysisError["code"], status = 400) {
@@ -104,11 +106,31 @@ export async function POST(request: Request) {
     // 6. Increment usage after successful audit
     await incrementServerUsage(request, email, clerkUserId);
 
-    // 7. Return successful result
+    // 7. Save audit to Supabase if user is authenticated
+    let auditId: string | undefined;
+    if (clerkUserId) {
+      try {
+        const dbUser = await getUserByClerkId(clerkUserId);
+        if (dbUser) {
+          const id = await saveAudit({
+            userId: dbUser.id,
+            url,
+            result: audit,
+          });
+          if (id) auditId = id;
+        }
+      } catch {
+        // Don't fail the audit if save fails
+        console.error("Failed to save audit to Supabase");
+      }
+    }
+
+    // 8. Return successful result
     return NextResponse.json({
       success: true,
       data: audit,
       url,
+      ...(auditId && { auditId }),
     });
   } catch {
     return errorResponse(
