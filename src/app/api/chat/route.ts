@@ -79,8 +79,9 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { auditId, message } = body;
 
-    if (!auditId || !message || typeof message !== "string" || message.trim().length === 0) {
-      return NextResponse.json({ error: "Missing auditId or message" }, { status: 400 });
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!auditId || !UUID_RE.test(auditId) || !message || typeof message !== "string" || message.trim().length === 0) {
+      return NextResponse.json({ error: "Missing or invalid auditId or message" }, { status: 400 });
     }
 
     if (message.length > 2000) {
@@ -132,6 +133,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Audit not found" }, { status: 404 });
     }
 
+    // Increment credits BEFORE streaming to prevent bypass via aborted requests
+    await incrementChatCredits(dbUser.id);
+
     // Build context
     const auditContext = condenseAuditContext(audit.result, audit.url);
     const recentHistory = history.slice(-10);
@@ -178,14 +182,13 @@ export async function POST(request: Request) {
             }
           }
 
-          // Save assistant message and increment credits
+          // Save assistant message after stream completes
           await saveChatMessage({
             auditId,
             userId: dbUser.id,
             role: "assistant",
             content: fullResponse,
           });
-          await incrementChatCredits(dbUser.id);
 
           // Send done event with updated credits
           const updatedCredits = await getChatCredits(dbUser.id, features.chatLimit);

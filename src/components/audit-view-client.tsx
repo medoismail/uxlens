@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Header } from "@/components/header";
 import { ResultsReport } from "@/components/results-report";
 import type { UXAuditResult, PlanTier, HeatmapZone } from "@/lib/types";
@@ -11,14 +12,17 @@ interface AuditViewClientProps {
     result: UXAuditResult;
     screenshotPath: string | null;
     heatmapZones: unknown[] | null;
+    pageHeight: number | null;
     createdAt: string;
   };
   plan: PlanTier;
 }
 
 export function AuditViewClient({ audit, plan }: AuditViewClientProps) {
+  const router = useRouter();
+
   function handleReset() {
-    window.location.href = "/dashboard";
+    router.push("/dashboard");
   }
 
   function handleHumanAuditRequested() {
@@ -38,7 +42,7 @@ export function AuditViewClient({ audit, plan }: AuditViewClientProps) {
           auditId={audit.id}
           screenshotUrl={audit.screenshotPath || undefined}
           heatmapZones={(audit.heatmapZones as HeatmapZone[]) || undefined}
-          pageHeight={3000}
+          pageHeight={audit.pageHeight || 3000}
           viewportWidth={1280}
         />
       </main>

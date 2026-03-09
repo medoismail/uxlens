@@ -19,8 +19,9 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const auditId = searchParams.get("auditId");
 
-    if (!auditId) {
-      return NextResponse.json({ error: "Missing auditId" }, { status: 400 });
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!auditId || !UUID_RE.test(auditId)) {
+      return NextResponse.json({ error: "Missing or invalid auditId" }, { status: 400 });
     }
 
     // Get or create Supabase user

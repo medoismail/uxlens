@@ -50,11 +50,16 @@ async function handleClerkEvent(payload: Record<string, unknown>) {
 
   if (eventType === "user.created" || eventType === "user.updated") {
     const clerkId = data.id as string;
+    const primaryEmailId = data.primary_email_address_id as string | undefined;
     const emailAddresses = data.email_addresses as Array<{
       email_address: string;
       id: string;
     }>;
-    const primaryEmail = emailAddresses?.[0]?.email_address;
+
+    // Use primary_email_address_id to find the correct primary email
+    const primaryEmail = primaryEmailId
+      ? emailAddresses?.find((e) => e.id === primaryEmailId)?.email_address
+      : emailAddresses?.[0]?.email_address;
 
     if (clerkId && primaryEmail) {
       await upsertUser(clerkId, primaryEmail);

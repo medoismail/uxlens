@@ -6,15 +6,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: base,
-      lastModified: "2026-03-09",
+      lastModified: new Date().toISOString(),
       changeFrequency: "weekly",
       priority: 1,
     },
     {
       url: `${base}/pricing`,
-      lastModified: "2026-03-09",
+      lastModified: new Date().toISOString(),
       changeFrequency: "monthly",
       priority: 0.8,
+    },
+    {
+      url: `${base}/sign-in`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: "monthly",
+      priority: 0.3,
+    },
+    {
+      url: `${base}/sign-up`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: "monthly",
+      priority: 0.3,
     },
   ];
 }

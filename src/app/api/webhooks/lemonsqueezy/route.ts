@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { getRedis } from "@/lib/server-usage";
 import { updateUserPlan } from "@/lib/db/users";
-import type { PlanTier } from "@/lib/types";
+import { resolveplanFromVariant } from "@/lib/lemonsqueezy";
 
 /**
  * Webhook endpoint for LemonSqueezy subscription events.
@@ -39,19 +39,19 @@ export async function POST(request: Request) {
     const attrs = payload.data?.attributes;
     const email: string | undefined = attrs?.user_email;
     const status: string | undefined = attrs?.status;
+    const variantId: string = String(attrs?.variant_id || "");
     const variantName: string = (attrs?.variant_name || "").toLowerCase();
 
     console.log(`[LemonSqueezy Webhook] ${eventName}`, {
       customerId: attrs?.customer_id,
       email,
       status,
+      variantId,
       variantName,
     });
 
-    // Determine plan tier from variant name
-    let plan: PlanTier = "starter";
-    if (variantName.includes("pro")) plan = "pro";
-    if (variantName.includes("agency")) plan = "agency";
+    // Determine plan tier: prefer stable variant_id, fallback to variant_name
+    const plan = resolveplanFromVariant(variantId, variantName);
 
     // Store subscription in Redis
     if (email) {

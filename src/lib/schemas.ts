@@ -21,14 +21,49 @@ export const urlSchema = z
       try {
         const url = new URL(val.startsWith("http") ? val : `https://${val}`);
         const hostname = url.hostname.toLowerCase();
-        return (
-          !hostname.includes("localhost") &&
-          !hostname.includes("127.0.0.1") &&
-          !hostname.includes("0.0.0.0") &&
-          !hostname.startsWith("192.168.") &&
-          !hostname.startsWith("10.") &&
-          hostname.includes(".")
-        );
+
+        // Block non-http(s) schemes
+        if (!["http:", "https:"].includes(url.protocol)) return false;
+
+        // Must have a dot (no bare hostnames)
+        if (!hostname.includes(".")) return false;
+
+        // Block localhost variants
+        if (
+          hostname === "localhost" ||
+          hostname.endsWith(".localhost") ||
+          hostname === "127.0.0.1" ||
+          hostname === "0.0.0.0" ||
+          hostname === "[::1]"
+        ) return false;
+
+        // Block private/reserved IPv4 ranges
+        const ipv4Match = hostname.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+        if (ipv4Match) {
+          const [, a, b] = ipv4Match.map(Number);
+          if (a === 10) return false;                         // 10.0.0.0/8
+          if (a === 172 && b >= 16 && b <= 31) return false;  // 172.16.0.0/12
+          if (a === 192 && b === 168) return false;            // 192.168.0.0/16
+          if (a === 169 && b === 254) return false;            // 169.254.0.0/16 (link-local / AWS metadata)
+          if (a === 127) return false;                         // 127.0.0.0/8
+          if (a === 0) return false;                           // 0.0.0.0/8
+        }
+
+        // Block IPv6 private ranges
+        if (hostname.startsWith("[")) {
+          const inner = hostname.slice(1, -1).toLowerCase();
+          if (
+            inner === "::1" ||
+            inner.startsWith("fc") ||
+            inner.startsWith("fd") ||
+            inner.startsWith("fe80")
+          ) return false;
+        }
+
+        // Block .internal and .local TLDs
+        if (hostname.endsWith(".internal") || hostname.endsWith(".local")) return false;
+
+        return true;
       } catch {
         return false;
       }

@@ -9,6 +9,25 @@ function initLemonSqueezy() {
   });
 }
 
+/**
+ * Map variant_id (stable) to plan tier, with variantName fallback.
+ * Configure env vars: LS_VARIANT_STARTER, LS_VARIANT_PRO, LS_VARIANT_AGENCY
+ */
+export function resolveplanFromVariant(variantId: string, variantName: string): PlanTier {
+  // Prefer stable variant_id mapping from env vars
+  if (variantId) {
+    if (variantId === process.env.LS_VARIANT_AGENCY) return "agency";
+    if (variantId === process.env.LS_VARIANT_PRO) return "pro";
+    if (variantId === process.env.LS_VARIANT_STARTER) return "starter";
+  }
+
+  // Fallback to variant name matching
+  const name = variantName.toLowerCase();
+  if (name.includes("agency")) return "agency";
+  if (name.includes("pro")) return "pro";
+  return "starter";
+}
+
 export interface SubscriptionStatus {
   isActive: boolean;
   plan: PlanTier;
@@ -55,11 +74,10 @@ export async function checkSubscriptionByEmail(
 
     if (!activeSub) return inactive;
 
-    // Map variant name to plan tier
+    // Map variant to plan tier using stable variant_id with name fallback
+    const variantId = String(activeSub.attributes.variant_id || "");
     const variantName = (activeSub.attributes.variant_name || "").toLowerCase();
-    let plan: PlanTier = "starter";
-    if (variantName.includes("pro")) plan = "pro";
-    if (variantName.includes("agency")) plan = "agency";
+    const plan = resolveplanFromVariant(variantId, variantName);
 
     return {
       isActive: true,

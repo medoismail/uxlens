@@ -26,6 +26,13 @@ export default async function AuditPage({ params }: AuditPageProps) {
     notFound();
   }
 
+  // Extract pageHeight from heatmap_zones metadata if stored, otherwise null
+  const zones = audit.heatmap_zones as Record<string, unknown> | unknown[] | null;
+  let pageHeight: number | null = null;
+  if (zones && !Array.isArray(zones) && typeof zones === "object" && "pageHeight" in zones) {
+    pageHeight = (zones as { pageHeight: number }).pageHeight;
+  }
+
   return (
     <AuditViewClient
       audit={{
@@ -34,6 +41,7 @@ export default async function AuditPage({ params }: AuditPageProps) {
         result: audit.result,
         screenshotPath: audit.screenshot_path,
         heatmapZones: audit.heatmap_zones as unknown[],
+        pageHeight,
         createdAt: audit.created_at,
       }}
       plan={dbUser.plan}

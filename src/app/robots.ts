@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/dashboard", "/audit/"],
+        disallow: ["/api/", "/dashboard", "/audit/", "/sign-in", "/sign-up"],
       },
     ],
     sitemap: "https://www.uxlens.pro/sitemap.xml",

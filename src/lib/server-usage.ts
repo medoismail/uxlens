@@ -213,17 +213,18 @@ export async function checkServerUsage(
   }
 }
 
-/** Increment usage after a successful audit */
+/** Increment usage after a successful audit. Accepts resolved plan to avoid double-lookup. */
 export async function incrementServerUsage(
   request: Request,
   email?: string,
-  clerkUserId?: string
+  clerkUserId?: string,
+  resolvedPlan?: PlanTier
 ): Promise<void> {
   try {
     const r = getRedis();
     if (!r) return;
 
-    const plan = await resolveplan(email, clerkUserId);
+    const plan = resolvedPlan ?? await resolveplan(email, clerkUserId);
     const ip = getClientIP(request);
     const identifier =
       plan === "free"

@@ -11,9 +11,11 @@ interface PdfExportButtonProps {
 
 export function PdfExportButton({ data, url }: PdfExportButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleExport() {
     setIsGenerating(true);
+    setError(null);
 
     try {
       // Dynamic import to avoid bundling react-pdf for all users
@@ -35,15 +37,16 @@ export function PdfExportButton({ data, url }: PdfExportButtonProps) {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(downloadUrl);
-    } catch (error) {
-      console.error("PDF export failed:", error);
-      alert("Failed to generate PDF. Please try again.");
+    } catch (err) {
+      console.error("PDF export failed:", err);
+      setError("Failed to generate PDF. Please try again.");
     } finally {
       setIsGenerating(false);
     }
   }
 
   return (
+    <>
     <button
       onClick={handleExport}
       disabled={isGenerating}
@@ -66,5 +69,11 @@ export function PdfExportButton({ data, url }: PdfExportButtonProps) {
         </>
       )}
     </button>
+    {error && (
+      <p className="text-[11px] mt-1" style={{ color: "var(--score-low, #ef4444)" }}>
+        {error}
+      </p>
+    )}
+    </>
   );
 }
