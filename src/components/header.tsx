@@ -35,7 +35,7 @@ function PlanBadge() {
 
 export function Header() {
   return (
-    <header className="w-full border-b sticky top-0 z-50 backdrop-blur-md" style={{ borderColor: "var(--border)", background: "oklch(0.924 0.063 295 / 85%)" }}>
+    <header className="w-full border-b sticky top-0 z-50 backdrop-blur-md" style={{ borderColor: "var(--border)", background: "oklch(1 0 0 / 85%)" }}>
       <nav aria-label="Main navigation" className="mx-auto flex h-14 max-w-[960px] items-center justify-between px-7">
         <div className="flex items-center gap-6">
           <Link
