@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Pricing — UX Audit Plans",
+  title: "Pricing — AI UX Audit Plans",
   description:
-    "Choose your UXLens plan: Free (5 audits/mo), Starter ($12/mo, 50 audits), Pro ($29/mo, 200 audits), or Agency ($79/mo, 1,000 audits). Full AI-powered UX audits with conversion analysis, trust scoring, and hero rewrites.",
+    "Start free with 5 audits/month: full scores, heatmaps, all killers, trust matrix. Upgrade for strategic fixes, PDF export, and AI chat assistant. Plans from $12/mo.",
   alternates: {
     canonical: "https://www.uxlens.pro/pricing",
   },
   openGraph: {
     title: "UXLens Pricing — AI UX Audit Plans from Free to Agency",
     description:
-      "Start free with 5 audits/month. Upgrade for full reports, trust matrix, hero rewrites, and more. Plans from $12/mo.",
+      "Start free with 5 audits/month. Upgrade for strategic fixes, PDF export, and AI chat. Plans from $12/mo.",
     url: "https://www.uxlens.pro/pricing",
   },
 };
