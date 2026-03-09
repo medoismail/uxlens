@@ -12,14 +12,14 @@ import { Footer } from "@/components/footer";
 import { HomeSEOContent } from "@/components/home-seo-content";
 import { normalizeUrl } from "@/lib/validate-url";
 import { useSubscription } from "@/hooks/use-subscription";
-import type { AnalysisResult, UXAuditResult, UsageCheck } from "@/lib/types";
+import type { AnalysisResult, UXAuditResult, UsageCheck, HeatmapZone } from "@/lib/types";
 
 type AppState =
   | { status: "idle" }
   | { status: "loading" }
   | { status: "error"; message: string }
   | { status: "limit_reached"; usage: UsageCheck }
-  | { status: "success"; data: UXAuditResult; url: string }
+  | { status: "success"; data: UXAuditResult; url: string; auditId?: string; screenshotUrl?: string; heatmapZones?: HeatmapZone[]; pageHeight?: number; viewportWidth?: number }
   | { status: "human_audit_requested"; url: string; email: string };
 
 export function HomeClient() {
@@ -42,7 +42,16 @@ export function HomeClient() {
       const result: AnalysisResult = await res.json();
 
       if (result.success) {
-        setState({ status: "success", data: result.data, url: result.url });
+        setState({
+          status: "success",
+          data: result.data,
+          url: result.url,
+          auditId: result.auditId,
+          screenshotUrl: result.screenshotUrl,
+          heatmapZones: result.heatmapZones,
+          pageHeight: result.pageHeight,
+          viewportWidth: result.viewportWidth,
+        });
       } else if (result.code === "USAGE_LIMIT" && result.usage) {
         if (result.usage.audits_remaining === 0 && result.usage.upgrade_suggestion) {
           setState({ status: "limit_reached", usage: result.usage });
@@ -101,6 +110,11 @@ export function HomeClient() {
             isSubscribed={isSubscribed}
             plan={plan}
             onSubscriptionVerified={handleSubscriptionVerified}
+            auditId={state.auditId}
+            screenshotUrl={state.screenshotUrl}
+            heatmapZones={state.heatmapZones}
+            pageHeight={state.pageHeight}
+            viewportWidth={state.viewportWidth}
           />
         )}
         {state.status === "human_audit_requested" && (

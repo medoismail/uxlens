@@ -9,7 +9,8 @@ import {
   X, AlertTriangle, Check,
 } from "lucide-react";
 import { Footer } from "@/components/footer";
-import type { UXAuditResult, AuditSection, Finding, PlanTier } from "@/lib/types";
+import { ScreenshotSection } from "@/components/screenshot-section";
+import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone } from "@/lib/types";
 
 interface ResultsReportProps {
   data: UXAuditResult;
@@ -19,6 +20,11 @@ interface ResultsReportProps {
   isSubscribed: boolean;
   plan: PlanTier;
   onSubscriptionVerified: (email: string) => void;
+  auditId?: string;
+  screenshotUrl?: string;
+  heatmapZones?: HeatmapZone[];
+  pageHeight?: number;
+  viewportWidth?: number;
 }
 
 /* ── Helpers ── */
@@ -123,6 +129,7 @@ function LockedOverlay({ message }: { message: string }) {
 
 export function ResultsReport({
   data, url, onReset, onHumanAuditRequested, isSubscribed, plan,
+  screenshotUrl, heatmapZones, pageHeight, viewportWidth,
 }: ResultsReportProps) {
   const isFree = plan === "free" && !isSubscribed;
   let domain = url;
@@ -183,6 +190,16 @@ export function ResultsReport({
           </div>
         </div>
       </div>
+
+      {/* ─── Screenshot + Heatmap (all tiers) ─── */}
+      {screenshotUrl && heatmapZones && pageHeight && viewportWidth && (
+        <ScreenshotSection
+          screenshotUrl={screenshotUrl}
+          heatmapZones={heatmapZones}
+          pageHeight={pageHeight}
+          viewportWidth={viewportWidth}
+        />
+      )}
 
       {/* ─── Category Grid ─── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-5 stagger-children">

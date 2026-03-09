@@ -7,6 +7,7 @@ import { generateUXAudit } from "@/lib/openai";
 import { checkServerUsage, incrementServerUsage } from "@/lib/server-usage";
 import { getUserByClerkId } from "@/lib/db/users";
 import { saveAudit } from "@/lib/db/audits";
+import { getSupabase } from "@/lib/supabase";
 import type { AnalysisError } from "@/lib/types";
 
 function errorResponse(error: string, code: AnalysisError["code"], status = 400) {
@@ -91,16 +92,74 @@ export async function POST(request: Request) {
       );
     }
 
-    // 5. Generate UX audit via OpenAI
-    let audit;
-    try {
-      audit = await generateUXAudit(content);
-    } catch {
+    // 5. Run screenshot capture and UX audit in parallel
+    // Screenshot is non-blocking — if it fails, audit still returns
+    let screenshotUrl: string | undefined;
+    let heatmapZones: unknown[] | undefined;
+    let pageHeight: number | undefined;
+    let viewportWidth: number | undefined;
+
+    const [audit, screenshotResult] = await Promise.all([
+      // UX audit (required)
+      generateUXAudit(content).catch(() => null),
+      // Screenshot (optional, non-blocking)
+      (async () => {
+        try {
+          const { captureScreenshot } = await import("@/lib/screenshot");
+          const { generateHeatmapZones } = await import("@/lib/heatmap");
+          const result = await captureScreenshot(url);
+          const zones = generateHeatmapZones(
+            result.elements,
+            result.pageHeight,
+            result.viewportHeight
+          );
+
+          // Upload screenshot to Supabase Storage
+          const sb = getSupabase();
+          if (sb) {
+            const filename = `${Date.now()}-${encodeURIComponent(new URL(url).hostname)}.jpg`;
+            const { error: uploadError } = await sb.storage
+              .from("screenshots")
+              .upload(filename, result.buffer, {
+                contentType: "image/jpeg",
+                cacheControl: "31536000",
+              });
+
+            if (!uploadError) {
+              const { data: publicUrl } = sb.storage
+                .from("screenshots")
+                .getPublicUrl(filename);
+              return {
+                screenshotUrl: publicUrl.publicUrl,
+                heatmapZones: zones,
+                pageHeight: result.pageHeight,
+                viewportWidth: result.viewportWidth,
+              };
+            }
+          }
+
+          return null;
+        } catch (e) {
+          console.error("Screenshot capture failed (non-blocking):", e);
+          return null;
+        }
+      })(),
+    ]);
+
+    if (!audit) {
       return errorResponse(
         "We couldn't generate the analysis right now. Please try again.",
         "AI_FAILED",
         500
       );
+    }
+
+    // Extract screenshot data if available
+    if (screenshotResult) {
+      screenshotUrl = screenshotResult.screenshotUrl;
+      heatmapZones = screenshotResult.heatmapZones;
+      pageHeight = screenshotResult.pageHeight;
+      viewportWidth = screenshotResult.viewportWidth;
     }
 
     // 6. Increment usage after successful audit
@@ -116,6 +175,8 @@ export async function POST(request: Request) {
             userId: dbUser.id,
             url,
             result: audit,
+            screenshotPath: screenshotUrl,
+            heatmapZones,
           });
           if (id) auditId = id;
         }
@@ -131,6 +192,10 @@ export async function POST(request: Request) {
       data: audit,
       url,
       ...(auditId && { auditId }),
+      ...(screenshotUrl && { screenshotUrl }),
+      ...(heatmapZones && { heatmapZones }),
+      ...(pageHeight && { pageHeight }),
+      ...(viewportWidth && { viewportWidth }),
     });
   } catch {
     return errorResponse(

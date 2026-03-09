@@ -92,6 +92,21 @@ export interface AnalysisResponse {
   success: true;
   data: UXAuditResult;
   url: string;
+  auditId?: string;
+  screenshotUrl?: string;
+  heatmapZones?: HeatmapZone[];
+  pageHeight?: number;
+  viewportWidth?: number;
+}
+
+/** Heatmap zone for attention overlay */
+export interface HeatmapZone {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  intensity: number;
+  label: string;
 }
 
 export interface AnalysisError {
