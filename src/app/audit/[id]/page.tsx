@@ -42,6 +42,7 @@ export default async function AuditPage({ params }: AuditPageProps) {
         screenshotPath: audit.screenshot_path,
         heatmapZones: audit.heatmap_zones as unknown[],
         pageHeight,
+        competitorAnalysis: audit.competitor_analysis || undefined,
         createdAt: audit.created_at,
       }}
       plan={dbUser.plan}

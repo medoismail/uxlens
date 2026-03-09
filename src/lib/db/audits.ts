@@ -1,5 +1,5 @@
 import { getSupabase } from "@/lib/supabase";
-import type { UXAuditResult } from "@/lib/types";
+import type { UXAuditResult, CompetitorAnalysis } from "@/lib/types";
 
 export interface DbAudit {
   id: string;
@@ -8,6 +8,7 @@ export interface DbAudit {
   screenshot_path: string | null;
   heatmap_zones: unknown | null;
   result: UXAuditResult;
+  competitor_analysis: CompetitorAnalysis | null;
   created_at: string;
 }
 
@@ -94,4 +95,35 @@ export async function getAuditById(
 
   if (error) return null;
   return data as DbAudit;
+}
+
+/**
+ * Update competitor analysis for an existing audit.
+ * Uses clerk_id to resolve the user, then verifies audit ownership.
+ */
+export async function updateCompetitorAnalysis(
+  auditId: string,
+  clerkUserId: string,
+  analysis: CompetitorAnalysis
+): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+
+  // Resolve DB user from Clerk ID
+  const { getUserByClerkId } = await import("./users");
+  const dbUser = await getUserByClerkId(clerkUserId);
+  if (!dbUser) return false;
+
+  const { error } = await sb
+    .from("audits")
+    .update({ competitor_analysis: analysis })
+    .eq("id", auditId)
+    .eq("user_id", dbUser.id);
+
+  if (error) {
+    console.error("updateCompetitorAnalysis error:", error);
+    return false;
+  }
+
+  return true;
 }

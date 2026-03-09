@@ -146,3 +146,53 @@ export const analyzeRequestSchema = z.object({
   url: urlSchema,
   email: z.string().email().optional(),
 });
+
+/* ── Competitor Analysis Schemas ───────────────────────── */
+
+const competitorCategoryScoresSchema = z.object({
+  messageClarity: z.object({ score: z.number().min(0).max(100), note: z.string() }),
+  cognitiveLoad: z.object({ score: z.number().min(0).max(100), note: z.string() }),
+  conversionArch: z.object({ score: z.number().min(0).max(100), note: z.string() }),
+  trustSignals: z.object({ score: z.number().min(0).max(100), note: z.string() }),
+  contradictions: z.object({ score: z.number().min(0).max(100), note: z.string() }),
+  firstScreen: z.object({ score: z.number().min(0).max(100), note: z.string() }),
+});
+
+const competitorProfileSchema = z.object({
+  url: z.string(),
+  name: z.string(),
+  estimatedScore: z.number().min(0).max(100),
+  estimatedGrade: z.string(),
+  categories: competitorCategoryScoresSchema,
+  strengths: z.array(z.string()),
+  weaknesses: z.array(z.string()),
+});
+
+const categoryComparisonSchema = z.object({
+  category: z.string(),
+  userScore: z.number().min(0).max(100),
+  competitor1Score: z.number().min(0).max(100),
+  competitor2Score: z.number().min(0).max(100),
+  winner: z.enum(["user", "competitor1", "competitor2"]),
+  insight: z.string(),
+});
+
+export const competitorAnalysisSchema = z.object({
+  competitors: z.array(competitorProfileSchema).min(1).max(2),
+  categoryComparisons: z.array(categoryComparisonSchema),
+  competitiveAdvantages: z.array(z.string()),
+  competitivePosition: z.string(),
+  userOverallScore: z.number().min(0).max(100),
+  averageCompetitorScore: z.number().min(0).max(100),
+  scoreGap: z.number(),
+});
+
+export const identifyCompetitorsSchema = z.object({
+  competitors: z.array(
+    z.object({
+      url: z.string().url(),
+      name: z.string(),
+      reasoning: z.string(),
+    })
+  ).min(1).max(2),
+});

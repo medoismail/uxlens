@@ -146,13 +146,14 @@ export interface PlanFeatures {
   pdfExport: boolean;
   aiChat: boolean;
   chatLimit: number;
+  competitorAnalysis: boolean;
 }
 
 export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
-  free: { improvements: false, pdfExport: false, aiChat: false, chatLimit: 0 },
-  starter: { improvements: true, pdfExport: true, aiChat: false, chatLimit: 0 },
-  pro: { improvements: true, pdfExport: true, aiChat: true, chatLimit: 50 },
-  agency: { improvements: true, pdfExport: true, aiChat: true, chatLimit: 200 },
+  free: { improvements: false, pdfExport: false, aiChat: false, chatLimit: 0, competitorAnalysis: false },
+  starter: { improvements: true, pdfExport: true, aiChat: false, chatLimit: 0, competitorAnalysis: false },
+  pro: { improvements: true, pdfExport: true, aiChat: true, chatLimit: 50, competitorAnalysis: true },
+  agency: { improvements: true, pdfExport: true, aiChat: true, chatLimit: 200, competitorAnalysis: true },
 };
 
 /** Chat message interface */
@@ -161,4 +162,42 @@ export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
   createdAt: string;
+}
+
+/* ── Competitor Analysis (Pro+) ────────────────────────── */
+
+export interface CompetitorProfile {
+  url: string;
+  name: string;
+  estimatedScore: number;
+  estimatedGrade: string;
+  categories: {
+    messageClarity: CategoryScore;
+    cognitiveLoad: CategoryScore;
+    conversionArch: CategoryScore;
+    trustSignals: CategoryScore;
+    contradictions: CategoryScore;
+    firstScreen: CategoryScore;
+  };
+  strengths: string[];   // 3 things competitor does better
+  weaknesses: string[];  // 3 things user does better
+}
+
+export interface CategoryComparison {
+  category: string;
+  userScore: number;
+  competitor1Score: number;
+  competitor2Score: number;
+  winner: "user" | "competitor1" | "competitor2";
+  insight: string;
+}
+
+export interface CompetitorAnalysis {
+  competitors: CompetitorProfile[];
+  categoryComparisons: CategoryComparison[];
+  competitiveAdvantages: string[];        // 5 actionable items
+  competitivePosition: string;            // 2-3 sentence summary
+  userOverallScore: number;
+  averageCompetitorScore: number;
+  scoreGap: number;                       // positive = user ahead
 }

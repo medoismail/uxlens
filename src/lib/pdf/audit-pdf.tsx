@@ -6,7 +6,7 @@ import {
   View,
   StyleSheet,
 } from "@react-pdf/renderer";
-import type { UXAuditResult } from "@/lib/types";
+import type { UXAuditResult, CompetitorAnalysis } from "@/lib/types";
 
 const BRAND = "#7c3aed";
 const BRAND_LIGHT = "#ede9fe";
@@ -56,9 +56,10 @@ function PageFooter() {
 interface AuditPDFProps {
   data: UXAuditResult;
   url: string;
+  competitorAnalysis?: CompetitorAnalysis;
 }
 
-export function AuditPDF({ data, url }: AuditPDFProps) {
+export function AuditPDF({ data, url, competitorAnalysis }: AuditPDFProps) {
   let domain = url;
   try { domain = new URL(url).hostname.replace("www.", ""); } catch {}
 
@@ -197,6 +198,97 @@ export function AuditPDF({ data, url }: AuditPDFProps) {
 
         <PageFooter />
       </Page>
+
+      {/* Competitor Analysis Page (Pro+) */}
+      {competitorAnalysis && competitorAnalysis.competitors.length > 0 && (
+        <Page size="A4" style={styles.page} wrap>
+          <View style={styles.header} fixed>
+            <Text style={styles.logo}>UXLens</Text>
+            <Text style={{ fontSize: 9, color: "#888" }}>{domain} — Competitor Analysis</Text>
+          </View>
+
+          <Text style={styles.sectionTitle}>Competitive Position</Text>
+          <Text style={styles.text}>{competitorAnalysis.competitivePosition}</Text>
+
+          {/* Score Comparison Table */}
+          <Text style={styles.sectionTitle}>Score Comparison</Text>
+          <View style={styles.categoryRow}>
+            <Text style={styles.categoryLabel}>Your site</Text>
+            <Text style={[styles.categoryScore, { color: scoreColorStr(competitorAnalysis.userOverallScore) }]}>
+              {competitorAnalysis.userOverallScore}/100
+            </Text>
+          </View>
+          {competitorAnalysis.competitors.map((comp) => (
+            <View key={comp.url} style={styles.categoryRow}>
+              <Text style={styles.categoryLabel}>{comp.name}</Text>
+              <Text style={[styles.categoryScore, { color: scoreColorStr(comp.estimatedScore) }]}>
+                {comp.estimatedScore}/100 ({comp.estimatedGrade})
+              </Text>
+            </View>
+          ))}
+          <View style={styles.categoryRow}>
+            <Text style={[styles.categoryLabel, { fontFamily: "Helvetica-Bold" }]}>Score Gap</Text>
+            <Text style={[styles.categoryScore, { color: competitorAnalysis.scoreGap >= 0 ? "#22c55e" : "#ef4444" }]}>
+              {competitorAnalysis.scoreGap >= 0 ? "+" : ""}{competitorAnalysis.scoreGap} points
+            </Text>
+          </View>
+
+          <View style={styles.divider} />
+
+          {/* Category-by-Category */}
+          <Text style={styles.sectionTitle}>Category Comparison</Text>
+          {competitorAnalysis.categoryComparisons.map((cat, i) => (
+            <View key={i} style={{ marginBottom: 8 }}>
+              <Text style={styles.sectionSubtitle}>{cat.category}</Text>
+              <View style={{ flexDirection: "row", gap: 12, marginBottom: 2 }}>
+                <Text style={[styles.text, { flex: 1 }]}>You: {cat.userScore}</Text>
+                <Text style={[styles.text, { flex: 1 }]}>{competitorAnalysis.competitors[0]?.name || "Comp 1"}: {cat.competitor1Score}</Text>
+                {competitorAnalysis.competitors.length > 1 && (
+                  <Text style={[styles.text, { flex: 1 }]}>{competitorAnalysis.competitors[1]?.name || "Comp 2"}: {cat.competitor2Score}</Text>
+                )}
+              </View>
+              <Text style={[styles.text, { fontSize: 9, color: "#666" }]}>{cat.insight}</Text>
+            </View>
+          ))}
+
+          <View style={styles.divider} />
+
+          {/* Competitor Profiles */}
+          {competitorAnalysis.competitors.map((comp, ci) => (
+            <View key={ci} wrap={false} minPresenceAhead={60}>
+              <Text style={styles.sectionTitle}>{comp.name}</Text>
+              <Text style={[styles.text, { color: "#888", fontSize: 9 }]}>{comp.url}</Text>
+              <Text style={styles.sectionSubtitle}>Their Strengths</Text>
+              {comp.strengths.map((s, i) => (
+                <View key={i} style={styles.bulletItem}>
+                  <Text style={[styles.bullet, { color: "#ef4444" }]}>▲</Text>
+                  <Text style={styles.bulletText}>{s}</Text>
+                </View>
+              ))}
+              <Text style={styles.sectionSubtitle}>Your Advantages</Text>
+              {comp.weaknesses.map((w, i) => (
+                <View key={i} style={styles.bulletItem}>
+                  <Text style={[styles.bullet, { color: "#22c55e" }]}>✓</Text>
+                  <Text style={styles.bulletText}>{w}</Text>
+                </View>
+              ))}
+            </View>
+          ))}
+
+          <View style={styles.divider} />
+
+          {/* Competitive Advantages */}
+          <Text style={styles.sectionTitle}>Competitive Advantages</Text>
+          {competitorAnalysis.competitiveAdvantages.map((adv, i) => (
+            <View key={i} style={styles.bulletItem}>
+              <Text style={styles.bullet}>{i + 1}.</Text>
+              <Text style={styles.bulletText}>{adv}</Text>
+            </View>
+          ))}
+
+          <PageFooter />
+        </Page>
+      )}
     </Document>
   );
 }

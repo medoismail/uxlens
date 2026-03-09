@@ -13,7 +13,8 @@ import { ScreenshotSection } from "@/components/screenshot-section";
 import { PdfExportButton } from "@/components/pdf-export-button";
 import { ChatWidget } from "@/components/chat-widget";
 import { PLAN_FEATURES } from "@/lib/types";
-import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone } from "@/lib/types";
+import { CompetitorSection, CompetitorLockedPreview } from "@/components/competitor-section";
+import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone, CompetitorAnalysis } from "@/lib/types";
 
 interface ResultsReportProps {
   data: UXAuditResult;
@@ -29,6 +30,8 @@ interface ResultsReportProps {
   pageHeight?: number;
   viewportWidth?: number;
   screenshotStatus?: "loading" | "done" | "failed";
+  competitorAnalysis?: CompetitorAnalysis;
+  competitorStatus?: "loading" | "done" | "failed" | "locked";
 }
 
 /* ── Helpers ── */
@@ -134,6 +137,7 @@ function LockedOverlay({ message }: { message: string }) {
 export function ResultsReport({
   data, url, onReset, onHumanAuditRequested, plan,
   auditId, screenshotUrl, heatmapZones, pageHeight, viewportWidth, screenshotStatus,
+  competitorAnalysis, competitorStatus,
 }: ResultsReportProps) {
   const features = PLAN_FEATURES[plan];
   let domain = url;
@@ -155,7 +159,7 @@ export function ResultsReport({
         {/* PDF Export button — Starter+ only */}
         {features.pdfExport && (
           <div className="mt-3">
-            <PdfExportButton data={data} url={url} />
+            <PdfExportButton data={data} url={url} competitorAnalysis={competitorAnalysis} />
           </div>
         )}
       </div>
@@ -407,6 +411,14 @@ export function ResultsReport({
 
       {features.improvements && data.rewrite.rewriteRationale && (
         <p className="text-[12px] text-foreground/30 leading-relaxed mb-6 px-1">{data.rewrite.rewriteRationale}</p>
+      )}
+
+      {/* ─── Competitor Analysis ─── */}
+      <ReportDivider label="Competitor Analysis" />
+      {competitorStatus && competitorStatus !== "locked" ? (
+        <CompetitorSection data={competitorAnalysis} status={competitorStatus} />
+      ) : (
+        <CompetitorLockedPreview />
       )}
 
       {/* ─── Human Audit CTA ─── */}

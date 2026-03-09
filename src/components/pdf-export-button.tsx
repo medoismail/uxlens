@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import { Download, Loader2 } from "lucide-react";
-import type { UXAuditResult } from "@/lib/types";
+import type { UXAuditResult, CompetitorAnalysis } from "@/lib/types";
 
 interface PdfExportButtonProps {
   data: UXAuditResult;
   url: string;
+  competitorAnalysis?: CompetitorAnalysis;
 }
 
-export function PdfExportButton({ data, url }: PdfExportButtonProps) {
+export function PdfExportButton({ data, url, competitorAnalysis }: PdfExportButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,7 +23,7 @@ export function PdfExportButton({ data, url }: PdfExportButtonProps) {
       const { pdf } = await import("@react-pdf/renderer");
       const { AuditPDF } = await import("@/lib/pdf/audit-pdf");
 
-      const blob = await pdf(<AuditPDF data={data} url={url} />).toBlob();
+      const blob = await pdf(<AuditPDF data={data} url={url} competitorAnalysis={competitorAnalysis} />).toBlob();
 
       // Trigger download
       let domain = "audit";

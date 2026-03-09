@@ -12,14 +12,15 @@ import { Footer } from "@/components/footer";
 import { HomeSEOContent } from "@/components/home-seo-content";
 import { normalizeUrl } from "@/lib/validate-url";
 import { useSubscription } from "@/hooks/use-subscription";
-import type { AnalysisResult, UXAuditResult, UsageCheck, HeatmapZone } from "@/lib/types";
+import { PLAN_FEATURES } from "@/lib/types";
+import type { AnalysisResult, UXAuditResult, UsageCheck, HeatmapZone, CompetitorAnalysis } from "@/lib/types";
 
 type AppState =
   | { status: "idle" }
   | { status: "loading" }
   | { status: "error"; message: string }
   | { status: "limit_reached"; usage: UsageCheck }
-  | { status: "success"; data: UXAuditResult; url: string; auditId?: string; screenshotUrl?: string; heatmapZones?: HeatmapZone[]; pageHeight?: number; viewportWidth?: number; screenshotStatus?: "loading" | "done" | "failed" }
+  | { status: "success"; data: UXAuditResult; url: string; auditId?: string; screenshotUrl?: string; heatmapZones?: HeatmapZone[]; pageHeight?: number; viewportWidth?: number; screenshotStatus?: "loading" | "done" | "failed"; competitorAnalysis?: CompetitorAnalysis; competitorStatus?: "loading" | "done" | "failed" | "locked" }
   | { status: "human_audit_requested"; url: string; email: string };
 
 export function HomeClient() {
@@ -45,6 +46,10 @@ export function HomeClient() {
       const result: AnalysisResult = await res.json();
 
       if (result.success) {
+        // Determine competitor analysis status based on plan
+        const features = PLAN_FEATURES[plan];
+        const compStatus = features.competitorAnalysis ? "loading" as const : "locked" as const;
+
         // Show the report immediately (without screenshot)
         setState({
           status: "success",
@@ -52,10 +57,16 @@ export function HomeClient() {
           url: result.url,
           auditId: result.auditId,
           screenshotStatus: "loading",
+          competitorStatus: compStatus,
         });
 
         // Step 2: Capture screenshot in the background (separate request)
         fetchScreenshot(result.url, result.auditId);
+
+        // Step 3: Run competitor analysis in background (Pro+ only)
+        if (features.competitorAnalysis) {
+          fetchCompetitorAnalysis(result.url, result.data, result.auditId);
+        }
       } else if (result.code === "USAGE_LIMIT" && result.usage) {
         if (result.usage.audits_remaining === 0 && result.usage.upgrade_suggestion) {
           setState({ status: "limit_reached", usage: result.usage });
@@ -119,6 +130,51 @@ export function HomeClient() {
     }
   }
 
+  /** Fire-and-forget: run competitor analysis and update state when it arrives */
+  async function fetchCompetitorAnalysis(url: string, auditData: UXAuditResult, auditId?: string) {
+    try {
+      const res = await fetch("/api/competitor-analysis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url,
+          auditId,
+          overallScore: auditData.overallScore,
+          categories: auditData.categories,
+          headline: auditData.rewrite?.beforeHeadline || "",
+          executiveSummary: auditData.executiveSummary,
+        }),
+      });
+
+      if (!res.ok) {
+        setState((prev) => {
+          if (prev.status !== "success") return prev;
+          return { ...prev, competitorStatus: "failed" };
+        });
+        return;
+      }
+
+      const result = await res.json();
+
+      if (result.success && result.data) {
+        setState((prev) => {
+          if (prev.status !== "success") return prev;
+          return { ...prev, competitorAnalysis: result.data, competitorStatus: "done" };
+        });
+      } else {
+        setState((prev) => {
+          if (prev.status !== "success") return prev;
+          return { ...prev, competitorStatus: "failed" };
+        });
+      }
+    } catch {
+      setState((prev) => {
+        if (prev.status !== "success") return prev;
+        return { ...prev, competitorStatus: "failed" };
+      });
+    }
+  }
+
   function handleHumanAuditRequested(url: string, email: string) {
     setState({ status: "human_audit_requested", url: normalizeUrl(url), email });
   }
@@ -164,6 +220,8 @@ export function HomeClient() {
             pageHeight={state.pageHeight}
             viewportWidth={state.viewportWidth}
             screenshotStatus={state.screenshotStatus}
+            competitorAnalysis={state.competitorAnalysis}
+            competitorStatus={state.competitorStatus}
           />
         )}
         {state.status === "human_audit_requested" && (

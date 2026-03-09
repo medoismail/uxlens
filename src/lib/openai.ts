@@ -1,6 +1,6 @@
 import OpenAI from "openai";
-import type { ExtractedContent, UXAuditResult } from "./types";
-import { uxAuditSchema } from "./schemas";
+import type { ExtractedContent, UXAuditResult, CompetitorAnalysis } from "./types";
+import { uxAuditSchema, identifyCompetitorsSchema, competitorAnalysisSchema } from "./schemas";
 
 function getClient() {
   return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -334,5 +334,185 @@ export async function generateUXAudit(
 
   const parsed = JSON.parse(raw);
   const validated = uxAuditSchema.parse(parsed);
+  return validated;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Competitor Analysis (Pro+)
+   ───────────────────────────────────────────────────────── */
+
+/**
+ * Step 1: Identify the 2 biggest competitors for a given landing page.
+ * Small, fast GPT-4o call (~512 tokens).
+ */
+export async function identifyCompetitors(
+  url: string,
+  headline: string,
+  executiveSummary: string
+): Promise<{ url: string; name: string; reasoning: string }[]> {
+  const response = await withRetry(() =>
+    getClient().chat.completions.create({
+      model: "gpt-4o",
+      response_format: { type: "json_object" },
+      temperature: 0.3,
+      max_tokens: 512,
+      messages: [
+        {
+          role: "system",
+          content: `You are a market research analyst. Given a landing page URL, headline, and summary, identify the 2 biggest direct competitors in the same market. Return their actual, real website URLs — NOT made-up URLs. Only return competitors that are real, well-known companies with live websites. Return STRICT JSON only.`,
+        },
+        {
+          role: "user",
+          content: `Identify the 2 biggest direct competitors for this landing page:
+
+URL: ${url}
+HEADLINE: ${headline}
+SUMMARY: ${executiveSummary}
+
+Return JSON:
+{
+  "competitors": [
+    { "url": "https://competitor1.com", "name": "Competitor Name", "reasoning": "Why they're a direct competitor" },
+    { "url": "https://competitor2.com", "name": "Competitor Name", "reasoning": "Why they're a direct competitor" }
+  ]
+}
+
+Rules:
+- Only return REAL companies with live, public websites
+- URLs must be the main marketing/landing page (not a subpage)
+- Competitors must be in the SAME market/category, not just tangentially related
+- If the site is too niche to identify 2 competitors, return just 1`,
+        },
+      ],
+    })
+  );
+
+  const raw = response.choices[0]?.message?.content;
+  if (!raw) throw new Error("No response from OpenAI");
+
+  const parsed = JSON.parse(raw);
+  const validated = identifyCompetitorsSchema.parse(parsed);
+  return validated.competitors;
+}
+
+/**
+ * Step 2: Deep competitor comparison.
+ * Full GPT-4o call analyzing all 3 sites side-by-side.
+ */
+export async function generateCompetitorComparison(
+  userUrl: string,
+  userContent: ExtractedContent,
+  userAuditScores: {
+    overallScore: number;
+    categories: UXAuditResult["categories"];
+  },
+  competitors: {
+    url: string;
+    name: string;
+    content: ExtractedContent;
+  }[]
+): Promise<CompetitorAnalysis> {
+  function summarizeContent(c: ExtractedContent): string {
+    return `URL: ${c.url}
+TITLE: ${c.title || "(none)"}
+META: ${c.metaDescription || "(none)"}
+HEADINGS: ${c.headings.slice(0, 8).join(" | ") || "(none)"}
+BUTTONS: ${c.buttons.slice(0, 8).join(" | ") || "(none)"}
+TRUST SIGNALS: ${c.trustSignals.slice(0, 6).join(" | ") || "(none)"}
+BODY TEXT (first 1500 chars): ${(c.bodyText || "").slice(0, 1500)}`;
+  }
+
+  const compSections = competitors
+    .map(
+      (c, i) => `
+═══ COMPETITOR ${i + 1}: ${c.name} ═══
+${summarizeContent(c.content)}`
+    )
+    .join("\n\n");
+
+  const userCats = userAuditScores.categories;
+
+  const response = await withRetry(() =>
+    getClient().chat.completions.create({
+      model: "gpt-4o",
+      response_format: { type: "json_object" },
+      temperature: 0.4,
+      max_tokens: 4096,
+      messages: [
+        {
+          role: "system",
+          content: `You are a senior UX competitive analyst. You compare landing pages across 6 UX categories using the same methodology as UXLens audits. Your job is to:
+1. Score each competitor on the same 6 categories (messageClarity, cognitiveLoad, conversionArch, trustSignals, contradictions, firstScreen)
+2. Identify what each competitor does BETTER and WORSE than the user's site
+3. Provide 5 actionable competitive advantages the user can implement
+4. Give a 2-3 sentence competitive position summary
+
+Be specific: cite actual content from each site. Do not give generic advice. Return STRICT JSON only.`,
+        },
+        {
+          role: "user",
+          content: `Compare this user's landing page against their competitors.
+
+═══ USER'S SITE ═══
+${summarizeContent(userContent)}
+
+USER'S AUDIT SCORES (already calculated):
+- Overall: ${userAuditScores.overallScore}/100
+- Message Clarity: ${userCats.messageClarity.score}/100
+- Cognitive Load: ${userCats.cognitiveLoad.score}/100
+- Conversion Arch: ${userCats.conversionArch.score}/100
+- Trust Signals: ${userCats.trustSignals.score}/100
+- Contradictions: ${userCats.contradictions.score}/100
+- First Screen: ${userCats.firstScreen.score}/100
+
+${compSections}
+
+Return JSON:
+{
+  "competitors": [
+    {
+      "url": "...",
+      "name": "...",
+      "estimatedScore": <0-100 overall>,
+      "estimatedGrade": "Critical|Poor|Needs Work|Decent|Good|Strong|Excellent",
+      "categories": {
+        "messageClarity": { "score": <0-100>, "note": "..." },
+        "cognitiveLoad": { "score": <0-100>, "note": "..." },
+        "conversionArch": { "score": <0-100>, "note": "..." },
+        "trustSignals": { "score": <0-100>, "note": "..." },
+        "contradictions": { "score": <0-100>, "note": "..." },
+        "firstScreen": { "score": <0-100>, "note": "..." }
+      },
+      "strengths": ["3 things they do better than the user"],
+      "weaknesses": ["3 things the user does better than them"]
+    }
+  ],
+  "categoryComparisons": [
+    {
+      "category": "Message Clarity",
+      "userScore": ${userCats.messageClarity.score},
+      "competitor1Score": <0-100>,
+      "competitor2Score": <0-100>,
+      "winner": "user|competitor1|competitor2",
+      "insight": "one-sentence comparison insight"
+    }
+    // ... for all 6 categories
+  ],
+  "competitiveAdvantages": ["5 specific, actionable recommendations based on competitor weaknesses"],
+  "competitivePosition": "2-3 sentence summary of competitive standing",
+  "userOverallScore": ${userAuditScores.overallScore},
+  "averageCompetitorScore": <average of competitor scores>,
+  "scoreGap": <userScore minus averageCompetitorScore>
+}`,
+        },
+      ],
+    })
+  );
+
+  const raw = response.choices[0]?.message?.content;
+  if (!raw) throw new Error("No response from OpenAI");
+
+  const parsed = JSON.parse(raw);
+  const validated = competitorAnalysisSchema.parse(parsed);
   return validated;
 }
