@@ -17,19 +17,12 @@ interface AuditViewClientProps {
 }
 
 export function AuditViewClient({ audit, plan }: AuditViewClientProps) {
-  const isSubscribed = plan !== "free";
-
   function handleReset() {
     window.location.href = "/dashboard";
   }
 
   function handleHumanAuditRequested() {
     // Not applicable for saved audits
-  }
-
-  function handleSubscriptionVerified() {
-    // Refresh the page to update the view
-    window.location.reload();
   }
 
   return (
@@ -41,13 +34,11 @@ export function AuditViewClient({ audit, plan }: AuditViewClientProps) {
           url={audit.url}
           onReset={handleReset}
           onHumanAuditRequested={handleHumanAuditRequested}
-          isSubscribed={isSubscribed}
           plan={plan}
-          onSubscriptionVerified={handleSubscriptionVerified}
           auditId={audit.id}
           screenshotUrl={audit.screenshotPath || undefined}
           heatmapZones={(audit.heatmapZones as HeatmapZone[]) || undefined}
-          pageHeight={3000} // Default since saved audits may not have this
+          pageHeight={3000}
           viewportWidth={1280}
         />
       </main>

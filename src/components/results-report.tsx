@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import { Footer } from "@/components/footer";
 import { ScreenshotSection } from "@/components/screenshot-section";
+import { PdfExportButton } from "@/components/pdf-export-button";
+import { PLAN_FEATURES } from "@/lib/types";
 import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone } from "@/lib/types";
 
 interface ResultsReportProps {
@@ -17,9 +19,9 @@ interface ResultsReportProps {
   url: string;
   onReset: () => void;
   onHumanAuditRequested: (url: string, email: string) => void;
-  isSubscribed: boolean;
+  isSubscribed?: boolean;
   plan: PlanTier;
-  onSubscriptionVerified: (email: string) => void;
+  onSubscriptionVerified?: (email: string) => void;
   auditId?: string;
   screenshotUrl?: string;
   heatmapZones?: HeatmapZone[];
@@ -93,9 +95,9 @@ function UpgradeCard() {
   return (
     <div className="rounded-xl border p-5 my-6 text-center" style={{ background: "linear-gradient(135deg, var(--brand-dim), var(--s1))", borderColor: "var(--brand-glow)" }}>
       <Lock className="h-5 w-5 mx-auto mb-2" style={{ color: "var(--brand)" }} />
-      <h3 className="text-[14px] font-semibold tracking-tight mb-1">Unlock the full report</h3>
+      <h3 className="text-[14px] font-semibold tracking-tight mb-1">Unlock strategic fixes & optimized copy</h3>
       <p className="text-[12px] text-foreground/40 leading-relaxed max-w-sm mx-auto mb-4">
-        Get detailed findings, trust matrix, optimized copy, strategic fixes, and more with a paid plan.
+        Upgrade to get strategic fixes, section recommendations, AI-optimized hero copy, and PDF export.
       </p>
       <Link
         href="/pricing"
@@ -128,10 +130,10 @@ function LockedOverlay({ message }: { message: string }) {
 /* ── Main Component ── */
 
 export function ResultsReport({
-  data, url, onReset, onHumanAuditRequested, isSubscribed, plan,
+  data, url, onReset, onHumanAuditRequested, plan,
   screenshotUrl, heatmapZones, pageHeight, viewportWidth,
 }: ResultsReportProps) {
-  const isFree = plan === "free" && !isSubscribed;
+  const features = PLAN_FEATURES[plan];
   let domain = url;
   try { domain = new URL(url).hostname.replace("www.", ""); } catch {}
 
@@ -147,6 +149,13 @@ export function ResultsReport({
           9-Layer UX Audit Report
         </p>
         <h1 className="text-xl font-semibold tracking-tight text-foreground">{domain}</h1>
+
+        {/* PDF Export button — Starter+ only */}
+        {features.pdfExport && (
+          <div className="mt-3">
+            <PdfExportButton data={data} url={url} />
+          </div>
+        )}
       </div>
 
       {/* ─── Score Banner ─── */}
@@ -201,7 +210,7 @@ export function ResultsReport({
         />
       )}
 
-      {/* ─── Category Grid ─── */}
+      {/* ─── Category Grid (all tiers) ─── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-5 stagger-children">
         {CATEGORY_DEFS.map((cat) => {
           const catData = data.categories[cat.key as keyof typeof data.categories];
@@ -226,7 +235,7 @@ export function ResultsReport({
         })}
       </div>
 
-      {/* ─── Conversion Killers ─── */}
+      {/* ─── Conversion Killers (all tiers see ALL) ─── */}
       <AccordionSection
         icon={<Flame className="h-4 w-4" style={{ color: "var(--score-low)" }} />}
         name="Top Conversion Killers"
@@ -235,35 +244,30 @@ export function ResultsReport({
         className="fu fu-3"
       >
         <div className="flex flex-col gap-2 mb-4">
-          {(isFree ? data.conversionKillers.slice(0, 3) : data.conversionKillers).map((k, i) => (
+          {data.conversionKillers.map((k, i) => (
             <div key={i} className="flex gap-2.5 text-[12px] leading-relaxed text-foreground/50 p-2.5 px-3.5 rounded-[7px] border-l-2" style={{ background: "var(--s2)", borderColor: "var(--score-low)" }}>
               <span className="font-medium shrink-0 min-w-[18px]" style={{ color: "var(--score-low)" }}>{i + 1}.</span>
               <span>{k}</span>
             </div>
           ))}
-          {isFree && data.conversionKillers.length > 3 && (
-            <LockedHint count={data.conversionKillers.length - 3} label="more issues" />
-          )}
         </div>
 
         {data.quickWins.length > 0 && (
           <>
             <p className="text-[12px] uppercase tracking-[2px] mb-2.5" style={{ color: "var(--score-high)" }}>Quick wins (under 1 hour)</p>
             <div className="flex flex-col gap-2 mb-4">
-              {(isFree ? data.quickWins.slice(0, 2) : data.quickWins).map((w, i) => (
+              {data.quickWins.map((w, i) => (
                 <div key={i} className="flex gap-2.5 text-[12px] leading-relaxed text-foreground/50 p-2.5 px-3.5 rounded-[7px] border-l-2" style={{ background: "var(--s2)", borderColor: "var(--score-high)" }}>
                   <span className="font-medium shrink-0 min-w-[18px]" style={{ color: "var(--score-high)" }}>{i + 1}.</span>
                   <span>{w}</span>
                 </div>
               ))}
-              {isFree && data.quickWins.length > 2 && (
-                <LockedHint count={data.quickWins.length - 2} label="more quick wins" />
-              )}
             </div>
           </>
         )}
 
-        {!isFree && data.strategicFixes.length > 0 && (
+        {/* Strategic fixes — Starter+ only */}
+        {features.improvements && data.strategicFixes.length > 0 && (
           <>
             <p className="text-[12px] uppercase tracking-[2px] mb-2.5" style={{ color: "var(--accent-purple)" }}>Strategic fixes</p>
             <div className="flex flex-col gap-2">
@@ -276,26 +280,26 @@ export function ResultsReport({
             </div>
           </>
         )}
-        {isFree && data.strategicFixes.length > 0 && (
+        {!features.improvements && data.strategicFixes.length > 0 && (
           <LockedHint count={data.strategicFixes.length} label="strategic fixes" />
         )}
       </AccordionSection>
 
-      {/* ─── Upgrade Card (free users) ─── */}
-      {isFree && <UpgradeCard />}
+      {/* ─── Upgrade Card (free users who can't see improvements) ─── */}
+      {!features.improvements && <UpgradeCard />}
 
       {/* ─── Divider ─── */}
       <ReportDivider label="Detailed Audit" />
 
-      {/* ─── Section Accordions ─── */}
+      {/* ─── Section Accordions (all tiers see findings; recommendations locked for free) ─── */}
       {data.sections.map((sec, idx) => (
-        <SectionAccordion key={sec.id} section={sec} delay={idx + 3} locked={isFree} />
+        <SectionAccordion key={sec.id} section={sec} delay={idx + 3} showRecommendations={features.improvements} />
       ))}
 
       {/* ─── Divider ─── */}
       <ReportDivider label="Confusion & Trust Analysis" />
 
-      {/* ─── Confusion Map ─── */}
+      {/* ─── Confusion Map (all tiers) ─── */}
       <AccordionSection
         icon={<Brain className="h-4 w-4" style={{ color: "var(--brand)" }} />}
         name="Confusion Detection Map"
@@ -317,47 +321,39 @@ export function ResultsReport({
           ))}
         </div>
 
+        {/* First-screen insights — all tiers */}
         {data.firstScreenAnalysis.immediateUnderstanding && (
-          isFree ? (
-            <LockedOverlay message="First-screen insights are available on paid plans" />
-          ) : (
-            <div className="flex flex-col gap-2.5">
-              <InsightCard icon={<Eye className="h-3.5 w-3.5" />} label="First impression" value={data.firstScreenAnalysis.immediateUnderstanding} type="warning" />
-              <InsightCard icon={<HelpCircle className="h-3.5 w-3.5" />} label="Unanswered above the fold" value={data.firstScreenAnalysis.unansweredQuestion} type="issue" />
-              <InsightCard icon={<Heart className="h-3.5 w-3.5" />} label="Dominant emotion triggered" value={data.firstScreenAnalysis.dominantEmotion} type="warning" />
-              <InsightCard icon={<LogOut className="h-3.5 w-3.5" />} label="#1 exit reason" value={data.firstScreenAnalysis.exitReason} type="issue" />
-            </div>
-          )
+          <div className="flex flex-col gap-2.5">
+            <InsightCard icon={<Eye className="h-3.5 w-3.5" />} label="First impression" value={data.firstScreenAnalysis.immediateUnderstanding} type="warning" />
+            <InsightCard icon={<HelpCircle className="h-3.5 w-3.5" />} label="Unanswered above the fold" value={data.firstScreenAnalysis.unansweredQuestion} type="issue" />
+            <InsightCard icon={<Heart className="h-3.5 w-3.5" />} label="Dominant emotion triggered" value={data.firstScreenAnalysis.dominantEmotion} type="warning" />
+            <InsightCard icon={<LogOut className="h-3.5 w-3.5" />} label="#1 exit reason" value={data.firstScreenAnalysis.exitReason} type="issue" />
+          </div>
         )}
       </AccordionSection>
 
-      {/* ─── Trust Matrix ─── */}
+      {/* ─── Trust Matrix (all tiers) ─── */}
       <AccordionSection
         icon={<Shield className="h-4 w-4" style={{ color: "var(--score-high)" }} />}
         name="Trust Signal Matrix"
         subtitle="Credibility components scored individually"
-        defaultOpen={!isFree}
+        defaultOpen
         className="fu fu-8"
-        locked={isFree}
       >
-        {isFree ? (
-          <LockedOverlay message="Trust signal breakdown is available on paid plans" />
-        ) : (
-          <div className="flex flex-col gap-2">
-            {data.trustMatrix.map((t) => (
-              <div key={t.label} className="flex items-center gap-3 text-[12px]">
-                <span className="w-[160px] text-foreground/40 shrink-0">{t.label}</span>
-                <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
-                  <div
-                    className="h-full rounded-full animate-bar-width"
-                    style={{ background: scoreColor(t.score), width: `${t.score}%`, "--bar-width": `${t.score}%` } as React.CSSProperties}
-                  />
-                </div>
-                <span className="w-8 text-right text-foreground/50 tabular-nums">{t.score}</span>
+        <div className="flex flex-col gap-2">
+          {data.trustMatrix.map((t) => (
+            <div key={t.label} className="flex items-center gap-3 text-[12px]">
+              <span className="w-[160px] text-foreground/40 shrink-0">{t.label}</span>
+              <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
+                <div
+                  className="h-full rounded-full animate-bar-width"
+                  style={{ background: scoreColor(t.score), width: `${t.score}%`, "--bar-width": `${t.score}%` } as React.CSSProperties}
+                />
               </div>
-            ))}
-          </div>
-        )}
+              <span className="w-8 text-right text-foreground/50 tabular-nums">{t.score}</span>
+            </div>
+          ))}
+        </div>
       </AccordionSection>
 
       {/* ─── Divider ─── */}
@@ -370,7 +366,7 @@ export function ResultsReport({
           <span className="text-[12px] px-2 py-0.5 rounded tracking-wide" style={{ color: "var(--brand)", background: "var(--brand-dim)", border: "1px solid var(--brand-glow)" }}>AI OPTIMIZED</span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2">
-          {/* Before */}
+          {/* Before — always visible */}
           <div className="p-5 sm:border-r" style={{ borderColor: "var(--border)" }}>
             <p className="text-[12px] uppercase tracking-[1.5px] text-foreground/30 mb-3">Before</p>
             <p className="text-[20px] leading-tight mb-2 text-foreground/30 line-through">{data.rewrite.beforeHeadline || "—"}</p>
@@ -379,10 +375,10 @@ export function ResultsReport({
               {data.rewrite.beforeCTA || "—"}
             </span>
           </div>
-          {/* After */}
+          {/* After — Starter+ only */}
           <div className="p-5 relative">
             <p className="text-[12px] uppercase tracking-[1.5px] text-foreground/30 mb-3">After</p>
-            {isFree ? (
+            {!features.improvements ? (
               <LockedOverlay message="AI-optimized copy is available on paid plans" />
             ) : (
               <>
@@ -397,7 +393,7 @@ export function ResultsReport({
         </div>
       </div>
 
-      {!isFree && data.rewrite.rewriteRationale && (
+      {features.improvements && data.rewrite.rewriteRationale && (
         <p className="text-[12px] text-foreground/30 leading-relaxed mb-6 px-1">{data.rewrite.rewriteRationale}</p>
       )}
 
@@ -431,7 +427,6 @@ function AccordionSection({
   subtitle,
   defaultOpen = false,
   className = "",
-  locked = false,
   children,
 }: {
   icon: React.ReactNode;
@@ -439,16 +434,15 @@ function AccordionSection({
   subtitle?: string;
   defaultOpen?: boolean;
   className?: string;
-  locked?: boolean;
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(locked ? false : defaultOpen);
+  const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className={`rounded-[11px] border overflow-hidden mb-3 ${className} ${locked ? "opacity-75" : ""}`} style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+    <div className={`rounded-[11px] border overflow-hidden mb-3 ${className}`} style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
       <button
-        onClick={() => !locked && setOpen(!open)}
-        className={`w-full flex items-center justify-between px-[18px] py-4 select-none transition-colors gap-3 ${locked ? "cursor-default" : "cursor-pointer hover:bg-foreground/[0.015]"}`}
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-[18px] py-4 select-none transition-colors gap-3 cursor-pointer hover:bg-foreground/[0.015]"
       >
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-[7px] grid place-items-center shrink-0" style={{ background: "var(--s2)" }}>
@@ -460,11 +454,7 @@ function AccordionSection({
           </div>
         </div>
         <div className="flex items-center gap-2.5 shrink-0">
-          {locked ? (
-            <Lock className="h-3.5 w-3.5 text-foreground/25" />
-          ) : (
-            <ChevronDown className={`h-3.5 w-3.5 text-foreground/30 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
-          )}
+          <ChevronDown className={`h-3.5 w-3.5 text-foreground/30 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
         </div>
       </button>
       {open && (
@@ -480,14 +470,14 @@ function AccordionSection({
 /* Section Accordion (audit sections with findings)         */
 /* ──────────────────────────────────────────────────────── */
 
-function SectionAccordion({ section, delay, locked = false }: { section: AuditSection; delay: number; locked?: boolean }) {
+function SectionAccordion({ section, delay, showRecommendations = true }: { section: AuditSection; delay: number; showRecommendations?: boolean }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className={`rounded-[11px] border overflow-hidden mb-3 fu fu-${Math.min(9, delay)} ${locked ? "opacity-75" : ""}`} style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+    <div className={`rounded-[11px] border overflow-hidden mb-3 fu fu-${Math.min(9, delay)}`} style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
       <button
-        onClick={() => !locked && setOpen(!open)}
-        className={`w-full flex items-center justify-between px-[18px] py-4 select-none transition-colors gap-3 ${locked ? "cursor-default" : "cursor-pointer hover:bg-foreground/[0.015]"}`}
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-[18px] py-4 select-none transition-colors gap-3 cursor-pointer hover:bg-foreground/[0.015]"
       >
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-[7px] grid place-items-center shrink-0" style={{ background: "var(--s2)" }}>
@@ -502,24 +492,20 @@ function SectionAccordion({ section, delay, locked = false }: { section: AuditSe
           <span className="text-[12px] font-bold font-mono px-2.5 py-0.5 rounded-[5px]" style={scoreBadgeStyle(section.score)}>
             {section.score}/100
           </span>
-          {locked ? (
-            <Lock className="h-3.5 w-3.5 text-foreground/25" />
-          ) : (
-            <ChevronDown className={`h-3.5 w-3.5 text-foreground/30 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
-          )}
+          <ChevronDown className={`h-3.5 w-3.5 text-foreground/30 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
         </div>
       </button>
-      {open && !locked && (
+      {open && (
         <div className="border-t px-5 py-5" style={{ borderColor: "var(--border)" }}>
-          {/* Findings */}
+          {/* Findings — visible to all tiers */}
           <div className="flex flex-col gap-2.5 mb-5">
             {section.findings.map((f, i) => (
               <FindingCard key={i} finding={f} />
             ))}
           </div>
 
-          {/* Recommendations */}
-          {section.recommendations.length > 0 && (
+          {/* Recommendations — Starter+ only */}
+          {showRecommendations && section.recommendations.length > 0 && (
             <>
               <p className="text-[12px] uppercase tracking-[2px] text-foreground/30 mb-2.5">Recommendations</p>
               <div className="flex flex-col gap-2">
@@ -531,6 +517,9 @@ function SectionAccordion({ section, delay, locked = false }: { section: AuditSe
                 ))}
               </div>
             </>
+          )}
+          {!showRecommendations && section.recommendations.length > 0 && (
+            <LockedHint count={section.recommendations.length} label="recommendations" />
           )}
         </div>
       )}

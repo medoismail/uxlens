@@ -139,3 +139,26 @@ export const PLAN_LIMITS: Record<PlanTier, number> = {
 };
 
 export const RATE_LIMIT_PER_HOUR = 10;
+
+/** Feature access per plan tier */
+export interface PlanFeatures {
+  improvements: boolean;
+  pdfExport: boolean;
+  aiChat: boolean;
+  chatLimit: number;
+}
+
+export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
+  free: { improvements: false, pdfExport: false, aiChat: false, chatLimit: 0 },
+  starter: { improvements: true, pdfExport: true, aiChat: false, chatLimit: 0 },
+  pro: { improvements: true, pdfExport: true, aiChat: true, chatLimit: 50 },
+  agency: { improvements: true, pdfExport: true, aiChat: true, chatLimit: 200 },
+};
+
+/** Chat message interface */
+export interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  createdAt: string;
+}

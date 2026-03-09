@@ -1,0 +1,200 @@
+import React from "react";
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+} from "@react-pdf/renderer";
+import type { UXAuditResult } from "@/lib/types";
+
+const BRAND = "#7c3aed";
+const BRAND_LIGHT = "#ede9fe";
+
+const styles = StyleSheet.create({
+  page: { padding: 40, fontSize: 10, fontFamily: "Helvetica", color: "#1a1a2e" },
+  coverPage: { padding: 40, display: "flex", justifyContent: "center", alignItems: "center" },
+  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 30, borderBottom: "2px solid " + BRAND, paddingBottom: 15 },
+  logo: { fontSize: 20, fontFamily: "Helvetica-Bold", color: BRAND },
+  subtitle: { fontSize: 9, color: "#888" },
+  scoreBox: { alignItems: "center", padding: 20, backgroundColor: BRAND_LIGHT, borderRadius: 8, marginBottom: 20 },
+  bigScore: { fontSize: 48, fontFamily: "Helvetica-Bold", color: BRAND },
+  grade: { fontSize: 14, fontFamily: "Helvetica-Bold", color: BRAND, marginTop: 4 },
+  sectionTitle: { fontSize: 14, fontFamily: "Helvetica-Bold", color: BRAND, marginTop: 20, marginBottom: 8 },
+  sectionSubtitle: { fontSize: 11, fontFamily: "Helvetica-Bold", color: "#1a1a2e", marginTop: 14, marginBottom: 6 },
+  text: { fontSize: 10, lineHeight: 1.5, color: "#333", marginBottom: 4 },
+  bulletItem: { flexDirection: "row", marginBottom: 4, paddingLeft: 8 },
+  bullet: { width: 12, fontSize: 10, color: BRAND },
+  bulletText: { flex: 1, fontSize: 10, lineHeight: 1.5, color: "#333" },
+  categoryRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 6, borderBottom: "1px solid #eee" },
+  categoryLabel: { fontSize: 10, color: "#555" },
+  categoryScore: { fontSize: 10, fontFamily: "Helvetica-Bold" },
+  findingBox: { marginBottom: 6, padding: 8, backgroundColor: "#f9f9fb", borderRadius: 4, borderLeft: "3px solid " + BRAND },
+  findingTitle: { fontSize: 10, fontFamily: "Helvetica-Bold", color: "#1a1a2e" },
+  findingDesc: { fontSize: 9, color: "#555", marginTop: 2, lineHeight: 1.4 },
+  rewriteBox: { padding: 10, backgroundColor: BRAND_LIGHT, borderRadius: 6, marginTop: 6 },
+  rewriteLabel: { fontSize: 8, fontFamily: "Helvetica-Bold", color: BRAND, marginBottom: 3 },
+  rewriteText: { fontSize: 10, color: "#333", lineHeight: 1.4 },
+  footer: { position: "absolute", bottom: 25, left: 40, right: 40, flexDirection: "row", justifyContent: "space-between", fontSize: 8, color: "#aaa" },
+  divider: { borderBottom: "1px solid #eee", marginVertical: 12 },
+});
+
+function scoreColorStr(s: number): string {
+  if (s >= 75) return "#22c55e";
+  if (s >= 50) return "#eab308";
+  return "#ef4444";
+}
+
+interface AuditPDFProps {
+  data: UXAuditResult;
+  url: string;
+}
+
+export function AuditPDF({ data, url }: AuditPDFProps) {
+  let domain = url;
+  try { domain = new URL(url).hostname.replace("www.", ""); } catch {}
+
+  const categoryEntries = [
+    { label: "Message Clarity", score: data.categories.messageClarity.score },
+    { label: "Cognitive Load", score: data.categories.cognitiveLoad.score },
+    { label: "Conversion Architecture", score: data.categories.conversionArch.score },
+    { label: "Trust Signals", score: data.categories.trustSignals.score },
+    { label: "Contradictions", score: data.categories.contradictions.score },
+    { label: "First Screen", score: data.categories.firstScreen.score },
+  ];
+
+  return (
+    <Document>
+      {/* Cover Page */}
+      <Page size="A4" style={styles.page}>
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.logo}>UXLens</Text>
+            <Text style={styles.subtitle}>9-Layer UX Diagnostic Report</Text>
+          </View>
+          <View style={{ alignItems: "flex-end" }}>
+            <Text style={{ fontSize: 10, fontFamily: "Helvetica-Bold" }}>{domain}</Text>
+            <Text style={{ fontSize: 8, color: "#888", marginTop: 2 }}>
+              {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+            </Text>
+          </View>
+        </View>
+
+        {/* Score */}
+        <View style={styles.scoreBox}>
+          <Text style={styles.bigScore}>{data.overallScore}</Text>
+          <Text style={styles.grade}>Grade: {data.grade}</Text>
+        </View>
+
+        {/* Executive Summary */}
+        <Text style={styles.sectionTitle}>Executive Summary</Text>
+        <Text style={styles.text}>{data.executiveSummary}</Text>
+
+        {/* Categories */}
+        <Text style={styles.sectionTitle}>Category Scores</Text>
+        {categoryEntries.map((cat) => (
+          <View key={cat.label} style={styles.categoryRow}>
+            <Text style={styles.categoryLabel}>{cat.label}</Text>
+            <Text style={[styles.categoryScore, { color: scoreColorStr(cat.score) }]}>
+              {cat.score}/100
+            </Text>
+          </View>
+        ))}
+
+        <View style={styles.divider} />
+
+        {/* Conversion Killers */}
+        <Text style={styles.sectionTitle}>Conversion Killers</Text>
+        {data.conversionKillers.map((k, i) => (
+          <View key={i} style={styles.bulletItem}>
+            <Text style={styles.bullet}>•</Text>
+            <Text style={styles.bulletText}>{k}</Text>
+          </View>
+        ))}
+
+        {/* Quick Wins */}
+        <Text style={styles.sectionTitle}>Quick Wins</Text>
+        {data.quickWins.map((w, i) => (
+          <View key={i} style={styles.bulletItem}>
+            <Text style={[styles.bullet, { color: "#22c55e" }]}>✓</Text>
+            <Text style={styles.bulletText}>{w}</Text>
+          </View>
+        ))}
+
+        {/* Strategic Fixes */}
+        <Text style={styles.sectionTitle}>Strategic Fixes</Text>
+        {data.strategicFixes.map((f, i) => (
+          <View key={i} style={styles.bulletItem}>
+            <Text style={styles.bullet}>→</Text>
+            <Text style={styles.bulletText}>{f}</Text>
+          </View>
+        ))}
+
+        <View style={styles.footer}>
+          <Text>Generated by UXLens — www.uxlens.pro</Text>
+          <Text>Page 1</Text>
+        </View>
+      </Page>
+
+      {/* Detail Pages */}
+      <Page size="A4" style={styles.page}>
+        <View style={styles.header}>
+          <Text style={styles.logo}>UXLens</Text>
+          <Text style={{ fontSize: 9, color: "#888" }}>{domain} — Detailed Findings</Text>
+        </View>
+
+        {/* Sections */}
+        {data.sections.map((section) => (
+          <View key={section.id} wrap={false}>
+            <Text style={styles.sectionSubtitle}>
+              {section.name} — {section.score}/100
+            </Text>
+            <Text style={[styles.text, { color: "#666", marginBottom: 6 }]}>
+              {section.subtitle}
+            </Text>
+            {section.findings.slice(0, 3).map((finding, fi) => (
+              <View key={fi} style={styles.findingBox}>
+                <Text style={styles.findingTitle}>
+                  {finding.type === "issue" ? "⚠" : finding.type === "positive" ? "✓" : "!"} {finding.title}
+                </Text>
+                <Text style={styles.findingDesc}>{finding.desc}</Text>
+              </View>
+            ))}
+            {section.recommendations.length > 0 && (
+              <View style={{ marginTop: 4, marginBottom: 8 }}>
+                {section.recommendations.slice(0, 2).map((rec, ri) => (
+                  <View key={ri} style={styles.bulletItem}>
+                    <Text style={styles.bullet}>→</Text>
+                    <Text style={styles.bulletText}>{rec}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+        ))}
+
+        <View style={styles.divider} />
+
+        {/* Before/After Rewrite */}
+        <Text style={styles.sectionTitle}>Hero Rewrite</Text>
+        <View style={{ flexDirection: "row", gap: 8 }}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.rewriteLabel}>BEFORE</Text>
+            <Text style={styles.text}>{data.rewrite.beforeHeadline}</Text>
+            <Text style={[styles.text, { fontSize: 9, color: "#666" }]}>{data.rewrite.beforeSubheadline}</Text>
+          </View>
+          <View style={[{ flex: 1 }, styles.rewriteBox]}>
+            <Text style={styles.rewriteLabel}>AFTER</Text>
+            <Text style={styles.rewriteText}>{data.rewrite.afterHeadline}</Text>
+            <Text style={[styles.rewriteText, { fontSize: 9, marginTop: 3 }]}>{data.rewrite.afterSubheadline}</Text>
+          </View>
+        </View>
+
+        <View style={styles.footer}>
+          <Text>Generated by UXLens — www.uxlens.pro</Text>
+          <Text>Page 2</Text>
+        </View>
+      </Page>
+    </Document>
+  );
+}

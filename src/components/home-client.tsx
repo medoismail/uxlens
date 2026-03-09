@@ -107,9 +107,7 @@ export function HomeClient() {
             url={state.url}
             onReset={handleReset}
             onHumanAuditRequested={handleHumanAuditRequested}
-            isSubscribed={isSubscribed}
             plan={plan}
-            onSubscriptionVerified={handleSubscriptionVerified}
             auditId={state.auditId}
             screenshotUrl={state.screenshotUrl}
             heatmapZones={state.heatmapZones}

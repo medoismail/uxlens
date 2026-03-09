@@ -1,54 +1,19 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, Loader2, Sparkles, User, Zap } from "lucide-react";
+import { ArrowRight, Check, Sparkles, User } from "lucide-react";
+import { Show, useAuth } from "@clerk/nextjs";
 import { Header } from "@/components/header";
 import { PricingCards } from "@/components/pricing-cards";
 import { Footer } from "@/components/footer";
 
 export function PricingClient() {
-  const [email, setEmail] = useState("");
-  const [verifyError, setVerifyError] = useState("");
-  const [verifySuccess, setVerifySuccess] = useState("");
-  const [isVerifying, setIsVerifying] = useState(false);
-
-  async function handleVerify(e: React.FormEvent) {
-    e.preventDefault();
-    setVerifyError("");
-    setVerifySuccess("");
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setVerifyError("Please enter a valid email");
-      return;
-    }
-
-    setIsVerifying(true);
-    try {
-      const res = await fetch("/api/subscription/check", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
-
-      if (data.isActive) {
-        setVerifySuccess(`Active ${data.plan} plan. You're all set!`);
-      } else {
-        setVerifyError("No active subscription found for this email.");
-      }
-    } catch {
-      setVerifyError("Could not verify. Please try again.");
-    } finally {
-      setIsVerifying(false);
-    }
-  }
+  const { isSignedIn } = useAuth();
 
   function handleHumanAudit() {
     const baseUrl = process.env.NEXT_PUBLIC_LS_CHECKOUT_HUMAN_AUDIT || "#";
     if (baseUrl === "#") return;
     const url = new URL(baseUrl);
-    if (email) url.searchParams.set("checkout[email]", email);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const win = window as any;
@@ -73,7 +38,7 @@ export function PricingClient() {
             Simple, transparent pricing
           </h1>
           <p className="mt-3 text-[13px] text-foreground/40 max-w-md leading-relaxed">
-            Start free with 5 audits per month. Upgrade anytime for more capacity and deeper analysis.
+            Start free with 5 audits per month. Upgrade anytime for strategic fixes, PDF export, and AI chat.
           </p>
         </div>
 
@@ -89,7 +54,14 @@ export function PricingClient() {
             <p className="text-[12px] text-muted-foreground/60 mt-1">5 audits/month</p>
 
             <ul className="mt-4 space-y-2">
-              {["Overall UX score & grade", "6 category breakdowns", "Top 3 conversion killers", "2 quick wins", "Confusion metric scores"].map((f) => (
+              {[
+                "Full scores & 6 categories",
+                "Screenshot + attention heatmap",
+                "All conversion killers & quick wins",
+                "Trust signal matrix",
+                "Confusion detection map",
+                "Audit history dashboard",
+              ].map((f) => (
                 <li key={f} className="flex items-start gap-2 text-[12px] text-muted-foreground">
                   <Check className="h-3 w-3 text-foreground/30 mt-0.5 shrink-0" />
                   {f}
@@ -107,7 +79,7 @@ export function PricingClient() {
 
           {/* Paid Plans */}
           <div className="sm:col-span-3">
-            <PricingCards email={email || undefined} />
+            <PricingCards />
           </div>
         </div>
 
@@ -143,40 +115,34 @@ export function PricingClient() {
           </button>
         </div>
 
-        {/* Verify Access */}
-        <div className="mt-10 mb-16 text-center">
-          <p className="text-[12px] text-foreground/30 mb-3">Already subscribed?</p>
-          <form onSubmit={handleVerify} className="flex items-center gap-2 justify-center">
-            <div className="focus-glow rounded-lg border transition-all duration-200" style={{ borderColor: "var(--border2)", background: "var(--s1)" }}>
-              <input
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => { setEmail(e.target.value); setVerifyError(""); setVerifySuccess(""); }}
-                className="h-9 w-56 rounded-lg bg-transparent px-3.5 text-[12px] text-foreground placeholder:text-foreground/25 focus:outline-none"
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={isVerifying || !email.trim()}
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg border px-4 text-[12px] font-medium text-foreground transition-all duration-150 hover:border-foreground/20 active:scale-[0.98] disabled:opacity-40"
+        {/* Sign-in CTA for anonymous users */}
+        <Show when="signed-out">
+          <div className="mt-10 mb-16 text-center">
+            <p className="text-[12px] text-foreground/30 mb-3">Sign in to manage your subscription</p>
+            <Link
+              href="/sign-in"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border px-4 text-[12px] font-medium text-foreground transition-all duration-150 hover:border-foreground/20 active:scale-[0.98]"
               style={{ borderColor: "var(--border2)", background: "var(--s1)" }}
             >
-              {isVerifying ? (
-                <><Loader2 className="h-3 w-3 animate-spin" /> Checking</>
-              ) : (
-                "Verify Access"
-              )}
-            </button>
-          </form>
-          {verifyError && <p className="mt-2 text-[12px] text-destructive animate-fade-in">{verifyError}</p>}
-          {verifySuccess && (
-            <p className="mt-2 text-[12px] animate-fade-in" style={{ color: "var(--score-high)" }}>
-              <Zap className="inline h-3 w-3 mr-1" />
-              {verifySuccess}
-            </p>
-          )}
-        </div>
+              Sign In
+            </Link>
+          </div>
+        </Show>
+
+        {/* Dashboard link for signed-in users */}
+        <Show when="signed-in">
+          <div className="mt-10 mb-16 text-center">
+            <p className="text-[12px] text-foreground/30 mb-3">Manage your audits and subscription</p>
+            <Link
+              href="/dashboard"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border px-4 text-[12px] font-medium text-foreground transition-all duration-150 hover:border-foreground/20 active:scale-[0.98]"
+              style={{ borderColor: "var(--border2)", background: "var(--s1)" }}
+            >
+              Go to Dashboard
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+        </Show>
       </main>
 
       <Footer />
