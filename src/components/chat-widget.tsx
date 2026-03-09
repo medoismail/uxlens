@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { MessageCircle, X, Send, Loader2, Sparkles, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import type { ChatMessage } from "@/lib/types";
+import { ChatMarkdown } from "@/components/chat-markdown";
 
 interface ChatWidgetProps {
   auditId: string;
@@ -285,11 +286,15 @@ export function ChatWidget({ auditId, plan }: ChatWidgetProps) {
                       : { background: "var(--s2)", color: "var(--foreground)" }
                   }
                 >
-                  {msg.content || (
+                  {!msg.content ? (
                     <span className="inline-flex items-center gap-1.5 text-foreground/40">
                       <Loader2 className="h-3 w-3 animate-spin" />
                       Thinking...
                     </span>
+                  ) : msg.role === "assistant" ? (
+                    <ChatMarkdown content={msg.content} />
+                  ) : (
+                    msg.content
                   )}
                 </div>
               </div>
