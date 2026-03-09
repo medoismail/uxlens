@@ -26,41 +26,44 @@ export async function getChatCredits(
 
   const month = new Date().toISOString().slice(0, 7); // "YYYY-MM"
 
-  // Try to get existing credits
-  const { data } = await sb
+  // Upsert to avoid race condition when two concurrent requests try to create
+  // the first record for a new month. ignoreDuplicates prevents overwriting.
+  const { data, error } = await sb
     .from("chat_credits")
-    .select("messages_used, messages_limit")
-    .eq("user_id", userId)
-    .eq("month", month)
-    .single();
-
-  if (data) {
-    return {
-      messages_used: data.messages_used,
-      messages_limit: data.messages_limit,
-    };
-  }
-
-  // Create new credits record for this month
-  const { data: created, error } = await sb
-    .from("chat_credits")
-    .insert({
-      user_id: userId,
-      month,
-      messages_used: 0,
-      messages_limit: monthlyLimit,
-    })
+    .upsert(
+      {
+        user_id: userId,
+        month,
+        messages_used: 0,
+        messages_limit: monthlyLimit,
+      },
+      { onConflict: "user_id, month", ignoreDuplicates: true }
+    )
     .select("messages_used, messages_limit")
     .single();
 
-  if (error) {
-    console.error("getChatCredits insert error:", error);
+  if (error || !data) {
+    // If upsert returned nothing (row already existed), fetch the existing row
+    const { data: existing } = await sb
+      .from("chat_credits")
+      .select("messages_used, messages_limit")
+      .eq("user_id", userId)
+      .eq("month", month)
+      .single();
+
+    if (existing) {
+      return {
+        messages_used: existing.messages_used,
+        messages_limit: existing.messages_limit,
+      };
+    }
+    console.error("getChatCredits error:", error);
     return { messages_used: 0, messages_limit: monthlyLimit };
   }
 
   return {
-    messages_used: created.messages_used,
-    messages_limit: created.messages_limit,
+    messages_used: data.messages_used,
+    messages_limit: data.messages_limit,
   };
 }
 

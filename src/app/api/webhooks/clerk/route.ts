@@ -1,25 +1,23 @@
 import { NextResponse } from "next/server";
 import { Webhook } from "svix";
 import { upsertUser } from "@/lib/db/users";
+import { getSupabase } from "@/lib/supabase";
 
 /**
  * Clerk webhook handler.
- * On user.created or user.updated, upsert the user in Supabase.
+ * On user.created / user.updated → upsert user in Supabase.
+ * On user.deleted → delete user + cascade data (GDPR).
  */
 export async function POST(request: Request) {
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
 
+  // P0 FIX: Never process unverified payloads
   if (!WEBHOOK_SECRET) {
-    // If no webhook secret configured, accept but log
-    console.warn("[Clerk Webhook] No CLERK_WEBHOOK_SECRET configured, processing without verification");
-
-    try {
-      const body = await request.json();
-      return await handleClerkEvent(body);
-    } catch (error) {
-      console.error("[Clerk Webhook] Error:", error);
-      return NextResponse.json({ error: "Webhook processing failed" }, { status: 500 });
-    }
+    console.error("[Clerk Webhook] CLERK_WEBHOOK_SECRET is not configured");
+    return NextResponse.json(
+      { error: "Webhook secret not configured" },
+      { status: 500 }
+    );
   }
 
   // Verify the webhook signature using svix
@@ -64,5 +62,37 @@ async function handleClerkEvent(payload: Record<string, unknown>) {
     }
   }
 
+  // P1 FIX: Handle user.deleted for GDPR compliance
+  if (eventType === "user.deleted") {
+    const clerkId = data.id as string;
+    if (clerkId) {
+      await deleteUserData(clerkId);
+      console.log(`[Clerk Webhook] Deleted user data for clerk_id: ${clerkId}`);
+    }
+  }
+
   return NextResponse.json({ received: true });
+}
+
+/**
+ * Delete all user data from Supabase when Clerk account is deleted.
+ * The audits table cascades to chat_messages via foreign key.
+ */
+async function deleteUserData(clerkId: string) {
+  const sb = getSupabase();
+  if (!sb) return;
+
+  // Find the Supabase user
+  const { data: user } = await sb
+    .from("users")
+    .select("id")
+    .eq("clerk_id", clerkId)
+    .single();
+
+  if (!user) return;
+
+  // Delete in order: chat_credits → audits (cascades chat_messages) → user
+  await sb.from("chat_credits").delete().eq("user_id", user.id);
+  await sb.from("audits").delete().eq("user_id", user.id);
+  await sb.from("users").delete().eq("id", user.id);
 }

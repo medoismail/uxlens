@@ -58,7 +58,25 @@ async function resolveplan(email: string | undefined, clerkUserId?: string): Pro
     }
   }
 
-  // 3. Verify with LemonSqueezy (only if we have email)
+  // 3. Check Supabase database (if user is auth'd)
+  if (clerkUserId) {
+    try {
+      const { getUserPlan } = await import("./db/users");
+      const dbPlan = await getUserPlan(clerkUserId);
+      if (dbPlan !== "free") {
+        // Cache in Redis for fast lookups
+        if (r) {
+          const clerkCacheKey = `uxlens:sub:clerk:${clerkUserId}`;
+          await r.set(clerkCacheKey, dbPlan, { ex: 60 * 60 * 24 * 7 });
+        }
+        return dbPlan;
+      }
+    } catch {
+      // Supabase unavailable, fall through
+    }
+  }
+
+  // 4. Verify with LemonSqueezy (only if we have email)
   if (email) {
     try {
       const { checkSubscriptionByEmail } = await import("./lemonsqueezy");
@@ -96,14 +114,26 @@ export async function checkServerUsage(
   const r = getRedis();
 
   if (!r) {
-    // Redis not configured — allow all (development mode)
+    // Redis not configured — only allow in development mode
+    if (process.env.NODE_ENV === "development") {
+      return {
+        audit_allowed: true,
+        reason: "",
+        plan,
+        monthly_limit: limit,
+        audits_used: 0,
+        audits_remaining: limit,
+        upgrade_suggestion: "",
+      };
+    }
+    // Production without Redis = deny free users, allow paid (they verified through payment)
     return {
-      audit_allowed: true,
-      reason: "",
+      audit_allowed: plan !== "free",
+      reason: plan === "free" ? "Service temporarily unavailable. Please try again shortly." : "",
       plan,
       monthly_limit: limit,
       audits_used: 0,
-      audits_remaining: limit,
+      audits_remaining: plan === "free" ? 0 : limit,
       upgrade_suggestion: "",
     };
   }
@@ -170,14 +200,14 @@ export async function checkServerUsage(
       upgrade_suggestion: "",
     };
   } catch {
-    // Redis error — gracefully allow the request
+    // Redis error — allow paid users, block free to prevent abuse
     return {
-      audit_allowed: true,
-      reason: "",
+      audit_allowed: plan !== "free",
+      reason: plan === "free" ? "Service temporarily unavailable. Please try again shortly." : "",
       plan,
       monthly_limit: limit,
       audits_used: 0,
-      audits_remaining: limit,
+      audits_remaining: plan === "free" ? 0 : limit,
       upgrade_suggestion: "",
     };
   }

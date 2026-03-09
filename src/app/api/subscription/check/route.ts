@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { checkSubscriptionByEmail } from "@/lib/lemonsqueezy";
+import { getRedis } from "@/lib/server-usage";
 
 const requestSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -9,6 +10,24 @@ const requestSchema = z.object({
 /** Verify subscription status by email via LemonSqueezy API */
 export async function POST(request: Request) {
   try {
+    // Rate limit: 5 requests per IP per minute
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim()
+      || request.headers.get("x-real-ip")
+      || "unknown";
+    const r = getRedis();
+    if (r) {
+      const rateKey = `uxlens:subcheck:${ip}`;
+      const count = ((await r.get<number>(rateKey)) || 0);
+      if (count >= 5) {
+        return NextResponse.json(
+          { error: "Too many requests. Please wait a minute." },
+          { status: 429 }
+        );
+      }
+      await r.incr(rateKey);
+      await r.expire(rateKey, 60);
+    }
+
     const body = await request.json();
     const parsed = requestSchema.safeParse(body);
 

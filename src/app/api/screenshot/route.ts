@@ -2,18 +2,37 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { getSupabase } from "@/lib/supabase";
 import { getUserByClerkId } from "@/lib/db/users";
+import { getRedis } from "@/lib/server-usage";
 
-// Screenshot capture can take a while with Puppeteer
+// Screenshot capture can take a while
 export const maxDuration = 60;
 
 /**
  * POST /api/screenshot
  * Captures a screenshot of a URL and generates heatmap zones.
  * Called by the client AFTER the audit is complete.
- * Optionally updates the audit record in Supabase with screenshot data.
+ * Rate-limited by IP to prevent abuse of Microlink API quota.
  */
 export async function POST(request: Request) {
   try {
+    // Rate limit: max 10 screenshots per IP per hour
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim()
+      || request.headers.get("x-real-ip")
+      || "unknown";
+    const r = getRedis();
+    if (r) {
+      const rateKey = `uxlens:screenshot:${ip}`;
+      const count = ((await r.get<number>(rateKey)) || 0);
+      if (count >= 10) {
+        return NextResponse.json(
+          { error: "Screenshot rate limit exceeded" },
+          { status: 429 }
+        );
+      }
+      await r.incr(rateKey);
+      await r.expire(rateKey, 3600);
+    }
+
     const { url, auditId } = await request.json();
 
     if (!url || typeof url !== "string") {

@@ -110,8 +110,16 @@ export async function POST(request: Request) {
       }, { status: 403 });
     }
 
-    // Check chat credits
-    const credits = await getChatCredits(dbUser.id, features.chatLimit);
+    // Fetch credits, audit, and chat history in parallel
+    const [credits, audit, history] = await Promise.all([
+      getChatCredits(dbUser.id, features.chatLimit),
+      getAuditById(auditId, dbUser.id),
+      (async () => {
+        const { getChatHistory } = await import("@/lib/db/chat");
+        return getChatHistory(auditId, dbUser.id);
+      })(),
+    ]);
+
     if (credits.messages_used >= credits.messages_limit) {
       return NextResponse.json({
         error: `Monthly chat limit reached (${credits.messages_limit} messages). Resets next month.`,
@@ -120,18 +128,12 @@ export async function POST(request: Request) {
       }, { status: 429 });
     }
 
-    // Get audit data
-    const audit = await getAuditById(auditId, dbUser.id);
     if (!audit) {
       return NextResponse.json({ error: "Audit not found" }, { status: 404 });
     }
 
     // Build context
     const auditContext = condenseAuditContext(audit.result, audit.url);
-
-    // Get recent chat history (last 10 messages for context)
-    const { getChatHistory } = await import("@/lib/db/chat");
-    const history = await getChatHistory(auditId, dbUser.id);
     const recentHistory = history.slice(-10);
 
     // Build messages array
