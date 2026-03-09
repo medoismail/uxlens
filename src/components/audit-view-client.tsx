@@ -43,6 +43,7 @@ export function AuditViewClient({ audit, plan }: AuditViewClientProps) {
           plan={plan}
           auditId={audit.id}
           screenshotUrl={audit.screenshotPath || undefined}
+          screenshotStatus={audit.screenshotPath ? "done" : undefined}
           heatmapZones={(audit.heatmapZones as HeatmapZone[]) || undefined}
           pageHeight={audit.pageHeight || 3000}
           viewportWidth={1280}

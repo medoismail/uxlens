@@ -207,7 +207,7 @@ export function ResultsReport({
       </div>
 
       {/* ─── Screenshot + Heatmap (all tiers) ─── */}
-      {screenshotUrl && heatmapZones && pageHeight && viewportWidth ? (
+      {screenshotUrl ? (
         <ScreenshotSection
           screenshotUrl={screenshotUrl}
           heatmapZones={heatmapZones}
@@ -223,6 +223,15 @@ export function ResultsReport({
             <div className="h-4 w-4 border-2 border-foreground/15 border-t-foreground/40 rounded-full animate-spin" />
             Capturing screenshot & generating heatmap...
           </div>
+        </div>
+      ) : screenshotStatus === "failed" ? (
+        <div
+          className="rounded-xl border p-5 mb-4 flex items-center justify-center"
+          style={{ borderColor: "var(--border)", background: "var(--s1)", minHeight: "80px" }}
+        >
+          <p className="text-[12px] text-foreground/25">
+            Screenshot capture unavailable for this page
+          </p>
         </div>
       ) : null}
 

@@ -5,16 +5,16 @@ import type { HeatmapZone } from "@/lib/heatmap";
 
 interface ScreenshotSectionProps {
   screenshotUrl: string;
-  heatmapZones: HeatmapZone[];
-  pageHeight: number;
-  viewportWidth: number;
+  heatmapZones?: HeatmapZone[];
+  pageHeight?: number;
+  viewportWidth?: number;
 }
 
 export function ScreenshotSection({
   screenshotUrl,
   heatmapZones,
-  pageHeight,
-  viewportWidth,
+  pageHeight = 3000,
+  viewportWidth = 1280,
 }: ScreenshotSectionProps) {
   if (!screenshotUrl) return null;
 
@@ -25,7 +25,7 @@ export function ScreenshotSection({
     >
       <HeatmapOverlay
         screenshotUrl={screenshotUrl}
-        heatmapZones={heatmapZones}
+        heatmapZones={heatmapZones || []}
         pageHeight={pageHeight}
         viewportWidth={viewportWidth}
       />
