@@ -95,7 +95,7 @@ export function LimitReached({
       <h2 className="text-xl font-semibold tracking-tight text-foreground text-center">
         You&apos;ve used all {usage.monthly_limit} free audits this month
       </h2>
-      <p className="mt-2 text-[16px] text-foreground/45 text-center max-w-md">
+      <p className="mt-2 text-[13px] text-foreground/45 text-center max-w-md">
         Upgrade your plan to keep analyzing pages, or get a detailed human review.
       </p>
 
@@ -104,21 +104,21 @@ export function LimitReached({
         <div className="flex-1 h-[4px] w-32 rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
           <div className="h-full rounded-full" style={{ background: "var(--brand)", width: "100%" }} />
         </div>
-        <span className="text-[16px] font-mono text-foreground/40">
+        <span className="text-[12px] font-mono text-foreground/40">
           {usage.audits_used}/{usage.monthly_limit} used
         </span>
       </div>
 
       {/* Pricing section */}
       <div className="w-full max-w-3xl mt-10">
-        <p className="text-[16px] font-mono uppercase tracking-[2px] text-foreground/30 text-center mb-5">
+        <p className="text-[12px] font-mono uppercase tracking-[2px] text-foreground/30 text-center mb-5">
           Choose a plan
         </p>
         <PricingCards email={email || undefined} />
       </div>
 
       {/* OR divider */}
-      <div className="flex items-center gap-4 my-10 w-full max-w-lg text-foreground/20 text-[16px] uppercase tracking-[2px]">
+      <div className="flex items-center gap-4 my-10 w-full max-w-lg text-foreground/20 text-[12px] uppercase tracking-[2px]">
         <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
         or
         <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
@@ -131,8 +131,8 @@ export function LimitReached({
             <User className="h-3.5 w-3.5" style={{ color: "var(--brand-fg)" }} />
           </div>
           <div>
-            <h3 className="text-[16px] font-semibold tracking-tight">Get a Human Audit</h3>
-            <p className="text-[16px] text-foreground/35">Senior UX professional review — delivered in 2–3 business days</p>
+            <h3 className="text-[14px] font-semibold tracking-tight">Get a Human Audit</h3>
+            <p className="text-[12px] text-foreground/35">Senior UX professional review — delivered in 2–3 business days</p>
           </div>
           <span className="ml-auto text-[18px] font-bold tracking-tight shrink-0">$300</span>
         </div>
@@ -145,7 +145,7 @@ export function LimitReached({
                 placeholder="https://your-page.com"
                 value={auditUrl}
                 onChange={(e) => { setAuditUrl(e.target.value); if (auditError) setAuditError(""); }}
-                className="h-10 w-full rounded-lg bg-transparent px-3.5 text-[16px] font-mono text-foreground placeholder:text-foreground/25 focus:outline-none"
+                className="h-10 w-full rounded-lg bg-transparent px-3.5 text-[12px] font-mono text-foreground placeholder:text-foreground/25 focus:outline-none"
               />
             </div>
             <div className="focus-glow rounded-lg border transition-all duration-200" style={{ borderColor: "var(--border2)", background: "var(--background)" }}>
@@ -154,15 +154,15 @@ export function LimitReached({
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); if (auditError) setAuditError(""); if (verifyError) setVerifyError(""); }}
-                className="h-10 w-full rounded-lg bg-transparent px-3.5 text-[16px] text-foreground placeholder:text-foreground/25 focus:outline-none"
+                className="h-10 w-full rounded-lg bg-transparent px-3.5 text-[13px] text-foreground placeholder:text-foreground/25 focus:outline-none"
               />
             </div>
           </div>
-          {auditError && <p className="text-[16px] text-destructive animate-fade-in pl-1">{auditError}</p>}
+          {auditError && <p className="text-[12px] text-destructive animate-fade-in pl-1">{auditError}</p>}
           <button
             type="submit"
             disabled={!email.trim() || !auditUrl.trim()}
-            className="inline-flex w-full h-10 items-center justify-center gap-2 rounded-lg px-5 text-[16px] font-bold transition-all duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none"
+            className="inline-flex w-full h-10 items-center justify-center gap-2 rounded-lg px-5 text-[13px] font-bold transition-all duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none"
             style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
           >
             Request Human Audit
@@ -173,7 +173,7 @@ export function LimitReached({
 
       {/* Already subscribed? */}
       <div className="mt-8 text-center">
-        <p className="text-[16px] text-foreground/30 mb-2.5">Already subscribed?</p>
+        <p className="text-[12px] text-foreground/30 mb-2.5">Already subscribed?</p>
         <form onSubmit={handleVerifyAccess} className="flex items-center gap-2 justify-center">
           <div className="focus-glow rounded-lg border transition-all duration-200" style={{ borderColor: "var(--border2)", background: "var(--s1)" }}>
             <input
@@ -181,13 +181,13 @@ export function LimitReached({
               placeholder="you@example.com"
               value={email}
               onChange={(e) => { setEmail(e.target.value); if (verifyError) setVerifyError(""); }}
-              className="h-9 w-56 rounded-lg bg-transparent px-3.5 text-[16px] text-foreground placeholder:text-foreground/25 focus:outline-none"
+              className="h-9 w-56 rounded-lg bg-transparent px-3.5 text-[12px] text-foreground placeholder:text-foreground/25 focus:outline-none"
             />
           </div>
           <button
             type="submit"
             disabled={isVerifying || !email.trim()}
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg border px-4 text-[16px] font-medium text-foreground transition-all duration-150 hover:border-foreground/20 active:scale-[0.98] disabled:opacity-40"
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg border px-4 text-[12px] font-medium text-foreground transition-all duration-150 hover:border-foreground/20 active:scale-[0.98] disabled:opacity-40"
             style={{ borderColor: "var(--border2)", background: "var(--s1)" }}
           >
             {isVerifying ? (
@@ -197,13 +197,13 @@ export function LimitReached({
             )}
           </button>
         </form>
-        {verifyError && <p className="mt-2 text-[16px] text-destructive animate-fade-in">{verifyError}</p>}
+        {verifyError && <p className="mt-2 text-[12px] text-destructive animate-fade-in">{verifyError}</p>}
       </div>
 
       {/* Back button */}
       <button
         onClick={onReset}
-        className="mt-10 inline-flex items-center gap-2 rounded-lg border px-6 py-2.5 text-[16px] font-medium text-foreground transition-all duration-150 hover:border-foreground/20 active:scale-[0.98]"
+        className="mt-10 inline-flex items-center gap-2 rounded-lg border px-6 py-2.5 text-[13px] font-medium text-foreground transition-all duration-150 hover:border-foreground/20 active:scale-[0.98]"
         style={{ borderColor: "var(--border2)", background: "var(--s1)" }}
       >
         <RotateCcw className="h-3.5 w-3.5" />

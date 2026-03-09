@@ -24,7 +24,7 @@ export function ScoreCard({ label, score, icon }: ScoreCardProps) {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
           <span className="text-muted-foreground/60">{icon}</span>
-          <span className="text-[16px] font-medium text-foreground/80">{label}</span>
+          <span className="text-[13px] font-medium text-foreground/80">{label}</span>
         </div>
         <span className={`text-lg font-semibold tabular-nums tracking-tight ${getScoreColor(score)}`}>
           {score}

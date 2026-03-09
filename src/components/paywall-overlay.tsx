@@ -66,7 +66,7 @@ export function PaywallOverlay({ onSubscriptionVerified }: PaywallOverlayProps) 
           <h3 className="text-base font-semibold text-foreground tracking-tight">
             Unlock the full report
           </h3>
-          <p className="mt-1.5 text-[16px] text-muted-foreground max-w-xs">
+          <p className="mt-1.5 text-[13px] text-muted-foreground max-w-xs">
             Get all issues, conversion analysis, actionable fixes, and detailed suggestions.
           </p>
 
@@ -78,12 +78,12 @@ export function PaywallOverlay({ onSubscriptionVerified }: PaywallOverlayProps) 
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); if (error) setError(""); }}
-                  className="h-11 flex-1 rounded-xl bg-transparent px-4 text-[16px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none"
+                  className="h-11 flex-1 rounded-xl bg-transparent px-4 text-[13px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none"
                 />
                 <div className="pr-1">
                   <button
                     type="submit"
-                    className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-foreground px-4 text-[16px] font-medium text-background transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
+                    className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-foreground px-4 text-[12px] font-medium text-background transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
                   >
                     Continue
                     <ArrowRight className="h-3 w-3" />
@@ -91,13 +91,13 @@ export function PaywallOverlay({ onSubscriptionVerified }: PaywallOverlayProps) 
                 </div>
               </form>
 
-              {error && <p className="text-[16px] text-destructive animate-fade-in">{error}</p>}
+              {error && <p className="text-[12px] text-destructive animate-fade-in">{error}</p>}
 
               <button
                 type="button"
                 onClick={handleAlreadySubscribed}
                 disabled={isLoading}
-                className="text-[16px] text-muted-foreground/60 hover:text-foreground transition-colors"
+                className="text-[12px] text-muted-foreground/60 hover:text-foreground transition-colors"
               >
                 {isLoading ? (
                   <span className="inline-flex items-center gap-1.5">
@@ -114,7 +114,7 @@ export function PaywallOverlay({ onSubscriptionVerified }: PaywallOverlayProps) 
               <button
                 type="button"
                 onClick={() => setShowPricing(false)}
-                className="mt-4 text-[16px] text-muted-foreground/60 hover:text-foreground transition-colors"
+                className="mt-4 text-[12px] text-muted-foreground/60 hover:text-foreground transition-colors"
               >
                 Back
               </button>

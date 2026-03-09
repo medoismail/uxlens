@@ -12,7 +12,7 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
     <section className="flex flex-col items-center text-center px-6 pt-16 pb-16 relative z-[1]">
       {/* Badge — pill frame like old design */}
       <div className="animate-fade-in mb-6">
-        <span className="inline-flex items-center rounded-full border px-3.5 py-1.5 text-[16px] font-medium tracking-wide uppercase" style={{ borderColor: "var(--border2)", background: "var(--brand-dim)", color: "var(--brand)" }}>
+        <span className="inline-flex items-center rounded-full border px-3.5 py-1.5 text-[12px] font-medium tracking-wide uppercase" style={{ borderColor: "var(--border2)", background: "var(--brand-dim)", color: "var(--brand)" }}>
           Free AI UX Audit Tool
         </span>
       </div>
@@ -23,7 +23,7 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
       </h1>
 
       {/* Subheadline */}
-      <p className="animate-slide-up mt-4 text-[16px] leading-relaxed text-foreground/45 max-w-[520px] font-mono" style={{ animationDelay: "60ms" }}>
+      <p className="animate-slide-up mt-4 text-[12px] leading-relaxed text-foreground/45 max-w-[520px] font-mono" style={{ animationDelay: "60ms" }}>
         Free AI-powered UX audit tool that finds every reason your page fails to convert. 9-layer diagnostic with trust signals, confusion detection, and actionable fixes.
       </p>
 
@@ -35,7 +35,7 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
       {/* Algo badges */}
       <div className="animate-fade-in mt-6 flex flex-wrap justify-center gap-1.5" style={{ animationDelay: "250ms" }}>
         {["9 LAYERS", "SELF-CRITIQUE", "CONTRADICTION SCAN", "REWRITE ENGINE"].map((badge) => (
-          <span key={badge} className="text-[16px] font-mono px-2 py-0.5 rounded border text-foreground/30 tracking-wide" style={{ borderColor: "var(--border)" }}>
+          <span key={badge} className="text-[12px] font-mono px-2 py-0.5 rounded border text-foreground/30 tracking-wide" style={{ borderColor: "var(--border)" }}>
             {badge}
           </span>
         ))}
