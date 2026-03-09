@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { FileText, ExternalLink, ChevronLeft, ChevronRight, BarChart3 } from "lucide-react";
@@ -127,12 +128,14 @@ export function DashboardClient() {
                   >
                     {/* Thumbnail */}
                     {audit.screenshotPath && (
-                      <div className="rounded-lg overflow-hidden mb-3 border" style={{ borderColor: "var(--border)" }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
+                      <div className="relative rounded-lg overflow-hidden mb-3 border h-28" style={{ borderColor: "var(--border)" }}>
+                        <Image
                           src={audit.screenshotPath}
                           alt={`Screenshot of ${domain}`}
-                          className="w-full h-28 object-cover object-top"
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          className="object-cover object-top"
+                          unoptimized
                         />
                       </div>
                     )}

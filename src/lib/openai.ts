@@ -268,22 +268,64 @@ The JSON structure must be exactly:
 }
 
 /**
+ * Retry helper with exponential backoff.
+ * Retries on transient OpenAI errors (rate limit, server error, timeout).
+ */
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  maxRetries = 2
+): Promise<T> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (err: unknown) {
+      lastError = err;
+      const isRetryable =
+        err instanceof Error &&
+        (err.message.includes("429") ||
+          err.message.includes("500") ||
+          err.message.includes("502") ||
+          err.message.includes("503") ||
+          err.message.includes("timeout") ||
+          err.message.includes("ECONNRESET"));
+
+      if (!isRetryable || attempt === maxRetries) {
+        throw err;
+      }
+
+      // Exponential backoff: 1s, 2s
+      const delay = Math.pow(2, attempt) * 1000;
+      console.warn(
+        `OpenAI request failed (attempt ${attempt + 1}/${maxRetries + 1}), retrying in ${delay}ms...`,
+        err instanceof Error ? err.message : err
+      );
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  throw lastError;
+}
+
+/**
  * Send extracted page content to OpenAI and get a structured UX audit
  * using the 9-Layer Diagnostic Engine.
+ * Retries up to 2 times on transient failures (rate limits, server errors).
  */
 export async function generateUXAudit(
   content: ExtractedContent
 ): Promise<UXAuditResult> {
-  const response = await getClient().chat.completions.create({
-    model: "gpt-4o",
-    response_format: { type: "json_object" },
-    temperature: 0.4,
-    max_tokens: 4096,
-    messages: [
-      { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: buildUserPrompt(content) },
-    ],
-  });
+  const response = await withRetry(() =>
+    getClient().chat.completions.create({
+      model: "gpt-4o",
+      response_format: { type: "json_object" },
+      temperature: 0.4,
+      max_tokens: 4096,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: buildUserPrompt(content) },
+      ],
+    })
+  );
 
   const raw = response.choices[0]?.message?.content;
   if (!raw) {
