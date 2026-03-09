@@ -8,6 +8,9 @@ import { PLAN_FEATURES } from "@/lib/types";
 import type { PlanTier, UXAuditResult } from "@/lib/types";
 import { currentUser } from "@clerk/nextjs/server";
 
+// Allow up to 60s for streaming responses
+export const maxDuration = 60;
+
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 /**

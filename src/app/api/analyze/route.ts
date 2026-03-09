@@ -10,6 +10,9 @@ import { saveAudit } from "@/lib/db/audits";
 import { getSupabase } from "@/lib/supabase";
 import type { AnalysisError } from "@/lib/types";
 
+// Allow up to 60s on Vercel Pro, 10s on Hobby (default)
+export const maxDuration = 60;
+
 function errorResponse(error: string, code: AnalysisError["code"], status = 400) {
   return NextResponse.json({ success: false, error, code } satisfies AnalysisError, { status });
 }
