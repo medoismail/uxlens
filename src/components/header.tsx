@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Show, UserButton, SignInButton } from "@clerk/nextjs";
 
 export function Header() {
   return (
@@ -25,10 +26,39 @@ export function Header() {
           >
             Pricing
           </Link>
+          <Show when="signed-in">
+            <Link
+              href="/dashboard"
+              className="text-[12px] font-medium text-foreground/40 hover:text-foreground/70 transition-colors duration-150"
+            >
+              Dashboard
+            </Link>
+          </Show>
         </div>
-        <div className="flex items-center gap-1.5 text-[12px] border rounded-full px-3 py-1 tracking-wider" style={{ color: "var(--brand)", background: "var(--brand-dim)", borderColor: "var(--brand-glow)" }}>
-          <span className="w-[5px] h-[5px] rounded-full" style={{ background: "var(--brand)", animation: "blink-dot 1.8s ease-in-out infinite" }} />
-          DIAGNOSTIC ENGINE v3
+
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-1.5 text-[12px] border rounded-full px-3 py-1 tracking-wider" style={{ color: "var(--brand)", background: "var(--brand-dim)", borderColor: "var(--brand-glow)" }}>
+            <span className="w-[5px] h-[5px] rounded-full" style={{ background: "var(--brand)", animation: "blink-dot 1.8s ease-in-out infinite" }} />
+            DIAGNOSTIC ENGINE v3
+          </div>
+
+          <Show when="signed-out">
+            <SignInButton mode="modal">
+              <button className="text-[12px] font-medium px-3.5 py-1.5 rounded-lg border transition-all duration-150 hover:opacity-80" style={{ borderColor: "var(--brand-glow)", color: "var(--brand)", background: "var(--brand-dim)" }}>
+                Sign In
+              </button>
+            </SignInButton>
+          </Show>
+
+          <Show when="signed-in">
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "w-[32px] h-[32px]",
+                },
+              }}
+            />
+          </Show>
         </div>
       </nav>
     </header>

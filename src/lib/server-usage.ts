@@ -29,45 +29,69 @@ function getClientIP(request: Request): string {
 
 /**
  * Resolve the user's plan server-side.
- * If email provided, check subscription cache in Redis (or call LemonSqueezy).
- * Falls back to "free" if no email or not subscribed.
+ * Checks Clerk userId first (if auth'd), then email, then LemonSqueezy API.
+ * Falls back to "free" if no identity or not subscribed.
  */
-async function resolveplan(email: string | undefined): Promise<PlanTier> {
-  if (!email) return "free";
-
+async function resolveplan(email: string | undefined, clerkUserId?: string): Promise<PlanTier> {
   const r = getRedis();
-  if (r) {
-    // Check Redis cache first (cached for 1 hour)
-    const cacheKey = `uxlens:sub:${email.toLowerCase()}`;
-    const cached = await r.get<string>(cacheKey);
+
+  // 1. Check by Clerk userId first (fastest path for auth'd users)
+  if (clerkUserId && r) {
+    const clerkCacheKey = `uxlens:sub:clerk:${clerkUserId}`;
+    const cached = await r.get<string>(clerkCacheKey);
     if (cached) return cached as PlanTier;
   }
 
-  // Verify with LemonSqueezy
-  try {
-    const { checkSubscriptionByEmail } = await import("./lemonsqueezy");
-    const status = await checkSubscriptionByEmail(email);
+  if (!email && !clerkUserId) return "free";
 
-    if (r) {
-      const cacheKey = `uxlens:sub:${email.toLowerCase()}`;
-      await r.set(cacheKey, status.plan, { ex: 3600 }); // Cache 1 hour
+  // 2. Check by email in Redis
+  if (email && r) {
+    const cacheKey = `uxlens:sub:${email.toLowerCase()}`;
+    const cached = await r.get<string>(cacheKey);
+    if (cached) {
+      // Also cache by Clerk userId for faster future lookups
+      if (clerkUserId) {
+        const clerkCacheKey = `uxlens:sub:clerk:${clerkUserId}`;
+        await r.set(clerkCacheKey, cached, { ex: 60 * 60 * 24 * 7 });
+      }
+      return cached as PlanTier;
     }
-
-    return status.isActive ? status.plan : "free";
-  } catch {
-    return "free";
   }
+
+  // 3. Verify with LemonSqueezy (only if we have email)
+  if (email) {
+    try {
+      const { checkSubscriptionByEmail } = await import("./lemonsqueezy");
+      const status = await checkSubscriptionByEmail(email);
+
+      if (r) {
+        const cacheKey = `uxlens:sub:${email.toLowerCase()}`;
+        await r.set(cacheKey, status.plan, { ex: 3600 }); // Cache 1 hour
+        if (clerkUserId) {
+          const clerkCacheKey = `uxlens:sub:clerk:${clerkUserId}`;
+          await r.set(clerkCacheKey, status.plan, { ex: 60 * 60 * 24 * 7 });
+        }
+      }
+
+      return status.isActive ? status.plan : "free";
+    } catch {
+      return "free";
+    }
+  }
+
+  return "free";
 }
 
 /**
- * Check usage server-side. Uses IP for free users, email for subscribers.
+ * Check usage server-side. Uses IP for free users, email/clerkUserId for subscribers.
  * If Redis is not configured, allows all requests (dev mode).
  */
 export async function checkServerUsage(
   request: Request,
-  email?: string
+  email?: string,
+  clerkUserId?: string
 ): Promise<UsageCheck> {
-  const plan = await resolveplan(email);
+  const plan = await resolveplan(email, clerkUserId);
   const limit = PLAN_LIMITS[plan];
   const r = getRedis();
 
@@ -86,8 +110,11 @@ export async function checkServerUsage(
 
   try {
     const ip = getClientIP(request);
-    // Free users tracked by IP, subscribers by email
-    const identifier = plan === "free" ? ip : email!.toLowerCase();
+    // Free users tracked by IP, authenticated/subscribers by clerkUserId or email
+    const identifier =
+      plan === "free"
+        ? (clerkUserId || ip)
+        : (clerkUserId || email!.toLowerCase());
     const month = getCurrentMonth();
     const monthlyKey = `uxlens:usage:${identifier}:${month}`;
     const hourlyKey = `uxlens:hourly:${ip}`;
@@ -159,15 +186,19 @@ export async function checkServerUsage(
 /** Increment usage after a successful audit */
 export async function incrementServerUsage(
   request: Request,
-  email?: string
+  email?: string,
+  clerkUserId?: string
 ): Promise<void> {
   try {
     const r = getRedis();
     if (!r) return;
 
-    const plan = await resolveplan(email);
+    const plan = await resolveplan(email, clerkUserId);
     const ip = getClientIP(request);
-    const identifier = plan === "free" ? ip : email!.toLowerCase();
+    const identifier =
+      plan === "free"
+        ? (clerkUserId || ip)
+        : (clerkUserId || email!.toLowerCase());
     const month = getCurrentMonth();
     const monthlyKey = `uxlens:usage:${identifier}:${month}`;
     const hourlyKey = `uxlens:hourly:${ip}`;

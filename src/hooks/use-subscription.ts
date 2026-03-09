@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useAuth } from "@clerk/nextjs";
 import type { PlanTier } from "@/lib/types";
 
 const STORAGE_KEY = "uxlens_subscriber_email";
@@ -17,6 +18,7 @@ interface SubscriptionState {
 }
 
 export function useSubscription() {
+  const { isSignedIn, isLoaded } = useAuth();
   const [state, setState] = useState<SubscriptionState>({
     isSubscribed: false,
     plan: "free",
@@ -24,21 +26,46 @@ export function useSubscription() {
     isVerifying: false,
   });
 
-  // On mount, check localStorage for cached subscription
+  // For signed-in Clerk users: fetch plan from server
   useEffect(() => {
-    const email = localStorage.getItem(STORAGE_KEY);
-    const verified = localStorage.getItem(VERIFIED_KEY) === "true";
-    const verifiedAt = Number(localStorage.getItem(VERIFIED_AT_KEY) || "0");
-    const plan = (localStorage.getItem(PLAN_KEY) as PlanTier) || "free";
-    const isCacheValid = Date.now() - verifiedAt < CACHE_DURATION_MS;
+    if (!isLoaded) return;
 
-    if (email && verified && isCacheValid) {
-      setState({ isSubscribed: true, plan, email, isVerifying: false });
-    } else if (email) {
-      // Cache expired, re-verify
-      verifySubscription(email);
+    if (isSignedIn) {
+      // Authenticated user — fetch plan from /api/user/plan
+      fetchClerkPlan();
+    } else {
+      // Anonymous user — use localStorage-based flow
+      const email = localStorage.getItem(STORAGE_KEY);
+      const verified = localStorage.getItem(VERIFIED_KEY) === "true";
+      const verifiedAt = Number(localStorage.getItem(VERIFIED_AT_KEY) || "0");
+      const plan = (localStorage.getItem(PLAN_KEY) as PlanTier) || "free";
+      const isCacheValid = Date.now() - verifiedAt < CACHE_DURATION_MS;
+
+      if (email && verified && isCacheValid) {
+        setState({ isSubscribed: true, plan, email, isVerifying: false });
+      } else if (email) {
+        // Cache expired, re-verify
+        verifySubscription(email);
+      }
     }
-  }, []);
+  }, [isSignedIn, isLoaded]);
+
+  async function fetchClerkPlan() {
+    setState((prev) => ({ ...prev, isVerifying: true }));
+    try {
+      const res = await fetch("/api/user/plan");
+      const data = await res.json();
+      const plan: PlanTier = data.plan || "free";
+      setState({
+        isSubscribed: plan !== "free",
+        plan,
+        email: null, // Clerk manages identity, no need for email
+        isVerifying: false,
+      });
+    } catch {
+      setState((prev) => ({ ...prev, isVerifying: false }));
+    }
+  }
 
   const verifySubscription = useCallback(async (email: string) => {
     setState((prev) => ({ ...prev, isVerifying: true }));

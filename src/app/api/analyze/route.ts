@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { analyzeRequestSchema } from "@/lib/schemas";
 import { normalizeUrl } from "@/lib/validate-url";
 import { extractPageContent, hasEnoughContent } from "@/lib/extract-page-content";
@@ -26,8 +27,17 @@ export async function POST(request: Request) {
     const url = normalizeUrl(parsed.data.url);
     const email = parsed.data.email;
 
+    // 1b. Optionally get Clerk userId (won't fail for anonymous users)
+    let clerkUserId: string | undefined;
+    try {
+      const { userId } = await auth();
+      if (userId) clerkUserId = userId;
+    } catch {
+      // Not authenticated — that's fine, continue as anonymous
+    }
+
     // 2. Check server-side usage limits
-    const usage = await checkServerUsage(request, email);
+    const usage = await checkServerUsage(request, email, clerkUserId);
     if (!usage.audit_allowed) {
       return NextResponse.json(
         { success: false, error: usage.reason, code: "USAGE_LIMIT", usage } satisfies AnalysisError,
@@ -92,7 +102,7 @@ export async function POST(request: Request) {
     }
 
     // 6. Increment usage after successful audit
-    await incrementServerUsage(request, email);
+    await incrementServerUsage(request, email, clerkUserId);
 
     // 7. Return successful result
     return NextResponse.json({
