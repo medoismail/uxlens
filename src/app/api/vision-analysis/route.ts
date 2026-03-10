@@ -4,9 +4,9 @@ import { getSupabase } from "@/lib/supabase";
 import { getUserByClerkId, getUserPlan } from "@/lib/db/users";
 import { getRedis } from "@/lib/server-usage";
 import { generateVisionHeatmap, generateVisualAnalysis } from "@/lib/openai";
-import { hotspotsToZones } from "@/lib/heatmap";
-import { generateFallbackHeatmapZones } from "@/lib/heatmap";
-import type { HeatmapZone, VisualAnalysis, PlanTier } from "@/lib/types";
+import { hotspotsToZones, generateFallbackHeatmapZones } from "@/lib/heatmap";
+import type { HeatmapZone } from "@/lib/heatmap";
+import type { VisualAnalysis, PlanTier } from "@/lib/types";
 
 // Vision analysis can take a while (two parallel AI vision calls)
 export const maxDuration = 60;

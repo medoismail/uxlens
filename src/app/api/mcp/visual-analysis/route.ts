@@ -3,7 +3,8 @@ import { getSupabase } from "@/lib/supabase";
 import { generateVisionHeatmap, generateVisualAnalysis } from "@/lib/openai";
 import { hotspotsToZones } from "@/lib/heatmap";
 import { authenticateMcpRequest, checkMcpRateLimit } from "@/lib/mcp-auth";
-import type { HeatmapZone, VisualAnalysis } from "@/lib/types";
+import type { HeatmapZone } from "@/lib/heatmap";
+import type { VisualAnalysis } from "@/lib/types";
 
 export const maxDuration = 60;
 

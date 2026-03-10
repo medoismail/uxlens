@@ -140,14 +140,12 @@ export interface AnalysisResponse {
   viewportWidth?: number;
 }
 
-/** Heatmap zone for attention overlay */
+/** Heatmap attention point for gaussian overlay */
 export interface HeatmapZone {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  intensity: number;
-  label: string;
+  x: number;          // pixel center x
+  y: number;          // pixel center y
+  intensity: number;  // 0-1
+  radius: number;     // pixel radius for gaussian blob
 }
 
 export interface AnalysisError {
@@ -207,15 +205,12 @@ export interface ChatMessage {
 
 /* ── AI Vision Analysis ───────────────────────────────── */
 
-/** AI-generated attention hotspot from UXLens AI vision */
+/** AI-generated attention point from UXLens AI vision (gaussian heatmap) */
 export interface VisionHotspot {
-  x: number;          // normalized 0-1 (left edge)
-  y: number;          // normalized 0-1 (top edge)
-  width: number;      // normalized 0-1
-  height: number;     // normalized 0-1
-  intensity: "high" | "medium" | "low";
-  label: string;      // e.g. "Primary CTA button"
-  reason: string;     // Why this draws attention
+  x: number;          // normalized 0-1 (center of attention)
+  y: number;          // normalized 0-1 (center of attention)
+  intensity: number;  // 0.0-1.0 continuous attention strength
+  spread?: number;    // optional radius multiplier (0.5-2.0)
 }
 
 /** Visual design analysis from AI vision */

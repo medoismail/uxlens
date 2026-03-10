@@ -1,33 +1,82 @@
 export interface HeatmapZone {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+  x: number;      // pixel center x
+  y: number;      // pixel center y
   intensity: number; // 0-1
-  label: string;
+  radius: number;    // pixel radius for gaussian blob
 }
 
+/** Base radius for gaussian blobs at different intensity levels (pixels) */
+const BASE_RADIUS_HIGH = 140;
+const BASE_RADIUS_MID = 100;
+const BASE_RADIUS_LOW = 70;
+
 /**
- * Convert AI vision hotspots (normalized 0-1 coordinates) to pixel-based HeatmapZones.
+ * Convert AI vision hotspots (normalized 0-1 center points with continuous intensity)
+ * to pixel-based HeatmapZones with gaussian blob radius.
  */
 export function hotspotsToZones(
-  hotspots: { x: number; y: number; width: number; height: number; intensity: string; label: string }[],
+  hotspots: { x: number; y: number; intensity: number; spread?: number }[],
   viewportWidth: number,
   pageHeight: number
 ): HeatmapZone[] {
-  return hotspots.map((h) => ({
-    x: h.x * viewportWidth,
-    y: h.y * pageHeight,
-    width: h.width * viewportWidth,
-    height: h.height * pageHeight,
-    intensity: h.intensity === "high" ? 0.9 : h.intensity === "medium" ? 0.6 : 0.3,
-    label: h.label,
-  }));
+  return hotspots.map((h) => {
+    // Map intensity to base radius
+    let baseRadius: number;
+    if (h.intensity > 0.7) {
+      baseRadius = BASE_RADIUS_HIGH;
+    } else if (h.intensity > 0.35) {
+      baseRadius = BASE_RADIUS_MID;
+    } else {
+      baseRadius = BASE_RADIUS_LOW;
+    }
+
+    // Apply spread multiplier if provided
+    const spread = h.spread ?? 1.0;
+    const radius = baseRadius * spread;
+
+    return {
+      x: h.x * viewportWidth,
+      y: h.y * pageHeight,
+      intensity: h.intensity,
+      radius,
+    };
+  });
+}
+
+/**
+ * Normalize heatmap zones from any format (legacy bounding-box or new point-based).
+ * Legacy zones from old audits have: x (top-left), y (top-left), width, height, label.
+ * New zones have: x (center), y (center), intensity, radius.
+ */
+export function normalizeHeatmapZones(zones: Record<string, unknown>[]): HeatmapZone[] {
+  return zones.map((z) => {
+    // New format: has radius property
+    if (typeof z.radius === "number") {
+      return {
+        x: z.x as number,
+        y: z.y as number,
+        intensity: z.intensity as number,
+        radius: z.radius as number,
+      };
+    }
+
+    // Legacy format: x,y are top-left corner, has width/height/label
+    const width = (z.width as number) || 0;
+    const height = (z.height as number) || 0;
+    const intensity = (z.intensity as number) || 0.5;
+
+    return {
+      x: (z.x as number) + width / 2,
+      y: (z.y as number) + height / 2,
+      intensity,
+      radius: Math.max(width, height, 60) / 2,
+    };
+  });
 }
 
 /**
  * Fallback: Generate rule-based heatmap zones when AI vision is unavailable.
- * Uses F-pattern reading behavior + element type importance.
+ * Uses F-pattern reading behavior + typical page element importance.
  */
 export function generateFallbackHeatmapZones(
   pageHeight: number,
@@ -35,55 +84,70 @@ export function generateFallbackHeatmapZones(
 ): HeatmapZone[] {
   const zones: HeatmapZone[] = [];
 
-  // F-pattern base zones
+  // Hero headline area — strongest attention
   zones.push({
-    x: 0,
-    y: 0,
-    width: 1280,
-    height: Math.min(200, viewportHeight * 0.25),
-    intensity: 0.3,
-    label: "F-pattern: top scan",
+    x: 640,
+    y: 180,
+    intensity: 0.92,
+    radius: 160,
   });
 
+  // Primary CTA — strong fixation
   zones.push({
-    x: 0,
-    y: 0,
-    width: 400,
-    height: Math.min(viewportHeight, pageHeight),
-    intensity: 0.15,
-    label: "F-pattern: left scan",
-  });
-
-  // Hero area — typically high attention
-  zones.push({
-    x: 200,
-    y: 40,
-    width: 880,
-    height: 120,
+    x: 640,
+    y: 360,
     intensity: 0.85,
-    label: "Hero headline area",
+    radius: 100,
   });
 
-  // CTA area
+  // Subheadline area
   zones.push({
-    x: 460,
-    y: 300,
-    width: 360,
-    height: 60,
-    intensity: 0.9,
-    label: "Primary CTA area",
+    x: 640,
+    y: 260,
+    intensity: 0.65,
+    radius: 130,
   });
 
-  // Navigation
+  // F-pattern: top-left logo area
   zones.push({
-    x: 0,
-    y: 0,
-    width: 1280,
-    height: 60,
-    intensity: 0.4,
-    label: "Navigation bar",
+    x: 120,
+    y: 30,
+    intensity: 0.45,
+    radius: 80,
   });
 
-  zones.sort((a, b) => b.intensity - a.intensity);
+  // F-pattern: top horizontal scan
+  zones.push({
+    x: 640,
+    y: 30,
+    intensity: 0.35,
+    radius: 120,
+  });
+
+  // F-pattern: left vertical scan
+  zones.push({
+    x: 120,
+    y: Math.min(500, pageHeight * 0.2),
+    intensity: 0.3,
+    radius: 90,
+  });
+
+  // Below-fold content — reduced attention
+  if (pageHeight > viewportHeight) {
+    zones.push({
+      x: 640,
+      y: viewportHeight + 200,
+      intensity: 0.25,
+      radius: 140,
+    });
+
+    zones.push({
+      x: 640,
+      y: viewportHeight + 500,
+      intensity: 0.15,
+      radius: 120,
+    });
+  }
+
   return zones;
 }

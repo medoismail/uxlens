@@ -537,9 +537,9 @@ export async function generateUXAudit(
    ───────────────────────────────────────────────────────── */
 
 /**
- * Send a screenshot to AI vision and get AI-generated attention hotspots.
- * The AI analyzes visual hierarchy, contrast, size, positioning, and color
- * to determine where a real user's eyes would be drawn.
+ * Send a screenshot to AI vision and get point-based attention hotspots
+ * for rendering a realistic gaussian heatmap (like Hotjar/Clarity).
+ * Returns normalized (0-1) center points with continuous intensity.
  */
 export async function generateVisionHeatmap(
   screenshotBase64: string
@@ -555,26 +555,35 @@ export async function generateVisionHeatmap(
       messages: [
         {
           role: "system",
-          content: `You are an expert eye-tracking analyst and UX researcher. Given a screenshot of a web page, identify 8-15 areas where a user's visual attention would naturally be drawn in the first 10 seconds of viewing.
+          content: `You are an expert eye-tracking simulation engine. Given a screenshot of a web page, predict where a real user's gaze would fixate during the first 10 seconds of viewing.
 
-Use these eye-tracking principles:
-- F-pattern / Z-pattern reading behavior (Western languages read left-to-right, top-to-bottom)
-- Large elements with high contrast draw attention first
-- Faces and images of people attract strong fixation
-- Color contrast against the background (bright CTAs on muted backgrounds)
-- Isolated elements with whitespace around them get more attention
-- Above-the-fold content gets 80% of attention
-- Interactive elements (buttons, forms) draw deliberate attention
-- Text size and font weight indicate visual hierarchy
-- Motion or animation cues (even in a static screenshot, visual dynamism)
+Output ONLY center-point coordinates (x, y) with a continuous intensity value (0.0–1.0). No labels, no bounding boxes, no reasons.
 
-Return coordinates as NORMALIZED values (0-1) relative to the full image dimensions:
-- (0,0) = top-left corner
-- (1,1) = bottom-right corner
-- x and width are fractions of image width
-- y and height are fractions of image height
+Eye-tracking prediction model:
+- F-pattern / Z-pattern scanning (left→right, top→bottom for Western languages)
+- Large, high-contrast elements draw strongest fixation
+- Faces and images of people attract involuntary fixation
+- Bright CTAs on muted backgrounds create contrast-driven saccades
+- Isolated elements surrounded by whitespace receive amplified attention
+- Above-the-fold content receives ~80% of total gaze time
+- Interactive elements (buttons, input fields) draw deliberate fixation
+- Font size and weight determine text hierarchy fixation order
+- Visual weight (size × contrast × color saturation) predicts attention
 
-CRITICAL: Be precise with coordinates. Each hotspot should tightly wrap the actual visual element, not be vague or oversized.
+Intensity scale:
+- 0.85–1.0: Primary fixation targets (main headline, primary CTA, hero image)
+- 0.6–0.84: Strong secondary attention (subheadlines, feature icons, key images)
+- 0.35–0.59: Moderate attention (supporting text, secondary buttons, trust badges)
+- 0.15–0.34: Peripheral attention (navigation items, footer links, subtle elements)
+
+Distribution rules:
+- Generate 15-25 attention points covering the full visible page
+- 3-5 points should be high intensity (>0.7)
+- 5-8 points should be medium intensity (0.35-0.7)
+- Rest should be lower intensity peripheral points
+- Cluster multiple points near important elements (headlines, CTAs) with slight offset
+- Spread points naturally — avoid perfect grids or symmetric patterns
+- Above-fold content should have higher density of points
 
 Return STRICT JSON only.`,
         },
@@ -583,30 +592,27 @@ Return STRICT JSON only.`,
           content: [
             {
               type: "text",
-              text: `Analyze this web page screenshot and identify the attention hotspots. For each hotspot, specify the bounding box, intensity level, what the element is, and WHY it draws attention.
+              text: `Predict the eye-tracking attention heatmap for this web page screenshot.
 
 Return JSON:
 {
   "hotspots": [
     {
-      "x": <0-1 normalized left edge>,
-      "y": <0-1 normalized top edge>,
-      "width": <0-1 fraction of image width>,
-      "height": <0-1 fraction of image height>,
-      "intensity": "high" | "medium" | "low",
-      "label": "<what this element is, e.g. 'Hero headline', 'Primary CTA button'>",
-      "reason": "<brief reason why it draws attention>"
+      "x": <0.0-1.0 normalized center x>,
+      "y": <0.0-1.0 normalized center y>,
+      "intensity": <0.0-1.0 continuous attention strength>,
+      "spread": <0.5-2.0 optional radius multiplier, default 1.0>
     }
   ]
 }
 
 Rules:
-- Return 8-15 hotspots, sorted by visual priority (most attention-grabbing first)
-- Mark the single most prominent CTA/button as "high"
-- Main headline: usually "high"
-- Supporting elements: "medium"
-- Navigation, footer, subtle links: "low"
-- Be specific in labels — "Sign Up Free button" not just "button"`,
+- Return 15-25 attention points, sorted by intensity (highest first)
+- Coordinates are CENTER points (not corners), normalized 0-1
+- Intensity is a continuous float 0.0-1.0 (NOT discrete categories)
+- Use spread >1.0 for large visual elements (hero images, full-width sections)
+- Use spread <1.0 for small focused elements (buttons, icons)
+- NO labels, NO bounding boxes, NO descriptions — points only`,
             },
             {
               type: "image_url",

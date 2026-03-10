@@ -190,15 +190,12 @@ export const analyzeRequestSchema = z.object({
 export const visionHotspotSchema = z.object({
   x: z.number().min(0).max(1),
   y: z.number().min(0).max(1),
-  width: z.number().min(0).max(1),
-  height: z.number().min(0).max(1),
-  intensity: z.enum(["high", "medium", "low"]),
-  label: z.string(),
-  reason: z.string(),
+  intensity: z.number().min(0).max(1),
+  spread: z.number().min(0.3).max(3.0).optional(),
 });
 
 export const visionHeatmapResponseSchema = z.object({
-  hotspots: z.array(visionHotspotSchema).min(3).max(20),
+  hotspots: z.array(visionHotspotSchema).min(5).max(30),
 });
 
 export const visualAnalysisSchema = z.object({

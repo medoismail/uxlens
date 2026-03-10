@@ -39,10 +39,10 @@ function SocialProofBar() {
 
   return (
     <div
-      className="border-y py-4"
-      style={{ borderColor: "var(--border)" }}
+      className="border-y py-5"
+      style={{ borderColor: "rgba(0,0,0,0.05)" }}
     >
-      <div className="max-w-[960px] mx-auto px-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[12px] text-foreground/35">
+      <div className="max-w-[960px] mx-auto px-7 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[12px] text-foreground/30">
         {count !== null && (
           <span className="flex items-center gap-1.5 font-medium text-foreground/50">
             <Users className="h-3.5 w-3.5" />
@@ -67,10 +67,10 @@ function SocialProofBar() {
 function Divider({ label }: { label: string }) {
   return (
     <div className="max-w-[960px] mx-auto px-7">
-      <div className="flex items-center gap-4 text-foreground/15 text-[12px] uppercase tracking-[2px]">
-        <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+      <div className="flex items-center gap-4 text-foreground/12 text-[11px] uppercase tracking-[2.5px]">
+        <div className="flex-1 h-px" style={{ background: "rgba(0,0,0,0.05)" }} />
         {label}
-        <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+        <div className="flex-1 h-px" style={{ background: "rgba(0,0,0,0.05)" }} />
       </div>
     </div>
   );
@@ -164,7 +164,7 @@ const FAQS = [
   },
   {
     q: "What does the AI attention heatmap show?",
-    a: "UXLens AI analyzes your screenshot to identify where users will look. The heatmap overlays color-coded zones (red = high attention, amber = medium, blue = low) with labeled regions showing exactly which elements draw the eye.",
+    a: "UXLens AI analyzes your screenshot to predict where users will look. The result is a realistic gaussian heatmap overlay — warm colors (red, orange, yellow) indicate high attention areas, fading to transparent where attention is low. It simulates real eye-tracking data.",
   },
   {
     q: "Can I save and share my reports?",
@@ -187,7 +187,7 @@ export function HomeSEOContent() {
       <SocialProofBar />
 
       {/* ── Product Preview (the big visual hero) ── */}
-      <section className="max-w-[960px] mx-auto px-7 pt-12 pb-16">
+      <section className="max-w-[960px] mx-auto px-7 pt-14 pb-20">
         <div className="text-center mb-8">
           <p className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/25 mb-2">
             Sample Audit Report
@@ -207,12 +207,12 @@ export function HomeSEOContent() {
       {/* ── How It Works ── */}
       <Divider label="How it works" />
 
-      <section className="max-w-[960px] mx-auto px-7 py-12 sm:py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <section className="max-w-[960px] mx-auto px-7 py-14 sm:py-20">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
           {STEPS.map((step) => (
-            <div key={step.num} className="space-y-3">
+            <div key={step.num} className="space-y-3.5">
               <span
-                className="inline-block text-[12px] font-mono font-bold px-2 py-0.5 rounded"
+                className="inline-block text-[11px] font-mono font-bold px-2.5 py-1 rounded-md"
                 style={{
                   background: "var(--brand-dim)",
                   color: "var(--brand)",
@@ -223,7 +223,7 @@ export function HomeSEOContent() {
               <h3 className="text-[15px] font-semibold text-foreground tracking-tight">
                 {step.title}
               </h3>
-              <p className="text-[12px] text-foreground/40 leading-relaxed">
+              <p className="text-[12.5px] text-foreground/35 leading-relaxed">
                 {step.desc}
               </p>
             </div>
@@ -238,10 +238,10 @@ export function HomeSEOContent() {
       <FeatureSection
         label="AI Vision Heatmap"
         headline="AI sees your page like a real user"
-        description="UXLens AI analyzes your screenshot to generate a real attention heatmap — not a fake F-pattern overlay. Clear zone-based visualization shows exactly where users will look, with labeled high/medium/low attention areas."
+        description="UXLens AI analyzes your screenshot to generate a realistic gaussian attention heatmap — not a fake F-pattern overlay. Smooth, warm-colored blobs show exactly where users will look, just like real eye-tracking software."
         bullets={[
-          "AI vision-powered eye tracking",
-          "Zone-based heatmap with labeled regions",
+          "AI vision-powered eye tracking simulation",
+          "Realistic gaussian heatmap (like Hotjar/Clarity)",
           "Visual design analysis with 5 scores",
         ]}
       >
@@ -414,24 +414,24 @@ export function HomeSEOContent() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {USE_CASES.map((uc) => (
             <div
               key={uc.title}
-              className="rounded-xl border p-5 transition-all duration-200 hover:border-[var(--border2)]"
+              className="rounded-xl border p-6 transition-all duration-200 hover:border-[rgba(0,0,0,0.1)]"
               style={{
-                borderColor: "var(--border)",
+                borderColor: "rgba(0,0,0,0.06)",
                 background: "var(--s1)",
               }}
             >
               <uc.icon
-                className="h-4 w-4 mb-3"
+                className="h-4 w-4 mb-3.5"
                 style={{ color: "var(--brand)" }}
               />
-              <h3 className="text-[14px] font-semibold text-foreground mb-1.5">
+              <h3 className="text-[14px] font-semibold text-foreground mb-2">
                 {uc.title}
               </h3>
-              <p className="text-[12px] text-foreground/35 leading-relaxed">
+              <p className="text-[12.5px] text-foreground/35 leading-relaxed">
                 {uc.desc}
               </p>
             </div>
@@ -452,15 +452,15 @@ export function HomeSEOContent() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {PLANS.map((plan) => (
             <div
               key={plan.name}
-              className="rounded-xl border p-5 relative"
+              className="rounded-xl border p-6 relative"
               style={{
                 borderColor: plan.popular
                   ? "var(--brand-glow)"
-                  : "var(--border)",
+                  : "rgba(0,0,0,0.06)",
                 background: plan.popular
                   ? "linear-gradient(135deg, var(--brand-dim), var(--s1))"
                   : "var(--s1)",
@@ -520,12 +520,12 @@ export function HomeSEOContent() {
       </section>
 
       {/* ── CTA Banner ── */}
-      <section className="max-w-[960px] mx-auto px-7 pb-16">
+      <section className="max-w-[960px] mx-auto px-7 pb-20">
         <div
-          className="rounded-xl border p-8 text-center"
+          className="rounded-2xl border p-10 text-center"
           style={{
             background: "var(--brand-dim)",
-            borderColor: "var(--brand-glow)",
+            borderColor: "rgba(76,44,255,0.08)",
           }}
         >
           <h2 className="text-[20px] font-bold tracking-tight text-foreground mb-2">

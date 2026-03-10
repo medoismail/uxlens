@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState, useCallback } from "react";
 import { drawHeatmapOnCanvas } from "@/lib/heatmap-composite";
+import { normalizeHeatmapZones } from "@/lib/heatmap";
 import type { HeatmapZone } from "@/lib/heatmap";
 
 interface HeatmapOverlayProps {
@@ -25,6 +26,12 @@ export function HeatmapOverlay({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imgSize, setImgSize] = useState({ w: 0, h: 0 });
 
+  // Normalize zones to handle both legacy (bounding-box) and new (point-based) formats
+  const normalizedZones = useCallback(() => {
+    if (!heatmapZones.length) return [];
+    return normalizeHeatmapZones(heatmapZones as unknown as Record<string, unknown>[]);
+  }, [heatmapZones]);
+
   const drawHeatmap = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas || !imageLoaded || imgSize.w === 0) return;
@@ -38,10 +45,12 @@ export function HeatmapOverlay({
     canvas.height = displayH;
 
     ctx.clearRect(0, 0, displayW, displayH);
-    if (!showHeatmap || !heatmapZones.length) return;
 
-    drawHeatmapOnCanvas(ctx, heatmapZones, viewportWidth, pageHeight, displayW, displayH);
-  }, [showHeatmap, heatmapZones, viewportWidth, pageHeight, imageLoaded, imgSize]);
+    const zones = normalizedZones();
+    if (!showHeatmap || !zones.length) return;
+
+    drawHeatmapOnCanvas(ctx, zones, viewportWidth, pageHeight, displayW, displayH);
+  }, [showHeatmap, normalizedZones, viewportWidth, pageHeight, imageLoaded, imgSize]);
 
   useEffect(() => {
     drawHeatmap();
@@ -114,30 +123,18 @@ export function HeatmapOverlay({
         )}
       </div>
 
-      {/* Legend */}
+      {/* Gradient legend bar */}
       {showHeatmap && hasZones && (
-        <div className="flex items-center justify-center gap-5 text-[12px] text-foreground/40">
-          <div className="flex items-center gap-1.5">
-            <div
-              className="w-3 h-3 rounded-[3px]"
-              style={{ background: "rgba(255, 59, 48, 0.75)", border: "1px solid rgba(255, 59, 48, 0.9)" }}
-            />
-            <span>High attention</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div
-              className="w-3 h-3 rounded-[3px]"
-              style={{ background: "rgba(255, 179, 0, 0.65)", border: "1px solid rgba(255, 179, 0, 0.8)" }}
-            />
-            <span>Medium</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div
-              className="w-3 h-3 rounded-[3px]"
-              style={{ background: "rgba(50, 173, 230, 0.55)", border: "1px solid rgba(50, 173, 230, 0.7)" }}
-            />
-            <span>Low</span>
-          </div>
+        <div className="flex items-center justify-center gap-3">
+          <span className="text-[11px] text-foreground/35 font-medium">Low</span>
+          <div
+            className="h-2.5 rounded-full"
+            style={{
+              width: 160,
+              background: "linear-gradient(to right, rgba(255,255,0,0.7), rgba(255,165,0,0.8), rgba(255,50,0,0.9))",
+            }}
+          />
+          <span className="text-[11px] text-foreground/35 font-medium">High</span>
         </div>
       )}
     </div>

@@ -63,7 +63,7 @@ function Logo({ height = 26 }: { height?: number }) {
 export function Header() {
   return (
     <>
-      <header className="w-full border-b sticky top-0 z-50 backdrop-blur-md" style={{ borderColor: "var(--border)", background: "oklch(1 0 0 / 85%)" }}>
+      <header className="w-full border-b sticky top-0 z-50 backdrop-blur-md" style={{ borderColor: "rgba(0,0,0,0.05)", background: "oklch(1 0 0 / 88%)" }}>
         <nav aria-label="Main navigation" className="mx-auto flex h-14 max-w-[960px] items-center justify-between px-7">
           <div className="flex items-center gap-6">
             <Link
@@ -118,10 +118,10 @@ export function Header() {
 
         {/* Beta development banner */}
         <div
-          className="w-full border-t text-center py-2 px-4"
+          className="w-full border-t text-center py-2.5 px-4"
           style={{
-            borderColor: "var(--border)",
-            background: "linear-gradient(90deg, var(--brand-dim), oklch(0.97 0.01 276), var(--brand-dim))",
+            borderColor: "rgba(0,0,0,0.04)",
+            background: "linear-gradient(90deg, var(--brand-dim), oklch(0.98 0.005 276), var(--brand-dim))",
           }}
         >
           <p className="text-[11px] text-foreground/50 leading-relaxed max-w-[700px] mx-auto">

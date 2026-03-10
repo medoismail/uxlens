@@ -266,11 +266,11 @@ function createSkillServer(userId: string, keyId: string) {
       }
 
       if (zones.length) {
-        text += `\n## Attention Zones (${zones.length})\n\n`;
+        text += `\n## Attention Heatmap (${zones.length} points)\n\n`;
         const sorted = [...zones].sort((a, b) => b.intensity - a.intensity);
         for (const z of sorted.slice(0, 10)) {
           const lvl = z.intensity >= 0.7 ? "HIGH" : z.intensity >= 0.4 ? "MEDIUM" : "LOW";
-          text += `- **${z.label}** — ${lvl} (${Math.round(z.intensity * 100)}%)\n`;
+          text += `- ${lvl} attention (${Math.round(z.intensity * 100)}%) at position (${Math.round(z.x)}, ${Math.round(z.y)}) radius ${Math.round(z.radius)}px\n`;
         }
       }
 
@@ -426,10 +426,10 @@ function createSkillServer(userId: string, keyId: string) {
             }
 
             if (zones.length) {
-              text += `\n### Top Attention Zones\n`;
+              text += `\n### Attention Heatmap (${zones.length} points)\n`;
               [...zones].sort((a, b) => b.intensity - a.intensity).slice(0, 8).forEach((z) => {
                 const lvl = z.intensity >= 0.7 ? "HIGH" : z.intensity >= 0.4 ? "MED" : "LOW";
-                text += `- **${z.label}** (${lvl})\n`;
+                text += `- ${lvl} (${Math.round(z.intensity * 100)}%) at (${Math.round(z.x)}, ${Math.round(z.y)})\n`;
               });
             }
           }

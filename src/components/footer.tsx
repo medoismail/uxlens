@@ -20,8 +20,8 @@ export function Footer() {
 
   return (
     <footer
-      className="border-t py-6 relative z-[1]"
-      style={{ borderColor: "var(--border)" }}
+      className="border-t py-8 relative z-[1]"
+      style={{ borderColor: "rgba(0,0,0,0.05)" }}
     >
       <div className="max-w-[960px] mx-auto px-7 flex flex-col sm:flex-row items-center justify-between gap-3">
         {/* Brand */}
