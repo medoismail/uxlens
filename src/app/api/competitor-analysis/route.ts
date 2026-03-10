@@ -92,7 +92,7 @@ export async function POST(request: Request) {
       return err("Rate limit reached. Please wait before running another competitor analysis.", 429);
     }
 
-    // 4. Identify competitors via GPT-4o
+    // 4. Identify competitors via AI
     const competitorSuggestions = await identifyCompetitors(
       url,
       headline || "",
@@ -167,7 +167,7 @@ export async function POST(request: Request) {
       return err("Could not re-fetch your page for comparison", 500);
     }
 
-    // 8. Run deep competitor comparison via GPT-4o
+    // 8. Run deep competitor comparison via AI
     const analysis: CompetitorAnalysis = await generateCompetitorComparison(
       url,
       userContent,

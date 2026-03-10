@@ -87,7 +87,7 @@ const STEPS = [
   {
     num: "02",
     title: "AI sees, analyzes & scores",
-    desc: "Our engine captures a full-page screenshot, uses GPT-4o vision to generate an attention heatmap, runs a visual design analysis, and audits 9 diagnostic layers with self-critique.",
+    desc: "Our engine captures a full-page screenshot, uses UXLens AI to generate an attention heatmap, runs a visual design analysis, and audits 9 diagnostic layers with self-critique.",
   },
   {
     num: "03",
@@ -152,11 +152,11 @@ const PLANS = [
 const FAQS = [
   {
     q: "What is a UX audit and why does it matter?",
-    a: "A UX audit identifies usability issues, conversion barriers, and trust gaps on your website. UXLens automates this with a 9-layer AI diagnostic powered by GPT-4o vision — delivering results in seconds instead of days.",
+    a: "A UX audit identifies usability issues, conversion barriers, and trust gaps on your website. UXLens automates this with a 9-layer AI diagnostic powered by UXLens AI v4 — delivering results in seconds instead of days.",
   },
   {
     q: "How does the AI analysis work?",
-    a: "UXLens captures a full-page screenshot with Puppeteer, sends it to GPT-4o vision for attention heatmap generation and visual design analysis, then runs your content through 9 specialized audit layers with a self-critique loop. You get scores, heatmaps, visual analysis, and actionable fixes.",
+    a: "UXLens captures a full-page screenshot, sends it to UXLens AI for attention heatmap generation and visual design analysis, then runs your content through 9 specialized audit layers with a self-critique loop. You get scores, heatmaps, visual analysis, and actionable fixes.",
   },
   {
     q: "Is it really free?",
@@ -164,7 +164,7 @@ const FAQS = [
   },
   {
     q: "What does the AI attention heatmap show?",
-    a: "GPT-4o vision analyzes your screenshot to identify where users will look. The heatmap overlays color-coded zones (red = high attention, amber = medium, blue = low) with labeled regions showing exactly which elements draw the eye.",
+    a: "UXLens AI analyzes your screenshot to identify where users will look. The heatmap overlays color-coded zones (red = high attention, amber = medium, blue = low) with labeled regions showing exactly which elements draw the eye.",
   },
   {
     q: "Can I save and share my reports?",
@@ -172,7 +172,7 @@ const FAQS = [
   },
   {
     q: "What makes UXLens different?",
-    a: "UXLens is the only tool that combines GPT-4o vision analysis (real AI heatmaps, not fake patterns) with a structured 9-layer diagnostic and visual design scoring. Each audit delivers fixes tailored to your page — not generic advice. Plus dashboard, PDF export, AI chat, and competitor analysis make it a complete platform.",
+    a: "UXLens is the only tool that combines AI vision analysis (real AI heatmaps, not fake patterns) with a structured 9-layer diagnostic and visual design scoring. Each audit delivers fixes tailored to your page — not generic advice. Plus dashboard, PDF export, AI chat, and competitor analysis make it a complete platform.",
   },
 ];
 
@@ -238,9 +238,9 @@ export function HomeSEOContent() {
       <FeatureSection
         label="AI Vision Heatmap"
         headline="AI sees your page like a real user"
-        description="GPT-4o vision analyzes your screenshot to generate a real attention heatmap — not a fake F-pattern overlay. Clear zone-based visualization shows exactly where users will look, with labeled high/medium/low attention areas."
+        description="UXLens AI analyzes your screenshot to generate a real attention heatmap — not a fake F-pattern overlay. Clear zone-based visualization shows exactly where users will look, with labeled high/medium/low attention areas."
         bullets={[
-          "GPT-4o vision-powered eye tracking",
+          "AI vision-powered eye tracking",
           "Zone-based heatmap with labeled regions",
           "Visual design analysis with 5 scores",
         ]}

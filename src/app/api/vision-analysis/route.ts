@@ -8,12 +8,12 @@ import { hotspotsToZones } from "@/lib/heatmap";
 import { generateFallbackHeatmapZones } from "@/lib/heatmap";
 import type { HeatmapZone, VisualAnalysis, PlanTier } from "@/lib/types";
 
-// Vision analysis can take a while (two parallel GPT-4o vision calls)
+// Vision analysis can take a while (two parallel AI vision calls)
 export const maxDuration = 60;
 
 /**
  * POST /api/vision-analysis
- * Takes a screenshot URL, sends it to GPT-4o vision for:
+ * Takes a screenshot URL, sends it to AI vision for:
  *   1. AI-generated attention heatmap (hotspot coordinates)
  *   2. Visual UX design analysis (5 scores + findings)
  *

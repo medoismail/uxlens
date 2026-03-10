@@ -342,7 +342,7 @@ export async function generateUXAudit(
    ───────────────────────────────────────────────────────── */
 
 /**
- * Send a screenshot to GPT-4o vision and get AI-generated attention hotspots.
+ * Send a screenshot to AI vision and get AI-generated attention hotspots.
  * The AI analyzes visual hierarchy, contrast, size, positioning, and color
  * to determine where a real user's eyes would be drawn.
  */
@@ -435,7 +435,7 @@ Rules:
 }
 
 /**
- * Send a screenshot to GPT-4o vision for visual UX design analysis.
+ * Send a screenshot to AI vision for visual UX design analysis.
  * Evaluates layout, visual hierarchy, whitespace, color/contrast, and mobile readiness.
  */
 export async function generateVisualAnalysis(
@@ -517,7 +517,7 @@ Return STRICT JSON only.`,
 
 /**
  * Step 1: Identify the 2 biggest competitors for a given landing page.
- * Small, fast GPT-4o call (~512 tokens).
+ * Small, fast AI call (~512 tokens).
  */
 export async function identifyCompetitors(
   url: string,
@@ -571,7 +571,7 @@ Rules:
 
 /**
  * Step 2: Deep competitor comparison.
- * Full GPT-4o call analyzing all 3 sites side-by-side.
+ * Full AI call analyzing all 3 sites side-by-side.
  */
 export async function generateCompetitorComparison(
   userUrl: string,

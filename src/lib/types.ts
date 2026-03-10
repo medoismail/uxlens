@@ -166,7 +166,7 @@ export interface ChatMessage {
 
 /* ── AI Vision Analysis ───────────────────────────────── */
 
-/** AI-generated attention hotspot from GPT-4o vision */
+/** AI-generated attention hotspot from UXLens AI vision */
 export interface VisionHotspot {
   x: number;          // normalized 0-1 (left edge)
   y: number;          // normalized 0-1 (top edge)
