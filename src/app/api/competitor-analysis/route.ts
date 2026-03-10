@@ -175,11 +175,13 @@ export async function POST(request: Request) {
       competitorsWithContent
     );
 
-    // 9. Save to Supabase if auditId provided (fire-and-forget)
+    // 9. Save to Supabase if auditId provided (must await — Vercel kills function after response)
     if (auditId && clerkUserId) {
-      updateCompetitorAnalysis(auditId, clerkUserId, analysis).catch((e) => {
+      try {
+        await updateCompetitorAnalysis(auditId, clerkUserId, analysis);
+      } catch (e) {
         console.error("[CompetitorAnalysis] Failed to save:", e);
-      });
+      }
     }
 
     // 10. Return result
