@@ -162,7 +162,7 @@ function ComparisonRow({ comp, comp1Name, comp2Name }: { comp: CategoryCompariso
           {winner} wins
         </span>
       </div>
-      <div className="grid grid-cols-3 gap-2 mb-1.5">
+      <div className="space-y-1.5 mb-1.5">
         <ScoreBar label="You" score={comp.userScore} />
         <ScoreBar label={comp1Name} score={comp.competitor1Score} />
         <ScoreBar label={comp2Name} score={comp.competitor2Score} />

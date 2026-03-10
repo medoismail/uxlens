@@ -21,10 +21,9 @@ export function HeatmapOverlay({
   heatmapLoading,
 }: HeatmapOverlayProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [imgSize, setImgSize] = useState({ w: 0, h: 0 });
+  const [imgNatural, setImgNatural] = useState({ w: 0, h: 0 });
 
   // Normalize zones to handle both legacy (bounding-box) and new (point-based) formats
   const normalizedZones = useCallback(() => {
@@ -34,23 +33,23 @@ export function HeatmapOverlay({
 
   const drawHeatmap = useCallback(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !imageLoaded || imgSize.w === 0) return;
+    if (!canvas || !imageLoaded || imgNatural.w === 0) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const displayW = imgSize.w;
-    const displayH = imgSize.h;
-    canvas.width = displayW;
-    canvas.height = displayH;
+    // Use the image's natural (pixel) dimensions for the canvas buffer.
+    // CSS w-full/h-full will scale the canvas to match the displayed image size.
+    canvas.width = imgNatural.w;
+    canvas.height = imgNatural.h;
 
-    ctx.clearRect(0, 0, displayW, displayH);
+    ctx.clearRect(0, 0, imgNatural.w, imgNatural.h);
 
     const zones = normalizedZones();
     if (!showHeatmap || !zones.length) return;
 
-    drawHeatmapOnCanvas(ctx, zones, viewportWidth, pageHeight, displayW, displayH);
-  }, [showHeatmap, normalizedZones, viewportWidth, pageHeight, imageLoaded, imgSize]);
+    drawHeatmapOnCanvas(ctx, zones, viewportWidth, pageHeight, imgNatural.w, imgNatural.h);
+  }, [showHeatmap, normalizedZones, viewportWidth, pageHeight, imageLoaded, imgNatural]);
 
   useEffect(() => {
     drawHeatmap();
@@ -80,35 +79,37 @@ export function HeatmapOverlay({
         )}
       </div>
 
-      {/* Screenshot + overlay */}
+      {/* Screenshot + overlay — outer div scrolls, inner div holds image + canvas */}
       <div
-        ref={containerRef}
-        className="relative rounded-xl border overflow-hidden"
+        className="rounded-xl border overflow-hidden"
         style={{ borderColor: "var(--border)", maxHeight: "80vh", overflowY: "auto" }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={screenshotUrl}
-          alt="Page screenshot"
-          className="w-full block"
-          onLoad={(e) => {
-            const img = e.target as HTMLImageElement;
-            setImgSize({ w: img.clientWidth, h: img.clientHeight });
-            setImageLoaded(true);
-          }}
-        />
-        <canvas
-          ref={canvasRef}
-          className="absolute top-0 left-0 w-full h-full pointer-events-none"
-          style={{
-            opacity: showHeatmap && hasZones ? 1 : 0,
-            transition: "opacity 0.3s ease",
-          }}
-        />
+        {/* Inner wrapper: relative so canvas covers the full image, not just visible area */}
+        <div className="relative">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={screenshotUrl}
+            alt="Page screenshot"
+            className="w-full block"
+            onLoad={(e) => {
+              const img = e.target as HTMLImageElement;
+              setImgNatural({ w: img.naturalWidth, h: img.naturalHeight });
+              setImageLoaded(true);
+            }}
+          />
+          <canvas
+            ref={canvasRef}
+            className="absolute top-0 left-0 w-full h-full pointer-events-none"
+            style={{
+              opacity: showHeatmap && hasZones ? 1 : 0,
+              transition: "opacity 0.3s ease",
+            }}
+          />
+        </div>
 
         {/* Heatmap loading overlay */}
         {heatmapLoading && !hasZones && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full border"
+          <div className="sticky bottom-4 left-1/2 -translate-x-1/2 w-fit mx-auto flex items-center gap-2 px-4 py-2 rounded-full border z-10"
             style={{
               background: "rgba(0,0,0,0.7)",
               borderColor: "rgba(255,255,255,0.1)",
