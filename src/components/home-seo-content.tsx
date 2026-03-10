@@ -418,7 +418,7 @@ export function HomeSEOContent() {
           {USE_CASES.map((uc) => (
             <div
               key={uc.title}
-              className="rounded-xl border p-5 transition-all duration-200 hover:shadow-elevation-1"
+              className="rounded-xl border p-5 transition-all duration-200 hover:border-[var(--border2)]"
               style={{
                 borderColor: "var(--border)",
                 background: "var(--s1)",

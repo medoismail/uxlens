@@ -72,9 +72,9 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
 
       {/* Headline — 2 lines + rotating word on line 3 */}
       <h1 className="animate-slide-up text-[clamp(34px,5.5vw,56px)] font-bold tracking-[-1.5px] leading-[1.15] max-w-[780px] text-foreground">
-        Your Page Is Losing Conversions
+        Find What&apos;s Killing
         <br />
-        Find Out Why
+        Your Conversions
         <RotatingText />
       </h1>
 
