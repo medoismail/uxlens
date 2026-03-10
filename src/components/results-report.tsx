@@ -14,7 +14,7 @@ import { PdfExportButton } from "@/components/pdf-export-button";
 import { ChatWidget } from "@/components/chat-widget";
 import { PLAN_FEATURES } from "@/lib/types";
 import { CompetitorSection, CompetitorLockedPreview } from "@/components/competitor-section";
-import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone, CompetitorAnalysis, VisualAnalysis } from "@/lib/types";
+import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone, CompetitorAnalysis, VisualAnalysis, SectionRewrite } from "@/lib/types";
 
 interface ResultsReportProps {
   data: UXAuditResult;
@@ -445,7 +445,7 @@ export function ResultsReport({
 
       {/* ─── Section Accordions (all tiers see findings; recommendations locked for free) ─── */}
       {data.sections.map((sec, idx) => (
-        <SectionAccordion key={sec.id} section={sec} delay={idx + 3} showRecommendations={features.improvements} />
+        <SectionAccordion key={sec.id} section={sec} delay={idx + 3} showRecommendations={features.improvements} showRewrites={features.improvements} />
       ))}
 
       {/* ─── Divider ─── */}
@@ -635,7 +635,7 @@ function AccordionSection({
 /* Section Accordion (audit sections with findings)         */
 /* ──────────────────────────────────────────────────────── */
 
-function SectionAccordion({ section, delay, showRecommendations = true }: { section: AuditSection; delay: number; showRecommendations?: boolean }) {
+function SectionAccordion({ section, delay, showRecommendations = true, showRewrites = true }: { section: AuditSection; delay: number; showRecommendations?: boolean; showRewrites?: boolean }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -686,6 +686,18 @@ function SectionAccordion({ section, delay, showRecommendations = true }: { sect
           {!showRecommendations && section.recommendations.length > 0 && (
             <LockedHint count={section.recommendations.length} label="recommendations" />
           )}
+
+          {/* Per-section rewrite — Starter+ only */}
+          {section.rewrite && showRewrites && (
+            <div className="mt-5">
+              <SectionRewriteBlock rewrite={section.rewrite} />
+            </div>
+          )}
+          {section.rewrite && !showRewrites && (
+            <div className="mt-3">
+              <LockedHint count={section.rewrite.type === "text" ? section.rewrite.items.length : 1} label="AI rewrite suggestions" />
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -725,6 +737,104 @@ function FindingCard({ finding }: { finding: Finding }) {
         </div>
         <div className="text-foreground/45">{finding.desc}</div>
       </div>
+    </div>
+  );
+}
+
+/* ──────────────────────────────────────────────────────── */
+/* Section Rewrite Block (per-section before/after)         */
+/* ──────────────────────────────────────────────────────── */
+
+function SectionRewriteBlock({ rewrite }: { rewrite: SectionRewrite }) {
+  if (rewrite.type === "text") {
+    return (
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-[12px] uppercase tracking-[2px] text-foreground/30">AI Rewrite</span>
+          <span className="text-[11px] px-1.5 py-0.5 rounded tracking-wide" style={{ color: "var(--brand)", background: "var(--brand-dim)", border: "1px solid var(--brand-glow)" }}>COPY-READY</span>
+        </div>
+        <div className="flex flex-col gap-3">
+          {rewrite.items.map((item, i) => (
+            <div key={i} className="rounded-lg border overflow-hidden" style={{ borderColor: "var(--border)", background: "var(--s2)" }}>
+              <div className="px-3.5 py-2 border-b" style={{ borderColor: "var(--border)" }}>
+                <span className="text-[11px] font-semibold text-foreground/50">{item.label}</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2">
+                <div className="p-3.5 sm:border-r" style={{ borderColor: "var(--border)" }}>
+                  <p className="text-[10px] uppercase tracking-[1.5px] text-foreground/25 mb-1.5">Before</p>
+                  <p className="text-[12px] text-foreground/35 leading-relaxed line-through">{item.before}</p>
+                </div>
+                <div className="p-3.5">
+                  <p className="text-[10px] uppercase tracking-[1.5px] text-foreground/25 mb-1.5">After</p>
+                  <p className="text-[12px] text-foreground/70 leading-relaxed">{item.after}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        {rewrite.rationale && (
+          <p className="text-[11px] text-foreground/30 leading-relaxed mt-3 px-1">{rewrite.rationale}</p>
+        )}
+      </div>
+    );
+  }
+
+  // Structure rewrite
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-[12px] uppercase tracking-[2px] text-foreground/30">AI Structure Rewrite</span>
+        <span className="text-[11px] px-1.5 py-0.5 rounded tracking-wide" style={{ color: "var(--brand)", background: "var(--brand-dim)", border: "1px solid var(--brand-glow)" }}>SUGGESTED</span>
+      </div>
+
+      {/* Suggested order */}
+      {rewrite.suggestedOrder.length > 0 && (
+        <div className="mb-3">
+          <p className="text-[11px] font-semibold text-foreground/40 mb-2">Suggested section order</p>
+          <div className="flex flex-col gap-1.5">
+            {rewrite.suggestedOrder.map((item, i) => (
+              <div key={i} className="flex items-center gap-2.5 text-[12px] text-foreground/50 px-3 py-2 rounded-[7px]" style={{ background: "var(--s2)" }}>
+                <span className="font-mono text-[11px] font-bold min-w-[18px]" style={{ color: "var(--brand)" }}>{i + 1}</span>
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Additions */}
+      {rewrite.additions.length > 0 && (
+        <div className="mb-3">
+          <p className="text-[11px] font-semibold mb-2" style={{ color: "var(--score-high)" }}>Add</p>
+          <div className="flex flex-col gap-1.5">
+            {rewrite.additions.map((item, i) => (
+              <div key={i} className="flex items-center gap-2.5 text-[12px] text-foreground/50 px-3 py-2 rounded-[7px] border-l-2" style={{ background: "oklch(0.623 0.178 145 / 5%)", borderColor: "var(--score-high)" }}>
+                <span className="text-[11px] shrink-0" style={{ color: "var(--score-high)" }}>+</span>
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Removals */}
+      {rewrite.removals.length > 0 && (
+        <div className="mb-3">
+          <p className="text-[11px] font-semibold mb-2" style={{ color: "var(--score-low)" }}>Remove / Reword</p>
+          <div className="flex flex-col gap-1.5">
+            {rewrite.removals.map((item, i) => (
+              <div key={i} className="flex items-center gap-2.5 text-[12px] text-foreground/50 px-3 py-2 rounded-[7px] border-l-2" style={{ background: "oklch(0.647 0.176 17 / 5%)", borderColor: "var(--score-low)" }}>
+                <span className="text-[11px] shrink-0" style={{ color: "var(--score-low)" }}>−</span>
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {rewrite.rationale && (
+        <p className="text-[11px] text-foreground/30 leading-relaxed mt-2 px-1">{rewrite.rationale}</p>
+      )}
     </div>
   );
 }

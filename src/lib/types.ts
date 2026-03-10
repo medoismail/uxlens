@@ -20,6 +20,7 @@ export interface AuditSection {
   subtitle: string;
   findings: Finding[];
   recommendations: string[];
+  rewrite?: SectionRewrite;
 }
 
 export interface FirstScreenAnalysis {
@@ -51,6 +52,24 @@ export interface Rewrite {
   afterCTA: string;
   rewriteRationale: string;
 }
+
+/* ── Per-section rewrite types ─────────────────────────── */
+
+export interface TextRewrite {
+  type: "text";
+  items: { label: string; before: string; after: string }[];
+  rationale: string;
+}
+
+export interface StructureRewrite {
+  type: "structure";
+  suggestedOrder: string[];
+  additions: string[];
+  removals: string[];
+  rationale: string;
+}
+
+export type SectionRewrite = TextRewrite | StructureRewrite;
 
 export interface UXAuditResult {
   overallScore: number;

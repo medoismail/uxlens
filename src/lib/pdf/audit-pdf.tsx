@@ -247,6 +247,63 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
                 ))}
               </View>
             )}
+
+            {/* Per-section rewrite */}
+            {section.rewrite && section.rewrite.type === "text" && (
+              <View style={{ marginTop: 4, marginBottom: 8 }}>
+                <Text style={[styles.rewriteLabel, { fontSize: 9, marginBottom: 4 }]}>AI REWRITE</Text>
+                {section.rewrite.items.slice(0, 3).map((item, ii) => (
+                  <View key={ii} style={{ flexDirection: "row", gap: 8, marginBottom: 6 }}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 8, fontFamily: "Helvetica-Bold", color: "#888", marginBottom: 2 }}>{item.label} — BEFORE</Text>
+                      <Text style={[styles.text, { fontSize: 9, color: "#999" }]}>{item.before}</Text>
+                    </View>
+                    <View style={[{ flex: 1 }, styles.rewriteBox]}>
+                      <Text style={{ fontSize: 8, fontFamily: "Helvetica-Bold", color: BRAND, marginBottom: 2 }}>{item.label} — AFTER</Text>
+                      <Text style={[styles.rewriteText, { fontSize: 9 }]}>{item.after}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+            {section.rewrite && section.rewrite.type === "structure" && (
+              <View style={{ marginTop: 4, marginBottom: 8 }}>
+                <Text style={[styles.rewriteLabel, { fontSize: 9, marginBottom: 4 }]}>STRUCTURE REWRITE</Text>
+                {section.rewrite.suggestedOrder.length > 0 && (
+                  <View style={{ marginBottom: 4 }}>
+                    <Text style={{ fontSize: 8, fontFamily: "Helvetica-Bold", color: "#555", marginBottom: 2 }}>Suggested Order</Text>
+                    {section.rewrite.suggestedOrder.map((s, si) => (
+                      <View key={si} style={styles.bulletItem}>
+                        <Text style={[styles.bullet, { color: BRAND }]}>{si + 1}.</Text>
+                        <Text style={styles.bulletText}>{s}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+                {section.rewrite.additions.length > 0 && (
+                  <View style={{ marginBottom: 4 }}>
+                    <Text style={{ fontSize: 8, fontFamily: "Helvetica-Bold", color: "#22c55e", marginBottom: 2 }}>Add</Text>
+                    {section.rewrite.additions.map((a, ai) => (
+                      <View key={ai} style={styles.bulletItem}>
+                        <Text style={[styles.bullet, { color: "#22c55e" }]}>+</Text>
+                        <Text style={styles.bulletText}>{a}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+                {section.rewrite.removals.length > 0 && (
+                  <View style={{ marginBottom: 4 }}>
+                    <Text style={{ fontSize: 8, fontFamily: "Helvetica-Bold", color: "#ef4444", marginBottom: 2 }}>Remove / Reword</Text>
+                    {section.rewrite.removals.map((r, ri) => (
+                      <View key={ri} style={styles.bulletItem}>
+                        <Text style={[styles.bullet, { color: "#ef4444" }]}>−</Text>
+                        <Text style={styles.bulletText}>{r}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            )}
           </View>
         ))}
 

@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
 import type { ExtractedContent } from "./types";
 
-const MAX_BODY_TEXT_LENGTH = 3000;
+const MAX_BODY_TEXT_LENGTH = 5000;
 const MAX_ITEMS = 50;
 
 /** Trust-related keywords to detect trust signals in page content */

@@ -78,6 +78,22 @@ const findingSchema = z.object({
   impact: z.enum(["high", "medium", "low"]),
 });
 
+const textRewriteSchema = z.object({
+  type: z.literal("text"),
+  items: z.array(z.object({ label: z.string(), before: z.string(), after: z.string() })),
+  rationale: z.string(),
+});
+
+const structureRewriteSchema = z.object({
+  type: z.literal("structure"),
+  suggestedOrder: z.array(z.string()),
+  additions: z.array(z.string()),
+  removals: z.array(z.string()),
+  rationale: z.string(),
+});
+
+const sectionRewriteSchema = z.discriminatedUnion("type", [textRewriteSchema, structureRewriteSchema]);
+
 const sectionSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -86,6 +102,7 @@ const sectionSchema = z.object({
   subtitle: z.string(),
   findings: z.array(findingSchema),
   recommendations: z.array(z.string()),
+  rewrite: sectionRewriteSchema.optional(),
 });
 
 const categoryScoreSchema = z.object({

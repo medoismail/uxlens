@@ -145,6 +145,15 @@ Generate:
 4. Strategic fixes (require more thought/testing)
 5. Rewritten hero: new headline, new subheadline, new CTA
 6. One-paragraph executive summary
+7. Per-section rewrites: For EACH of the 7 sections, generate a "rewrite" object with concrete, copy-paste-ready improvements:
+
+   TEXT REWRITE sections (hero, messaging, cta, trust, firstscreen):
+   Return type "text" with 2-4 before/after items. Each item must quote the ACTUAL original copy from the page as "before" and provide an improved version as "after". Include a label for what each item is (e.g. "Headline", "CTA button", "Value proposition").
+
+   STRUCTURE REWRITE sections (structure, contradictions):
+   Return type "structure" with suggestedOrder (optimal section ordering), additions (sections/elements to add), and removals (sections/elements to remove or reword).
+
+   Every rewrite must reference specific content from the page — no generic advice.
 
 ═══════════════════════════════════════════
 OUTPUT INSTRUCTIONS
@@ -178,7 +187,16 @@ The JSON structure must be exactly:
       "findings": [
         { "type": <"issue"|"warning"|"positive">, "title": <string>, "desc": <string>, "impact": <"high"|"medium"|"low"> }
       ],
-      "recommendations": [<string>, <string>]
+      "recommendations": [<string>, <string>],
+      "rewrite": {
+        "type": "text",
+        "items": [
+          { "label": "Headline", "before": "<actual headline from page>", "after": "<improved headline>" },
+          { "label": "Subheadline", "before": "<actual subheadline>", "after": "<improved subheadline>" },
+          { "label": "CTA button", "before": "<actual CTA text>", "after": "<improved CTA>" }
+        ],
+        "rationale": "<why these changes improve conversion>"
+      }
     },
     {
       "id": "messaging",
@@ -187,7 +205,8 @@ The JSON structure must be exactly:
       "score": <0-100>,
       "subtitle": <string>,
       "findings": [...],
-      "recommendations": [...]
+      "recommendations": [...],
+      "rewrite": { "type": "text", "items": [{ "label": "Value proposition", "before": "...", "after": "..." }, ...], "rationale": "..." }
     },
     {
       "id": "cta",
@@ -196,7 +215,8 @@ The JSON structure must be exactly:
       "score": <0-100>,
       "subtitle": <string>,
       "findings": [...],
-      "recommendations": [...]
+      "recommendations": [...],
+      "rewrite": { "type": "text", "items": [{ "label": "Primary CTA", "before": "...", "after": "..." }, ...], "rationale": "..." }
     },
     {
       "id": "trust",
@@ -205,7 +225,8 @@ The JSON structure must be exactly:
       "score": <0-100>,
       "subtitle": <string>,
       "findings": [...],
-      "recommendations": [...]
+      "recommendations": [...],
+      "rewrite": { "type": "text", "items": [{ "label": "Social proof header", "before": "...", "after": "..." }, ...], "rationale": "..." }
     },
     {
       "id": "structure",
@@ -214,7 +235,14 @@ The JSON structure must be exactly:
       "score": <0-100>,
       "subtitle": <string>,
       "findings": [...],
-      "recommendations": [...]
+      "recommendations": [...],
+      "rewrite": {
+        "type": "structure",
+        "suggestedOrder": ["Hero", "Social Proof", "Features/Benefits", "Pricing", "FAQ", "Final CTA"],
+        "additions": ["<sections to add>"],
+        "removals": ["<sections to remove or reword>"],
+        "rationale": "..."
+      }
     },
     {
       "id": "contradictions",
@@ -223,7 +251,8 @@ The JSON structure must be exactly:
       "score": <0-100>,
       "subtitle": <string>,
       "findings": [...],
-      "recommendations": [...]
+      "recommendations": [...],
+      "rewrite": { "type": "structure", "suggestedOrder": [], "additions": ["<claims to add for consistency>"], "removals": ["<contradictory claims to remove>"], "rationale": "..." }
     },
     {
       "id": "firstscreen",
@@ -232,7 +261,8 @@ The JSON structure must be exactly:
       "score": <0-100>,
       "subtitle": <string>,
       "findings": [...],
-      "recommendations": [...]
+      "recommendations": [...],
+      "rewrite": { "type": "text", "items": [{ "label": "Above-fold headline", "before": "...", "after": "..." }, ...], "rationale": "..." }
     }
   ],
   "firstScreenAnalysis": {
@@ -319,7 +349,7 @@ export async function generateUXAudit(
       model: "gpt-4o",
       response_format: { type: "json_object" },
       temperature: 0.4,
-      max_tokens: 4096,
+      max_tokens: 8192,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: buildUserPrompt(content) },
