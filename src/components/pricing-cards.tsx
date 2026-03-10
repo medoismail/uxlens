@@ -22,6 +22,7 @@ const PLANS = [
       "Everything in Free",
       "Unlimited AI vision heatmaps",
       "Visual design analysis (5 scores)",
+      "Competitor benchmarking",
       "Strategic fixes & recommendations",
       "PDF export with heatmap",
     ],
@@ -37,7 +38,7 @@ const PLANS = [
     features: [
       "Everything in Starter",
       "AI chat assistant (50 msg/mo)",
-      "Competitor benchmarking",
+      "UXLens Skill (MCP for Claude Code)",
       "Full audit history dashboard",
     ],
     checkoutKey: "pro",

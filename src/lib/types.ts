@@ -151,7 +151,7 @@ export interface PlanFeatures {
 
 export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
   free: { improvements: false, pdfExport: false, aiChat: false, chatLimit: 0, competitorAnalysis: false },
-  starter: { improvements: true, pdfExport: true, aiChat: false, chatLimit: 0, competitorAnalysis: false },
+  starter: { improvements: true, pdfExport: true, aiChat: false, chatLimit: 0, competitorAnalysis: true },
   pro: { improvements: true, pdfExport: true, aiChat: true, chatLimit: 50, competitorAnalysis: true },
   agency: { improvements: true, pdfExport: true, aiChat: true, chatLimit: 200, competitorAnalysis: true },
 };

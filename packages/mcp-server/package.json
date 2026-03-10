@@ -1,0 +1,37 @@
+{
+  "name": "@uxlens/mcp-server",
+  "version": "0.1.0",
+  "description": "UXLens AI UX audit skill for Claude Code — run UX audits, visual analysis, and competitor benchmarking from your IDE",
+  "type": "module",
+  "bin": {
+    "uxlens-mcp": "./dist/bin/uxlens-mcp.js"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.0",
+    "zod": "^4.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "uxlens",
+    "mcp",
+    "claude-code",
+    "ux-audit",
+    "skill"
+  ],
+  "license": "MIT"
+}

@@ -83,7 +83,7 @@ export async function POST(request: Request) {
 
     const features = PLAN_FEATURES[plan];
     if (!features.competitorAnalysis) {
-      return err("Competitor analysis requires Pro or Agency plan", 403);
+      return err("Competitor analysis requires Starter, Pro, or Agency plan", 403);
     }
 
     // 3. Rate limit: 5/hour/IP

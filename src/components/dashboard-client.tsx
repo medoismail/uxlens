@@ -5,8 +5,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import { FileText, ExternalLink, ChevronLeft, ChevronRight, BarChart3, Crown, ArrowUpRight } from "lucide-react";
+import { FileText, ExternalLink, ChevronLeft, ChevronRight, BarChart3, Crown, ArrowUpRight, Key, Copy, Check, Trash2, Terminal } from "lucide-react";
 import type { PlanTier } from "@/lib/types";
+
+interface ApiKeyItem {
+  id: string;
+  name: string;
+  keyPrefix: string;
+  createdAt: string;
+  lastUsedAt: string | null;
+  revoked: boolean;
+}
 
 interface AuditItem {
   id: string;
@@ -128,6 +137,212 @@ function PlanCard({ planInfo, totalAudits }: { planInfo: PlanInfo; totalAudits: 
   );
 }
 
+function ApiKeysSection() {
+  const [keys, setKeys] = useState<ApiKeyItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newKey, setNewKey] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [copiedCmd, setCopiedCmd] = useState(false);
+  const [generating, setGenerating] = useState(false);
+
+  useEffect(() => {
+    fetchKeys();
+  }, []);
+
+  async function fetchKeys() {
+    try {
+      const res = await fetch("/api/keys");
+      if (res.ok) {
+        const data = await res.json();
+        setKeys(data.keys || []);
+      }
+    } catch {
+      // Ignore — user may not have pro plan
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function generate() {
+    setGenerating(true);
+    try {
+      const res = await fetch("/api/keys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Default" }),
+      });
+      const data = await res.json();
+      if (res.ok && data.key) {
+        setNewKey(data.key);
+        fetchKeys();
+      } else {
+        alert(data.error || "Failed to generate key");
+      }
+    } catch {
+      alert("Failed to generate key");
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  async function revoke(keyId: string) {
+    if (!confirm("Revoke this API key? Any tools using it will stop working.")) return;
+    try {
+      await fetch("/api/keys", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ keyId }),
+      });
+      fetchKeys();
+    } catch {
+      alert("Failed to revoke key");
+    }
+  }
+
+  function copyToClipboard(text: string, type: "key" | "cmd") {
+    navigator.clipboard.writeText(text);
+    if (type === "key") {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } else {
+      setCopiedCmd(true);
+      setTimeout(() => setCopiedCmd(false), 2000);
+    }
+  }
+
+  const activeKeys = keys.filter((k) => !k.revoked);
+  const installCmd = "claude mcp add --transport stdio uxlens -- npx -y @uxlens/mcp-server";
+
+  return (
+    <div
+      className="rounded-xl border p-5 mb-6"
+      style={{ borderColor: "var(--border)", background: "var(--s1)" }}
+    >
+      <div className="flex items-center gap-2.5 mb-3">
+        <div
+          className="w-8 h-8 rounded-lg grid place-items-center"
+          style={{ background: "#16a34a18" }}
+        >
+          <Key className="w-4 h-4" style={{ color: "#16a34a" }} />
+        </div>
+        <div>
+          <h3 className="text-[13px] font-bold text-foreground">UXLens Skill</h3>
+          <p className="text-[11px] text-foreground/40">Use UXLens inside Claude Code and other AI tools</p>
+        </div>
+      </div>
+
+      {/* Install command */}
+      <div className="mb-4">
+        <p className="text-[10px] uppercase tracking-wider text-foreground/30 mb-1.5 font-medium">Install Command</p>
+        <div
+          className="flex items-center gap-2 rounded-lg border px-3 py-2"
+          style={{ borderColor: "var(--border)", background: "var(--s2)" }}
+        >
+          <Terminal className="w-3.5 h-3.5 text-foreground/30 shrink-0" />
+          <code className="text-[11px] text-foreground/60 flex-1 font-mono truncate">
+            {installCmd}
+          </code>
+          <button
+            onClick={() => copyToClipboard(installCmd, "cmd")}
+            className="shrink-0 p-1 rounded hover:bg-foreground/5 transition-colors"
+            title="Copy command"
+          >
+            {copiedCmd ? (
+              <Check className="w-3.5 h-3.5 text-green-600" />
+            ) : (
+              <Copy className="w-3.5 h-3.5 text-foreground/30" />
+            )}
+          </button>
+        </div>
+        <p className="text-[10px] text-foreground/25 mt-1">
+          Set <code className="font-mono">UXLENS_API_KEY</code> environment variable with your key below
+        </p>
+      </div>
+
+      {/* New key display */}
+      {newKey && (
+        <div
+          className="rounded-lg border p-3 mb-4"
+          style={{ borderColor: "#bbf7d0", background: "#f0fdf4" }}
+        >
+          <p className="text-[11px] font-medium text-green-800 mb-1.5">
+            🔑 Your new API key (shown once — copy it now):
+          </p>
+          <div className="flex items-center gap-2">
+            <code className="text-[12px] font-mono text-green-900 flex-1 break-all">
+              {newKey}
+            </code>
+            <button
+              onClick={() => copyToClipboard(newKey, "key")}
+              className="shrink-0 p-1.5 rounded-md bg-green-100 hover:bg-green-200 transition-colors"
+            >
+              {copied ? (
+                <Check className="w-3.5 h-3.5 text-green-700" />
+              ) : (
+                <Copy className="w-3.5 h-3.5 text-green-700" />
+              )}
+            </button>
+          </div>
+          <button
+            onClick={() => setNewKey(null)}
+            className="text-[10px] text-green-600 hover:text-green-800 mt-2 transition-colors"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* Key list */}
+      {!loading && activeKeys.length > 0 && (
+        <div className="space-y-2 mb-4">
+          {activeKeys.map((k) => (
+            <div
+              key={k.id}
+              className="flex items-center justify-between rounded-lg border px-3 py-2"
+              style={{ borderColor: "var(--border)", background: "var(--s2)" }}
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <code className="text-[12px] font-mono text-foreground/60">
+                  {k.keyPrefix}...
+                </code>
+                <span className="text-[10px] text-foreground/25">
+                  {new Date(k.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                </span>
+                {k.lastUsedAt && (
+                  <span className="text-[10px] text-foreground/25">
+                    Last used {new Date(k.lastUsedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={() => revoke(k.id)}
+                className="p-1.5 rounded hover:bg-red-50 transition-colors group"
+                title="Revoke key"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-foreground/20 group-hover:text-red-500 transition-colors" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Generate button */}
+      <button
+        onClick={generate}
+        disabled={generating || activeKeys.length >= 3}
+        className="text-[12px] font-medium px-4 py-2 rounded-lg border transition-all duration-150 hover:opacity-80 disabled:opacity-40"
+        style={{
+          borderColor: "#bbf7d0",
+          color: "#16a34a",
+          background: "#f0fdf4",
+        }}
+      >
+        {generating ? "Generating..." : activeKeys.length >= 3 ? "Max 3 keys" : "Generate API Key"}
+      </button>
+    </div>
+  );
+}
+
 export function DashboardClient() {
   const [audits, setAudits] = useState<AuditItem[]>([]);
   const [total, setTotal] = useState(0);
@@ -187,6 +402,11 @@ export function DashboardClient() {
 
         {/* Plan info card */}
         {planInfo && <PlanCard planInfo={planInfo} totalAudits={total} />}
+
+        {/* API Keys (Pro/Agency only) */}
+        {planInfo && (planInfo.plan === "pro" || planInfo.plan === "agency") && (
+          <ApiKeysSection />
+        )}
 
         {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
