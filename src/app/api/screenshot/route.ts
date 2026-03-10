@@ -92,9 +92,12 @@ export async function POST(request: Request) {
       viewportWidth: result.viewportWidth,
     });
   } catch (error) {
-    console.error("Screenshot capture failed:", error);
+    const errMessage = error instanceof Error ? error.message : String(error);
+    const errStack = error instanceof Error ? error.stack : undefined;
+    console.error("[Screenshot] Capture failed:", errMessage);
+    if (errStack) console.error("[Screenshot] Stack:", errStack);
     return NextResponse.json(
-      { error: "Screenshot capture failed" },
+      { error: "Screenshot capture failed", detail: errMessage },
       { status: 500 }
     );
   }
