@@ -117,7 +117,7 @@ function createSkillServer(userId: string, keyId: string) {
   // ── Tool 1: audit_url ──────────────────────────────
   server.tool(
     "audit_url",
-    "Run a comprehensive 10-layer UX audit on a website. Returns overall score, category scores, heuristic evaluation, conversion killers, quick wins, strategic fixes, and UX strengths.",
+    "Run a comprehensive 10-layer UX audit on a website. Returns overall score, category scores, Nielsen's heuristic evaluation (10 heuristics scored 0-10), professional findings with severity/category/fix, conversion killers, quick wins, strategic fixes, and UX strengths. Audits are performed by a senior UX auditor persona — findings are specific, evidence-based, and commercially aware.",
     { url: z.string().url().describe("The website URL to audit") },
     async ({ url }) => {
       const allowed = await checkMcpRateLimit(keyId, "audit", 20);
@@ -169,6 +169,20 @@ function createSkillServer(userId: string, keyId: string) {
         audit.strategicFixes.forEach((f: string, i: number) => { text += `${i + 1}. ${f}\n`; });
       }
 
+      // Top findings with severity
+      const allFindings = audit.sections?.flatMap((s) => s.findings) || [];
+      const criticalAndHigh = allFindings.filter((f) => f.severity === "critical" || f.severity === "high");
+      if (criticalAndHigh.length) {
+        text += `\n## 🔴 Critical & High Severity Findings\n\n`;
+        criticalAndHigh.slice(0, 8).forEach((f, i) => {
+          text += `${i + 1}. **[${(f.severity || "high").toUpperCase()}]** ${f.title}\n`;
+          text += `   ${f.desc}\n`;
+          if (f.whyItMatters) text += `   *Why it matters:* ${f.whyItMatters}\n`;
+          if (f.recommendedFix) text += `   *Fix:* ${f.recommendedFix}\n`;
+          text += `\n`;
+        });
+      }
+
       text += formatHeuristics(audit);
       text += formatUxStrengths(audit);
 
@@ -179,7 +193,7 @@ function createSkillServer(userId: string, keyId: string) {
   // ── Tool 2: visual_analysis ────────────────────────
   server.tool(
     "visual_analysis",
-    "Capture a screenshot and run AI visual analysis. Returns attention heatmap zones and visual design scores.",
+    "Capture a screenshot and run AI visual analysis. Returns attention heatmap zones, visual design scores (layout, hierarchy, whitespace, contrast, mobile), and professional findings. Analysis uses eye-tracking principles and senior UX auditor methodology.",
     { url: z.string().url().describe("The website URL to analyze visually") },
     async ({ url }) => {
       const allowed = await checkMcpRateLimit(keyId, "visual", 10);
@@ -267,7 +281,7 @@ function createSkillServer(userId: string, keyId: string) {
   // ── Tool 3: competitor_analysis ────────────────────
   server.tool(
     "competitor_analysis",
-    "Compare a website against its top competitors. Returns competitive positioning, score gaps, and advantages.",
+    "Compare a website against its top 2 competitors. Returns competitive positioning, category-by-category scoring, score gaps, strengths/weaknesses per competitor, and 5 actionable competitive advantages.",
     { url: z.string().url().describe("Your website URL to compare") },
     async ({ url }) => {
       const allowed = await checkMcpRateLimit(keyId, "competitor", 5);
@@ -330,7 +344,7 @@ function createSkillServer(userId: string, keyId: string) {
   // ── Tool 4: full_audit ─────────────────────────────
   server.tool(
     "full_audit",
-    "Complete UXLens analysis: 10-layer audit + heuristic evaluation + screenshot + visual analysis + heatmap. The most comprehensive tool — use when you want everything.",
+    "Complete UXLens analysis: 10-layer professional UX audit + Nielsen's heuristic evaluation + screenshot + AI attention heatmap + visual design analysis. The most comprehensive tool — combines senior auditor methodology with AI vision for a full diagnostic report.",
     { url: z.string().url().describe("The website URL to fully audit") },
     async ({ url }) => {
       const allowed = await checkMcpRateLimit(keyId, "full", 10);
@@ -370,6 +384,18 @@ function createSkillServer(userId: string, keyId: string) {
       if (audit.quickWins?.length) {
         text += `\n### Quick Wins\n`;
         audit.quickWins.forEach((w: string, i: number) => { text += `${i + 1}. ${w}\n`; });
+      }
+
+      // Top findings with severity
+      const fullFindings = audit.sections?.flatMap((s) => s.findings) || [];
+      const critHigh = fullFindings.filter((f) => f.severity === "critical" || f.severity === "high");
+      if (critHigh.length) {
+        text += `\n### Critical & High Severity Findings\n`;
+        critHigh.slice(0, 6).forEach((f, i) => {
+          text += `${i + 1}. **[${(f.severity || "high").toUpperCase()}]** ${f.title} — ${f.desc}`;
+          if (f.recommendedFix) text += ` *Fix: ${f.recommendedFix}*`;
+          text += `\n`;
+        });
       }
 
       text += formatHeuristics(audit);
