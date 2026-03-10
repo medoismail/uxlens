@@ -2,7 +2,9 @@
   "name": "uxlens",
   "version": "0.1.0",
   "private": true,
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -14,6 +16,7 @@
     "@base-ui/react": "^1.2.0",
     "@clerk/nextjs": "^7.0.1",
     "@lemonsqueezy/lemonsqueezy.js": "^4.0.0",
+    "@modelcontextprotocol/sdk": "^1.27.1",
     "@react-pdf/renderer": "^4.3.2",
     "@sparticuz/chromium-min": "^143.0.4",
     "@supabase/supabase-js": "^2.99.0",

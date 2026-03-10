@@ -211,7 +211,11 @@ function ApiKeysSection() {
   }
 
   const activeKeys = keys.filter((k) => !k.revoked);
-  const installCmd = "claude mcp add --transport stdio uxlens -- npx -y @uxlens/mcp-server";
+
+  // Dynamic install command: include user's key if just generated
+  const hasRealKey = !!newKey;
+  const installCmd = `claude mcp add --transport http uxlens https://uxlens.pro/api/skill --header "Authorization: Bearer ${hasRealKey ? newKey : "YOUR_API_KEY"}"`;
+
 
   return (
     <div
@@ -255,7 +259,9 @@ function ApiKeysSection() {
           </button>
         </div>
         <p className="text-[10px] text-foreground/25 mt-1">
-          Set <code className="font-mono">UXLENS_API_KEY</code> environment variable with your key below
+          {hasRealKey
+            ? "Run this in your terminal — your API key is already included"
+            : "Generate an API key below, then the command will include it automatically"}
         </p>
       </div>
 
