@@ -9,8 +9,8 @@ import {
 } from "@react-pdf/renderer";
 import type { UXAuditResult, CompetitorAnalysis, VisualAnalysis } from "@/lib/types";
 
-const BRAND = "#7c3aed";
-const BRAND_LIGHT = "#ede9fe";
+const BRAND = "#4C2CFF";
+const BRAND_LIGHT = "#EDEAFF";
 
 const styles = StyleSheet.create({
   page: { padding: 40, paddingBottom: 60, fontSize: 10, fontFamily: "Helvetica", color: "#1a1a2e" },

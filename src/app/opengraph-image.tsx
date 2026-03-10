@@ -16,7 +16,7 @@ export default async function OGImage() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #f0e6f6 0%, #d8c4e8 40%, #a678c8 100%)",
+          background: "linear-gradient(135deg, #EAE8F4 0%, #c4b5fd 40%, #7c6cff 100%)",
           fontFamily: "system-ui, sans-serif",
         }}
       >
@@ -43,23 +43,21 @@ export default async function OGImage() {
               marginBottom: "24px",
             }}
           >
-            <div
-              style={{
-                width: "48px",
-                height: "48px",
-                borderRadius: "12px",
-                background: "#6d28d9",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "white",
-                fontSize: "20px",
-                fontWeight: 800,
-              }}
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 959 960"
+              fill="none"
             >
-              UX
-            </div>
-            <span style={{ fontSize: "36px", fontWeight: 700, color: "#1a1a2e" }}>
+              <rect width="959" height="960" rx="250" fill="#EAE8F4" />
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M632.152 263.312L543.036 311.394L603.22 312.221C634.143 312.645 664.374 321.434 690.702 337.653L796 402.519L736.18 499.563L649.965 446.453L679.343 498.97C694.437 525.955 701.939 556.522 701.053 587.426L697.508 711.019L583.528 707.752L586.431 606.557L555.624 658.248C539.795 684.809 517.065 706.588 489.849 721.273L381.008 780L326.848 679.688L415.964 631.604L355.781 630.778C324.857 630.354 294.625 621.566 268.296 605.346L163 540.481L222.82 443.436L309.032 496.546L279.656 444.03C264.562 417.045 257.06 386.478 257.946 355.574L261.492 231.981L375.472 235.248L372.568 336.442L403.376 284.75C419.205 258.191 441.934 236.412 469.15 221.728L577.992 163L632.152 263.312ZM439.138 447.453C430.545 461.872 430.299 479.781 438.494 494.43C446.685 509.073 462.078 518.235 478.855 518.465C495.632 518.695 511.271 509.959 519.861 495.546C528.454 481.127 528.7 463.218 520.506 448.569C512.314 433.925 496.921 424.763 480.144 424.533C463.367 424.303 447.728 433.04 439.138 447.453Z"
+                fill="#4C2CFF"
+              />
+            </svg>
+            <span style={{ fontSize: "36px", fontWeight: 700, color: "#0D0539" }}>
               UXLens
             </span>
           </div>
@@ -69,13 +67,13 @@ export default async function OGImage() {
             style={{
               fontSize: "22px",
               fontWeight: 600,
-              color: "#6d28d9",
+              color: "#4C2CFF",
               letterSpacing: "3px",
               textTransform: "uppercase" as const,
               marginBottom: "20px",
             }}
           >
-            9-Layer UX Diagnostic Engine
+            AI UX Audit Platform
           </div>
 
           {/* Description */}
@@ -96,7 +94,7 @@ export default async function OGImage() {
           <div
             style={{
               marginTop: "32px",
-              background: "#6d28d9",
+              background: "#4C2CFF",
               color: "white",
               padding: "14px 36px",
               borderRadius: "12px",
