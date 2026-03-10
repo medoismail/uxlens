@@ -20,9 +20,10 @@ const PLANS = [
     audits: "50 audits/month",
     features: [
       "Everything in Free",
+      "Unlimited AI vision heatmaps",
+      "Visual design analysis (5 scores)",
       "Strategic fixes & recommendations",
-      "AI hero rewrite (before/after)",
-      "PDF export",
+      "PDF export with heatmap",
     ],
     checkoutKey: "starter",
     popular: false,

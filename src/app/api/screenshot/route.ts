@@ -4,25 +4,26 @@ import { getSupabase } from "@/lib/supabase";
 import { getUserByClerkId } from "@/lib/db/users";
 import { getRedis } from "@/lib/server-usage";
 
-// Screenshot capture can take a while
+// Puppeteer screenshot can take a while
 export const maxDuration = 60;
 
 /**
  * POST /api/screenshot
- * Captures a screenshot of a URL and generates heatmap zones.
+ * Captures a full-page screenshot of a URL using Puppeteer.
  * Called by the client AFTER the audit is complete.
- * Rate-limited by IP to prevent abuse of Microlink API quota.
+ * Heatmap zones are generated separately via /api/vision-analysis.
  */
 export async function POST(request: Request) {
   try {
     // Rate limit: max 10 screenshots per IP per hour
-    const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim()
-      || request.headers.get("x-real-ip")
-      || "unknown";
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
     const r = getRedis();
     if (r) {
       const rateKey = `uxlens:screenshot:${ip}`;
-      const count = ((await r.get<number>(rateKey)) || 0);
+      const count = (await r.get<number>(rateKey)) || 0;
       if (count >= 10) {
         return NextResponse.json(
           { error: "Screenshot rate limit exceeded" },
@@ -39,16 +40,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing URL" }, { status: 400 });
     }
 
-    // Capture screenshot
+    // Capture screenshot with Puppeteer
     const { captureScreenshot } = await import("@/lib/screenshot");
-    const { generateHeatmapZones } = await import("@/lib/heatmap");
-
     const result = await captureScreenshot(url);
-    const heatmapZones = generateHeatmapZones(
-      result.elements,
-      result.pageHeight,
-      result.viewportHeight
-    );
 
     // Upload to Supabase Storage
     let screenshotUrl: string | undefined;
@@ -81,10 +75,7 @@ export async function POST(request: Request) {
           if (dbUser) {
             await sb
               .from("audits")
-              .update({
-                screenshot_path: screenshotUrl,
-                heatmap_zones: heatmapZones,
-              })
+              .update({ screenshot_path: screenshotUrl })
               .eq("id", auditId)
               .eq("user_id", dbUser.id);
           }
@@ -97,7 +88,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       screenshotUrl,
-      heatmapZones,
       pageHeight: result.pageHeight,
       viewportWidth: result.viewportWidth,
     });

@@ -1,5 +1,5 @@
 import { getSupabase } from "@/lib/supabase";
-import type { UXAuditResult, CompetitorAnalysis } from "@/lib/types";
+import type { UXAuditResult, CompetitorAnalysis, VisualAnalysis } from "@/lib/types";
 
 export interface DbAudit {
   id: string;
@@ -7,6 +7,7 @@ export interface DbAudit {
   url: string;
   screenshot_path: string | null;
   heatmap_zones: unknown | null;
+  visual_analysis: VisualAnalysis | null;
   result: UXAuditResult;
   competitor_analysis: CompetitorAnalysis | null;
   created_at: string;

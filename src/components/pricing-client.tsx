@@ -53,7 +53,7 @@ export function PricingClient({
             Simple, transparent pricing
           </h1>
           <p className="mt-3 text-[13px] text-foreground/40 max-w-md leading-relaxed">
-            Start free with 5 audits per month. Upgrade anytime for strategic fixes, PDF export, and AI chat.
+            Start free with 5 audits per month. Upgrade for unlimited AI heatmaps, visual design analysis, strategic fixes, PDF export, and AI chat.
           </p>
         </div>
 
@@ -136,7 +136,7 @@ export function PricingClient({
             <ul className="mt-4 space-y-2">
               {[
                 "Full scores & 6 categories",
-                "Screenshot + attention heatmap",
+                "Screenshot + 1 AI vision heatmap",
                 "All conversion killers & quick wins",
                 "Trust signal matrix",
                 "Confusion detection map",

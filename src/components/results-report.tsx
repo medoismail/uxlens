@@ -14,7 +14,7 @@ import { PdfExportButton } from "@/components/pdf-export-button";
 import { ChatWidget } from "@/components/chat-widget";
 import { PLAN_FEATURES } from "@/lib/types";
 import { CompetitorSection, CompetitorLockedPreview } from "@/components/competitor-section";
-import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone, CompetitorAnalysis } from "@/lib/types";
+import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone, CompetitorAnalysis, VisualAnalysis } from "@/lib/types";
 
 interface ResultsReportProps {
   data: UXAuditResult;
@@ -30,6 +30,9 @@ interface ResultsReportProps {
   pageHeight?: number;
   viewportWidth?: number;
   screenshotStatus?: "loading" | "done" | "failed";
+  heatmapStatus?: "loading" | "done" | "failed";
+  visualAnalysis?: VisualAnalysis;
+  visualAnalysisStatus?: "loading" | "done" | "failed";
   competitorAnalysis?: CompetitorAnalysis;
   competitorStatus?: "loading" | "done" | "failed" | "locked";
 }
@@ -137,6 +140,7 @@ function LockedOverlay({ message }: { message: string }) {
 export function ResultsReport({
   data, url, onReset, onHumanAuditRequested, plan,
   auditId, screenshotUrl, heatmapZones, pageHeight, viewportWidth, screenshotStatus,
+  heatmapStatus, visualAnalysis, visualAnalysisStatus,
   competitorAnalysis, competitorStatus,
 }: ResultsReportProps) {
   const features = PLAN_FEATURES[plan];
@@ -152,14 +156,23 @@ export function ResultsReport({
       {/* Report header */}
       <div className="text-center animate-fade-in mb-6">
         <p className="text-[12px] font-mono uppercase tracking-[2px] text-foreground/30 mb-2">
-          9-Layer UX Audit Report
+          Diagnostic Engine v4 — Full UX Report
         </p>
         <h1 className="text-xl font-semibold tracking-tight text-foreground">{domain}</h1>
 
         {/* PDF Export button — Starter+ only */}
         {features.pdfExport && (
           <div className="mt-3">
-            <PdfExportButton data={data} url={url} competitorAnalysis={competitorAnalysis} />
+            <PdfExportButton
+              data={data}
+              url={url}
+              competitorAnalysis={competitorAnalysis}
+              screenshotUrl={screenshotUrl}
+              heatmapZones={heatmapZones}
+              pageHeight={pageHeight}
+              viewportWidth={viewportWidth}
+              visualAnalysis={visualAnalysis}
+            />
           </div>
         )}
       </div>
@@ -213,6 +226,7 @@ export function ResultsReport({
           heatmapZones={heatmapZones}
           pageHeight={pageHeight}
           viewportWidth={viewportWidth}
+          heatmapLoading={heatmapStatus === "loading"}
         />
       ) : screenshotStatus === "loading" ? (
         <section
@@ -273,6 +287,80 @@ export function ResultsReport({
           </p>
         </div>
       ) : null}
+
+      {/* ─── Visual Analysis (AI Vision — Starter+ for full, free sees scores only) ─── */}
+      {visualAnalysisStatus === "loading" && (
+        <section className="rounded-xl border p-5 mb-4" style={{ borderColor: "var(--border)", background: "var(--s1)" }}>
+          <div className="flex items-center gap-2.5 mb-4">
+            <div className="w-8 h-8 rounded-[7px] grid place-items-center shrink-0" style={{ background: "var(--s2)" }}>
+              <Eye className="h-4 w-4" style={{ color: "var(--accent-blue, var(--brand))" }} />
+            </div>
+            <div>
+              <h3 className="text-[13px] font-semibold">Visual Design Analysis</h3>
+              <p className="text-[11px] text-foreground/35">AI-powered visual UX evaluation</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            {[1,2,3,4,5,6].map(i => (
+              <div key={i} className="rounded-lg border p-3" style={{ background: "var(--s2)", borderColor: "var(--border)" }}>
+                <div className="h-5 w-12 rounded bg-foreground/10 mb-2 animate-pulse" />
+                <div className="h-2 w-16 rounded bg-foreground/5 animate-pulse" />
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center gap-2 mt-4 justify-center">
+            <div className="h-3.5 w-3.5 border-2 border-foreground/15 border-t-foreground/40 rounded-full animate-spin" />
+            <span className="text-[11px] text-foreground/30">Analyzing visual design...</span>
+          </div>
+        </section>
+      )}
+
+      {visualAnalysis && visualAnalysisStatus === "done" && (
+        <AccordionSection
+          icon={<Eye className="h-4 w-4" style={{ color: "var(--accent-blue, var(--brand))" }} />}
+          name="Visual Design Analysis"
+          subtitle="AI vision-powered layout & design evaluation"
+          defaultOpen
+          className="fu fu-2"
+        >
+          {/* Score Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-5">
+            {[
+              { label: "Layout", score: visualAnalysis.layoutScore },
+              { label: "Visual Hierarchy", score: visualAnalysis.visualHierarchyScore },
+              { label: "Whitespace", score: visualAnalysis.whitespaceScore },
+              { label: "Color & Contrast", score: visualAnalysis.colorContrastScore },
+              { label: "Mobile Readiness", score: visualAnalysis.mobileReadinessScore },
+              { label: "Overall Visual", score: visualAnalysis.overallVisualScore },
+            ].map((item) => (
+              <div key={item.label} className="rounded-lg border p-3 text-center" style={{ background: "var(--s2)", borderColor: "var(--border)" }}>
+                <div className="text-[20px] font-bold font-mono mb-1" style={{ color: scoreColor(item.score) }}>{item.score}</div>
+                <div className="text-[11px] text-foreground/35 leading-snug">{item.label}</div>
+                <div className="h-[3px] rounded-full overflow-hidden mt-2" style={{ background: "var(--s3)" }}>
+                  <div
+                    className="h-full rounded-full animate-bar-width"
+                    style={{ background: scoreColor(item.score), width: `${item.score}%`, "--bar-width": `${item.score}%` } as React.CSSProperties}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Summary */}
+          {visualAnalysis.summary && (
+            <p className="text-[12px] text-foreground/45 leading-relaxed mb-4 px-1">{visualAnalysis.summary}</p>
+          )}
+
+          {/* Findings */}
+          {visualAnalysis.findings.length > 0 && (
+            <div className="flex flex-col gap-2.5">
+              {visualAnalysis.findings.map((f, i) => (
+                <FindingCard key={i} finding={f} />
+              ))}
+            </div>
+          )}
+        </AccordionSection>
+      )}
 
       {/* ─── Category Grid (all tiers) ─── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-5 stagger-children">

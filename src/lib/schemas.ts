@@ -147,6 +147,33 @@ export const analyzeRequestSchema = z.object({
   email: z.string().email().optional(),
 });
 
+/* ── AI Vision Schemas ────────────────────────────────── */
+
+export const visionHotspotSchema = z.object({
+  x: z.number().min(0).max(1),
+  y: z.number().min(0).max(1),
+  width: z.number().min(0).max(1),
+  height: z.number().min(0).max(1),
+  intensity: z.enum(["high", "medium", "low"]),
+  label: z.string(),
+  reason: z.string(),
+});
+
+export const visionHeatmapResponseSchema = z.object({
+  hotspots: z.array(visionHotspotSchema).min(3).max(20),
+});
+
+export const visualAnalysisSchema = z.object({
+  layoutScore: z.number().min(0).max(100),
+  visualHierarchyScore: z.number().min(0).max(100),
+  whitespaceScore: z.number().min(0).max(100),
+  colorContrastScore: z.number().min(0).max(100),
+  mobileReadinessScore: z.number().min(0).max(100),
+  overallVisualScore: z.number().min(0).max(100),
+  findings: z.array(findingSchema),
+  summary: z.string(),
+});
+
 /* ── Competitor Analysis Schemas ───────────────────────── */
 
 const competitorCategoryScoresSchema = z.object({

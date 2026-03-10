@@ -26,7 +26,7 @@ export function Footer() {
       <div className="max-w-[960px] mx-auto px-7 flex flex-col sm:flex-row items-center justify-between gap-3">
         {/* Brand */}
         <span className="text-[12px] text-foreground/20 font-mono">
-          UXLens &mdash; 9-Layer Diagnostic Engine
+          UXLens &mdash; Diagnostic Engine v4
         </span>
 
         {/* Counter — always show once loaded */}

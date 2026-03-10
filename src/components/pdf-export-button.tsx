@@ -2,15 +2,23 @@
 
 import { useState } from "react";
 import { Download, Loader2 } from "lucide-react";
-import type { UXAuditResult, CompetitorAnalysis } from "@/lib/types";
+import type { UXAuditResult, CompetitorAnalysis, HeatmapZone, VisualAnalysis } from "@/lib/types";
 
 interface PdfExportButtonProps {
   data: UXAuditResult;
   url: string;
   competitorAnalysis?: CompetitorAnalysis;
+  screenshotUrl?: string;
+  heatmapZones?: HeatmapZone[];
+  pageHeight?: number;
+  viewportWidth?: number;
+  visualAnalysis?: VisualAnalysis;
 }
 
-export function PdfExportButton({ data, url, competitorAnalysis }: PdfExportButtonProps) {
+export function PdfExportButton({
+  data, url, competitorAnalysis,
+  screenshotUrl, heatmapZones, pageHeight, viewportWidth, visualAnalysis,
+}: PdfExportButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,11 +27,35 @@ export function PdfExportButton({ data, url, competitorAnalysis }: PdfExportButt
     setError(null);
 
     try {
+      // Generate heatmap composite image if we have screenshot + zones
+      let heatmapImage: string | undefined;
+      if (screenshotUrl && heatmapZones && heatmapZones.length > 0) {
+        try {
+          const { generateHeatmapComposite } = await import("@/lib/heatmap-composite");
+          heatmapImage = await generateHeatmapComposite(
+            screenshotUrl,
+            heatmapZones,
+            pageHeight || 3000,
+            viewportWidth || 1280
+          );
+        } catch (e) {
+          console.warn("Failed to generate heatmap composite for PDF:", e);
+        }
+      }
+
       // Dynamic import to avoid bundling react-pdf for all users
       const { pdf } = await import("@react-pdf/renderer");
       const { AuditPDF } = await import("@/lib/pdf/audit-pdf");
 
-      const blob = await pdf(<AuditPDF data={data} url={url} competitorAnalysis={competitorAnalysis} />).toBlob();
+      const blob = await pdf(
+        <AuditPDF
+          data={data}
+          url={url}
+          competitorAnalysis={competitorAnalysis}
+          heatmapImage={heatmapImage}
+          visualAnalysis={visualAnalysis}
+        />
+      ).toBlob();
 
       // Trigger download
       let domain = "audit";

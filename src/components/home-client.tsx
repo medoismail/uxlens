@@ -13,14 +13,29 @@ import { HomeSEOContent } from "@/components/home-seo-content";
 import { normalizeUrl } from "@/lib/validate-url";
 import { useSubscription } from "@/hooks/use-subscription";
 import { PLAN_FEATURES } from "@/lib/types";
-import type { AnalysisResult, UXAuditResult, UsageCheck, HeatmapZone, CompetitorAnalysis } from "@/lib/types";
+import type { AnalysisResult, UXAuditResult, UsageCheck, HeatmapZone, CompetitorAnalysis, VisualAnalysis } from "@/lib/types";
 
 type AppState =
   | { status: "idle" }
   | { status: "loading" }
   | { status: "error"; message: string }
   | { status: "limit_reached"; usage: UsageCheck }
-  | { status: "success"; data: UXAuditResult; url: string; auditId?: string; screenshotUrl?: string; heatmapZones?: HeatmapZone[]; pageHeight?: number; viewportWidth?: number; screenshotStatus?: "loading" | "done" | "failed"; competitorAnalysis?: CompetitorAnalysis; competitorStatus?: "loading" | "done" | "failed" | "locked" }
+  | {
+      status: "success";
+      data: UXAuditResult;
+      url: string;
+      auditId?: string;
+      screenshotUrl?: string;
+      heatmapZones?: HeatmapZone[];
+      pageHeight?: number;
+      viewportWidth?: number;
+      screenshotStatus?: "loading" | "done" | "failed";
+      heatmapStatus?: "loading" | "done" | "failed";
+      visualAnalysis?: VisualAnalysis;
+      visualAnalysisStatus?: "loading" | "done" | "failed";
+      competitorAnalysis?: CompetitorAnalysis;
+      competitorStatus?: "loading" | "done" | "failed" | "locked";
+    }
   | { status: "human_audit_requested"; url: string; email: string };
 
 export function HomeClient() {
@@ -60,7 +75,7 @@ export function HomeClient() {
           competitorStatus: compStatus,
         });
 
-        // Step 2: Capture screenshot in the background (separate request)
+        // Step 2: Capture screenshot in the background
         fetchScreenshot(result.url, result.auditId);
 
         // Step 3: Run competitor analysis in background (Pro+ only)
@@ -84,7 +99,10 @@ export function HomeClient() {
     }
   }
 
-  /** Fire-and-forget: capture screenshot and update state when it arrives */
+  /**
+   * Step 2: Capture screenshot via Puppeteer, then chain to vision analysis.
+   * Screenshot → show image immediately → fire vision analysis in background.
+   */
   async function fetchScreenshot(url: string, auditId?: string) {
     try {
       const res = await fetch("/api/screenshot", {
@@ -94,10 +112,9 @@ export function HomeClient() {
       });
 
       if (!res.ok) {
-        // Mark screenshot as failed so spinner stops
         setState((prev) => {
           if (prev.status !== "success") return prev;
-          return { ...prev, screenshotStatus: "failed" };
+          return { ...prev, screenshotStatus: "failed", heatmapStatus: "failed" };
         });
         return;
       }
@@ -105,27 +122,77 @@ export function HomeClient() {
       const data = await res.json();
 
       if (data.screenshotUrl) {
+        // Show screenshot immediately — heatmap still loading
         setState((prev) => {
           if (prev.status !== "success") return prev;
           return {
             ...prev,
             screenshotUrl: data.screenshotUrl,
-            heatmapZones: data.heatmapZones,
             pageHeight: data.pageHeight,
             viewportWidth: data.viewportWidth,
             screenshotStatus: "done",
+            heatmapStatus: "loading",
+            visualAnalysisStatus: "loading",
           };
         });
+
+        // Chain: fire vision analysis now that we have the screenshot
+        fetchVisionAnalysis(data.screenshotUrl, auditId, data.pageHeight, data.viewportWidth);
       } else {
         setState((prev) => {
           if (prev.status !== "success") return prev;
-          return { ...prev, screenshotStatus: "failed" };
+          return { ...prev, screenshotStatus: "failed", heatmapStatus: "failed" };
         });
       }
     } catch {
       setState((prev) => {
         if (prev.status !== "success") return prev;
-        return { ...prev, screenshotStatus: "failed" };
+        return { ...prev, screenshotStatus: "failed", heatmapStatus: "failed" };
+      });
+    }
+  }
+
+  /**
+   * Step 2b: AI vision analysis — generates heatmap hotspots + visual design scores.
+   * Runs after screenshot is available.
+   */
+  async function fetchVisionAnalysis(
+    screenshotUrl: string,
+    auditId?: string,
+    pageHeight?: number,
+    viewportWidth?: number
+  ) {
+    try {
+      const res = await fetch("/api/vision-analysis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ screenshotUrl, auditId, pageHeight, viewportWidth }),
+      });
+
+      if (!res.ok) {
+        setState((prev) => {
+          if (prev.status !== "success") return prev;
+          return { ...prev, heatmapStatus: "failed", visualAnalysisStatus: "failed" };
+        });
+        return;
+      }
+
+      const data = await res.json();
+
+      setState((prev) => {
+        if (prev.status !== "success") return prev;
+        return {
+          ...prev,
+          heatmapZones: data.heatmapZones,
+          visualAnalysis: data.visualAnalysis || undefined,
+          heatmapStatus: "done",
+          visualAnalysisStatus: data.visualAnalysis ? "done" : "failed",
+        };
+      });
+    } catch {
+      setState((prev) => {
+        if (prev.status !== "success") return prev;
+        return { ...prev, heatmapStatus: "failed", visualAnalysisStatus: "failed" };
       });
     }
   }
@@ -220,6 +287,9 @@ export function HomeClient() {
             pageHeight={state.pageHeight}
             viewportWidth={state.viewportWidth}
             screenshotStatus={state.screenshotStatus}
+            heatmapStatus={state.heatmapStatus}
+            visualAnalysis={state.visualAnalysis}
+            visualAnalysisStatus={state.visualAnalysisStatus}
             competitorAnalysis={state.competitorAnalysis}
             competitorStatus={state.competitorStatus}
           />

@@ -8,6 +8,7 @@ interface ScreenshotSectionProps {
   heatmapZones?: HeatmapZone[];
   pageHeight?: number;
   viewportWidth?: number;
+  heatmapLoading?: boolean;
 }
 
 export function ScreenshotSection({
@@ -15,6 +16,7 @@ export function ScreenshotSection({
   heatmapZones,
   pageHeight = 3000,
   viewportWidth = 1280,
+  heatmapLoading,
 }: ScreenshotSectionProps) {
   if (!screenshotUrl) return null;
 
@@ -28,6 +30,7 @@ export function ScreenshotSection({
         heatmapZones={heatmapZones || []}
         pageHeight={pageHeight}
         viewportWidth={viewportWidth}
+        heatmapLoading={heatmapLoading}
       />
     </section>
   );

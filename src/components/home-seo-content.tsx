@@ -86,13 +86,13 @@ const STEPS = [
   },
   {
     num: "02",
-    title: "AI audits 9 layers in 30 seconds",
-    desc: "Our engine captures a screenshot, generates an attention heatmap, and runs your page through 9 diagnostic layers with self-critique.",
+    title: "AI sees, analyzes & scores",
+    desc: "Our engine captures a full-page screenshot, uses GPT-4o vision to generate an attention heatmap, runs a visual design analysis, and audits 9 diagnostic layers with self-critique.",
   },
   {
     num: "03",
     title: "Get your report with fixes",
-    desc: "Prioritized conversion killers, trust scores, an AI-rewritten hero section, and a PDF you can share with your team.",
+    desc: "AI attention heatmap, visual design scores, prioritized conversion killers, trust scores, an AI-rewritten hero section, and a PDF you can share with your team.",
   },
 ];
 
@@ -128,14 +128,14 @@ const PLANS = [
     name: "Free",
     price: "$0",
     audits: "5 audits / month",
-    features: ["Full 9-layer scores", "Attention heatmap", "Conversion killers", "Audit dashboard"],
+    features: ["Full 9-layer scores", "1 AI vision heatmap", "Conversion killers", "Audit dashboard"],
     popular: false,
   },
   {
     name: "Starter",
     price: "$12",
     audits: "50 audits / month",
-    features: ["Everything in Free", "Strategic fixes", "AI hero rewrite", "PDF export"],
+    features: ["Everything in Free", "Unlimited AI heatmaps", "Visual design analysis", "Strategic fixes", "PDF export with heatmap"],
     popular: false,
   },
   {
@@ -152,27 +152,27 @@ const PLANS = [
 const FAQS = [
   {
     q: "What is a UX audit and why does it matter?",
-    a: "A UX audit identifies usability issues, conversion barriers, and trust gaps on your website. UXLens automates this with a 9-layer AI diagnostic — delivering results in seconds instead of days.",
+    a: "A UX audit identifies usability issues, conversion barriers, and trust gaps on your website. UXLens automates this with a 9-layer AI diagnostic powered by GPT-4o vision — delivering results in seconds instead of days.",
   },
   {
     q: "How does the AI analysis work?",
-    a: "UXLens captures a full-page screenshot, generates an attention heatmap, then runs your content through 9 specialized audit layers with a self-critique loop. You get scores, conversion killers, and actionable fixes in under 30 seconds.",
+    a: "UXLens captures a full-page screenshot with Puppeteer, sends it to GPT-4o vision for attention heatmap generation and visual design analysis, then runs your content through 9 specialized audit layers with a self-critique loop. You get scores, heatmaps, visual analysis, and actionable fixes.",
   },
   {
     q: "Is it really free?",
-    a: "Yes. The free plan includes 5 audits per month with full scores, heatmaps, conversion killers, and a personal dashboard. Paid plans unlock strategic fixes, PDF export, AI chat, and competitor analysis.",
+    a: "Yes. The free plan includes 5 audits per month with full scores, 1 AI vision heatmap, conversion killers, and a personal dashboard. Paid plans unlock unlimited AI heatmaps, visual design analysis, strategic fixes, PDF export, AI chat, and competitor analysis.",
   },
   {
-    q: "What does the attention heatmap show?",
-    a: "The heatmap overlays your screenshot with color-coded zones showing where visitors are most likely to focus — based on F-pattern analysis, CTA placement, and visual hierarchy.",
+    q: "What does the AI attention heatmap show?",
+    a: "GPT-4o vision analyzes your screenshot to identify where users will look. The heatmap overlays color-coded zones (red = high attention, amber = medium, blue = low) with labeled regions showing exactly which elements draw the eye.",
   },
   {
     q: "Can I save and share my reports?",
-    a: "Yes. Sign in with Google or GitHub and every audit is saved to your dashboard. Paid plans let you export any report as a professionally formatted PDF.",
+    a: "Yes. Sign in with Google or GitHub and every audit is saved to your dashboard — including heatmap and visual analysis. Paid plans let you export any report as a professionally formatted PDF with the heatmap composite included.",
   },
   {
     q: "What makes UXLens different?",
-    a: "UXLens combines visual analysis (heatmaps) with a structured 9-layer AI diagnostic and built-in self-critique. Each audit delivers fixes tailored to your page — not generic advice. Plus dashboard, PDF export, and AI chat make it a complete platform.",
+    a: "UXLens is the only tool that combines GPT-4o vision analysis (real AI heatmaps, not fake patterns) with a structured 9-layer diagnostic and visual design scoring. Each audit delivers fixes tailored to your page — not generic advice. Plus dashboard, PDF export, AI chat, and competitor analysis make it a complete platform.",
   },
 ];
 
@@ -234,15 +234,15 @@ export function HomeSEOContent() {
       {/* ── Feature Sections (alternating layout) ── */}
       <Divider label="Features" />
 
-      {/* Feature 1: Heatmap */}
+      {/* Feature 1: AI Vision Heatmap */}
       <FeatureSection
-        label="Visual Analysis"
-        headline="See where visitors actually look"
-        description="Every audit generates an attention heatmap overlay on your real screenshot. Know instantly if your CTA, headline, and value proposition are visible — or getting ignored."
+        label="AI Vision Heatmap"
+        headline="AI sees your page like a real user"
+        description="GPT-4o vision analyzes your screenshot to generate a real attention heatmap — not a fake F-pattern overlay. Clear zone-based visualization shows exactly where users will look, with labeled high/medium/low attention areas."
         bullets={[
-          "F-pattern reading analysis",
-          "CTA visibility scoring",
-          "Visual hierarchy mapping",
+          "GPT-4o vision-powered eye tracking",
+          "Zone-based heatmap with labeled regions",
+          "Visual design analysis with 5 scores",
         ]}
       >
         <HeatmapMock />

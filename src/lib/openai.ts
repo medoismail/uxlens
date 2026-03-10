@@ -338,6 +338,180 @@ export async function generateUXAudit(
 }
 
 /* ─────────────────────────────────────────────────────────
+   AI Vision: Heatmap + Visual Analysis (Diagnostic Engine v4)
+   ───────────────────────────────────────────────────────── */
+
+/**
+ * Send a screenshot to GPT-4o vision and get AI-generated attention hotspots.
+ * The AI analyzes visual hierarchy, contrast, size, positioning, and color
+ * to determine where a real user's eyes would be drawn.
+ */
+export async function generateVisionHeatmap(
+  screenshotBase64: string
+): Promise<import("./types").VisionHotspot[]> {
+  const { visionHeatmapResponseSchema } = await import("./schemas");
+
+  const response = await withRetry(() =>
+    getClient().chat.completions.create({
+      model: "gpt-4o",
+      response_format: { type: "json_object" },
+      temperature: 0.3,
+      max_tokens: 2048,
+      messages: [
+        {
+          role: "system",
+          content: `You are an expert eye-tracking analyst and UX researcher. Given a screenshot of a web page, identify 8-15 areas where a user's visual attention would naturally be drawn in the first 10 seconds of viewing.
+
+Use these eye-tracking principles:
+- F-pattern / Z-pattern reading behavior (Western languages read left-to-right, top-to-bottom)
+- Large elements with high contrast draw attention first
+- Faces and images of people attract strong fixation
+- Color contrast against the background (bright CTAs on muted backgrounds)
+- Isolated elements with whitespace around them get more attention
+- Above-the-fold content gets 80% of attention
+- Interactive elements (buttons, forms) draw deliberate attention
+- Text size and font weight indicate visual hierarchy
+- Motion or animation cues (even in a static screenshot, visual dynamism)
+
+Return coordinates as NORMALIZED values (0-1) relative to the full image dimensions:
+- (0,0) = top-left corner
+- (1,1) = bottom-right corner
+- x and width are fractions of image width
+- y and height are fractions of image height
+
+CRITICAL: Be precise with coordinates. Each hotspot should tightly wrap the actual visual element, not be vague or oversized.
+
+Return STRICT JSON only.`,
+        },
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: `Analyze this web page screenshot and identify the attention hotspots. For each hotspot, specify the bounding box, intensity level, what the element is, and WHY it draws attention.
+
+Return JSON:
+{
+  "hotspots": [
+    {
+      "x": <0-1 normalized left edge>,
+      "y": <0-1 normalized top edge>,
+      "width": <0-1 fraction of image width>,
+      "height": <0-1 fraction of image height>,
+      "intensity": "high" | "medium" | "low",
+      "label": "<what this element is, e.g. 'Hero headline', 'Primary CTA button'>",
+      "reason": "<brief reason why it draws attention>"
+    }
+  ]
+}
+
+Rules:
+- Return 8-15 hotspots, sorted by visual priority (most attention-grabbing first)
+- Mark the single most prominent CTA/button as "high"
+- Main headline: usually "high"
+- Supporting elements: "medium"
+- Navigation, footer, subtle links: "low"
+- Be specific in labels — "Sign Up Free button" not just "button"`,
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:image/jpeg;base64,${screenshotBase64}`,
+                detail: "high",
+              },
+            },
+          ],
+        },
+      ],
+    })
+  );
+
+  const raw = response.choices[0]?.message?.content;
+  if (!raw) throw new Error("No response from OpenAI vision (heatmap)");
+
+  const parsed = JSON.parse(raw);
+  const validated = visionHeatmapResponseSchema.parse(parsed);
+  return validated.hotspots;
+}
+
+/**
+ * Send a screenshot to GPT-4o vision for visual UX design analysis.
+ * Evaluates layout, visual hierarchy, whitespace, color/contrast, and mobile readiness.
+ */
+export async function generateVisualAnalysis(
+  screenshotBase64: string
+): Promise<import("./types").VisualAnalysis> {
+  const { visualAnalysisSchema } = await import("./schemas");
+
+  const response = await withRetry(() =>
+    getClient().chat.completions.create({
+      model: "gpt-4o",
+      response_format: { type: "json_object" },
+      temperature: 0.4,
+      max_tokens: 2048,
+      messages: [
+        {
+          role: "system",
+          content: `You are a senior UX visual designer and conversion rate optimization expert conducting a professional visual audit. You are looking at the ACTUAL rendered page — not code, not wireframes, the real thing.
+
+Evaluate the page across 5 visual dimensions:
+
+1. LAYOUT (0-100): Grid alignment, section spacing, visual rhythm, content organization. Is the page well-structured or chaotic?
+
+2. VISUAL HIERARCHY (0-100): Can you instantly identify what's most important? Is the reading order clear? Does size/weight/color properly guide the eye from primary → secondary → tertiary content?
+
+3. WHITESPACE (0-100): Is breathing room well-used? Is the page too cramped (low score) or too sparse (medium)? Does whitespace create clear content groups?
+
+4. COLOR & CONTRAST (0-100): Are CTAs visually prominent against backgrounds? Is text readable? Does the color palette feel cohesive and intentional? Are there accessibility issues with contrast?
+
+5. MOBILE READINESS (0-100): Based on the desktop layout, how well would this degrade on a phone? Are touch targets large enough? Is text readable without zooming? Would the layout stack well?
+
+Also identify 3-5 specific visual issues, warnings, or positives — things you can SEE in the screenshot.
+
+Every finding must cite what you OBSERVE in the screenshot. No generic advice.
+
+Return STRICT JSON only.`,
+        },
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: `Perform a visual UX audit of this page screenshot. Return JSON:
+{
+  "layoutScore": <0-100>,
+  "visualHierarchyScore": <0-100>,
+  "whitespaceScore": <0-100>,
+  "colorContrastScore": <0-100>,
+  "mobileReadinessScore": <0-100>,
+  "overallVisualScore": <0-100 weighted average>,
+  "findings": [
+    { "type": "issue"|"warning"|"positive", "title": "<short title>", "desc": "<what you see and why it matters>", "impact": "high"|"medium"|"low" }
+  ],
+  "summary": "<2-3 sentence visual design assessment based on what you see>"
+}`,
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:image/jpeg;base64,${screenshotBase64}`,
+                detail: "high",
+              },
+            },
+          ],
+        },
+      ],
+    })
+  );
+
+  const raw = response.choices[0]?.message?.content;
+  if (!raw) throw new Error("No response from OpenAI vision (visual analysis)");
+
+  const parsed = JSON.parse(raw);
+  return visualAnalysisSchema.parse(parsed);
+}
+
+/* ─────────────────────────────────────────────────────────
    Competitor Analysis (Pro+)
    ───────────────────────────────────────────────────────── */
 

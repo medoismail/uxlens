@@ -164,6 +164,31 @@ export interface ChatMessage {
   createdAt: string;
 }
 
+/* ── AI Vision Analysis ───────────────────────────────── */
+
+/** AI-generated attention hotspot from GPT-4o vision */
+export interface VisionHotspot {
+  x: number;          // normalized 0-1 (left edge)
+  y: number;          // normalized 0-1 (top edge)
+  width: number;      // normalized 0-1
+  height: number;     // normalized 0-1
+  intensity: "high" | "medium" | "low";
+  label: string;      // e.g. "Primary CTA button"
+  reason: string;     // Why this draws attention
+}
+
+/** Visual design analysis from AI vision */
+export interface VisualAnalysis {
+  layoutScore: number;           // 0-100
+  visualHierarchyScore: number;  // 0-100
+  whitespaceScore: number;       // 0-100
+  colorContrastScore: number;    // 0-100
+  mobileReadinessScore: number;  // 0-100
+  overallVisualScore: number;    // 0-100
+  findings: Finding[];
+  summary: string;
+}
+
 /* ── Competitor Analysis (Pro+) ────────────────────────── */
 
 export interface CompetitorProfile {

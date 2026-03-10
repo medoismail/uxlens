@@ -4,9 +4,10 @@ import {
   Page,
   Text,
   View,
+  Image,
   StyleSheet,
 } from "@react-pdf/renderer";
-import type { UXAuditResult, CompetitorAnalysis } from "@/lib/types";
+import type { UXAuditResult, CompetitorAnalysis, VisualAnalysis } from "@/lib/types";
 
 const BRAND = "#7c3aed";
 const BRAND_LIGHT = "#ede9fe";
@@ -57,9 +58,11 @@ interface AuditPDFProps {
   data: UXAuditResult;
   url: string;
   competitorAnalysis?: CompetitorAnalysis;
+  heatmapImage?: string;
+  visualAnalysis?: VisualAnalysis;
 }
 
-export function AuditPDF({ data, url, competitorAnalysis }: AuditPDFProps) {
+export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAnalysis }: AuditPDFProps) {
   let domain = url;
   try { domain = new URL(url).hostname.replace("www.", ""); } catch {}
 
@@ -79,7 +82,7 @@ export function AuditPDF({ data, url, competitorAnalysis }: AuditPDFProps) {
         <View style={styles.header}>
           <View>
             <Text style={styles.logo}>UXLens</Text>
-            <Text style={styles.subtitle}>9-Layer UX Diagnostic Report</Text>
+            <Text style={styles.subtitle}>Diagnostic Engine v4 — Full UX Report</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
             <Text style={{ fontSize: 10, fontFamily: "Helvetica-Bold" }}>{domain}</Text>
@@ -141,6 +144,74 @@ export function AuditPDF({ data, url, competitorAnalysis }: AuditPDFProps) {
 
         <PageFooter />
       </Page>
+
+      {/* Attention Heatmap + Visual Analysis Page */}
+      {(heatmapImage || visualAnalysis) && (
+        <Page size="A4" style={styles.page} wrap>
+          <View style={styles.header} fixed>
+            <Text style={styles.logo}>UXLens</Text>
+            <Text style={{ fontSize: 9, color: "#888" }}>{domain} — Visual Analysis</Text>
+          </View>
+
+          {/* Heatmap Image */}
+          {heatmapImage && (
+            <View>
+              <Text style={styles.sectionTitle}>AI Attention Heatmap</Text>
+              <Text style={[styles.text, { marginBottom: 8 }]}>
+                AI-generated attention map showing where users are most likely to look. Red = high attention, amber = medium, blue = low.
+              </Text>
+              <Image
+                src={heatmapImage}
+                style={{ width: "100%", borderRadius: 4, border: "1px solid #eee" }}
+              />
+            </View>
+          )}
+
+          {/* Visual Analysis Scores */}
+          {visualAnalysis && (
+            <View>
+              <Text style={styles.sectionTitle}>Visual Design Analysis</Text>
+              <Text style={[styles.text, { marginBottom: 8 }]}>
+                {visualAnalysis.summary}
+              </Text>
+
+              {/* Score rows */}
+              {[
+                { label: "Layout", score: visualAnalysis.layoutScore },
+                { label: "Visual Hierarchy", score: visualAnalysis.visualHierarchyScore },
+                { label: "Whitespace", score: visualAnalysis.whitespaceScore },
+                { label: "Color & Contrast", score: visualAnalysis.colorContrastScore },
+                { label: "Mobile Readiness", score: visualAnalysis.mobileReadinessScore },
+                { label: "Overall Visual", score: visualAnalysis.overallVisualScore },
+              ].map((item) => (
+                <View key={item.label} style={styles.categoryRow}>
+                  <Text style={styles.categoryLabel}>{item.label}</Text>
+                  <Text style={[styles.categoryScore, { color: scoreColorStr(item.score) }]}>
+                    {item.score}/100
+                  </Text>
+                </View>
+              ))}
+
+              {/* Visual findings */}
+              {visualAnalysis.findings.length > 0 && (
+                <View style={{ marginTop: 12 }}>
+                  <Text style={styles.sectionSubtitle}>Visual Findings</Text>
+                  {visualAnalysis.findings.slice(0, 5).map((finding, fi) => (
+                    <View key={fi} style={styles.findingBox}>
+                      <Text style={styles.findingTitle}>
+                        {finding.type === "issue" ? "⚠" : finding.type === "positive" ? "✓" : "!"} {finding.title}
+                      </Text>
+                      <Text style={styles.findingDesc}>{finding.desc}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
+          )}
+
+          <PageFooter />
+        </Page>
+      )}
 
       {/* Detail Pages — wraps across pages automatically */}
       <Page size="A4" style={styles.page} wrap>

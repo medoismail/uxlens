@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
+import { drawHeatmapOnCanvas } from "@/lib/heatmap-composite";
 import type { HeatmapZone } from "@/lib/heatmap";
 
 interface HeatmapOverlayProps {
@@ -8,6 +9,7 @@ interface HeatmapOverlayProps {
   heatmapZones: HeatmapZone[];
   pageHeight: number;
   viewportWidth: number;
+  heatmapLoading?: boolean;
 }
 
 export function HeatmapOverlay({
@@ -15,6 +17,7 @@ export function HeatmapOverlay({
   heatmapZones,
   pageHeight,
   viewportWidth,
+  heatmapLoading,
 }: HeatmapOverlayProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -29,7 +32,6 @@ export function HeatmapOverlay({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Canvas matches actual rendered image size
     const displayW = imgSize.w;
     const displayH = imgSize.h;
     canvas.width = displayW;
@@ -38,73 +40,35 @@ export function HeatmapOverlay({
     ctx.clearRect(0, 0, displayW, displayH);
     if (!showHeatmap || !heatmapZones.length) return;
 
-    // Scale: map original viewport coords → displayed image coords
-    const scaleX = displayW / viewportWidth;
-    const scaleY = displayH / pageHeight;
-
-    // Use "lighter" blend mode so overlapping zones blend nicely
-    ctx.globalCompositeOperation = "lighter";
-
-    for (const zone of heatmapZones) {
-      const cx = (zone.x + zone.width / 2) * scaleX;
-      const cy = (zone.y + zone.height / 2) * scaleY;
-      const radius = Math.max(zone.width * scaleX, zone.height * scaleY) * 0.9;
-
-      const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-      const intensity = zone.intensity;
-      const alpha = intensity * 0.45;
-
-      if (intensity > 0.7) {
-        // Hot — red/orange
-        gradient.addColorStop(0, `rgba(255, 30, 0, ${alpha})`);
-        gradient.addColorStop(0.5, `rgba(255, 100, 0, ${alpha * 0.5})`);
-        gradient.addColorStop(1, "rgba(255, 100, 0, 0)");
-      } else if (intensity > 0.4) {
-        // Warm — orange/yellow
-        gradient.addColorStop(0, `rgba(255, 170, 0, ${alpha})`);
-        gradient.addColorStop(0.5, `rgba(255, 220, 50, ${alpha * 0.4})`);
-        gradient.addColorStop(1, "rgba(255, 220, 50, 0)");
-      } else {
-        // Cool — green/teal
-        gradient.addColorStop(0, `rgba(50, 200, 80, ${alpha})`);
-        gradient.addColorStop(0.5, `rgba(50, 180, 100, ${alpha * 0.3})`);
-        gradient.addColorStop(1, "rgba(50, 180, 100, 0)");
-      }
-
-      // KEY FIX: Only fill the zone's bounding area, not the entire canvas
-      ctx.fillStyle = gradient;
-      const x0 = Math.max(0, cx - radius);
-      const y0 = Math.max(0, cy - radius);
-      const x1 = Math.min(displayW, cx + radius);
-      const y1 = Math.min(displayH, cy + radius);
-      ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
-    }
-
-    ctx.globalCompositeOperation = "source-over";
+    drawHeatmapOnCanvas(ctx, heatmapZones, viewportWidth, pageHeight, displayW, displayH);
   }, [showHeatmap, heatmapZones, viewportWidth, pageHeight, imageLoaded, imgSize]);
 
   useEffect(() => {
     drawHeatmap();
   }, [drawHeatmap]);
 
+  const hasZones = heatmapZones.length > 0;
+
   return (
     <div className="space-y-3">
-      {/* Toggle */}
+      {/* Header + Toggle */}
       <div className="flex items-center justify-between">
         <h3 className="text-[14px] font-semibold text-foreground">
-          Page Screenshot & Attention Heatmap
+          Page Screenshot & AI Attention Heatmap
         </h3>
-        <button
-          onClick={() => setShowHeatmap(!showHeatmap)}
-          className="text-[12px] font-medium px-3 py-1.5 rounded-lg border transition-all duration-150"
-          style={{
-            borderColor: showHeatmap ? "var(--brand-glow)" : "var(--border)",
-            color: showHeatmap ? "var(--brand)" : "var(--foreground)",
-            background: showHeatmap ? "var(--brand-dim)" : "transparent",
-          }}
-        >
-          {showHeatmap ? "Hide Heatmap" : "Show Heatmap"}
-        </button>
+        {hasZones && (
+          <button
+            onClick={() => setShowHeatmap(!showHeatmap)}
+            className="text-[12px] font-medium px-3 py-1.5 rounded-lg border transition-all duration-150"
+            style={{
+              borderColor: showHeatmap ? "var(--brand-glow)" : "var(--border)",
+              color: showHeatmap ? "var(--brand)" : "var(--foreground)",
+              background: showHeatmap ? "var(--brand-dim)" : "transparent",
+            }}
+          >
+            {showHeatmap ? "Hide Heatmap" : "Show Heatmap"}
+          </button>
+        )}
       </div>
 
       {/* Screenshot + overlay */}
@@ -128,26 +92,50 @@ export function HeatmapOverlay({
           ref={canvasRef}
           className="absolute top-0 left-0 w-full h-full pointer-events-none"
           style={{
-            opacity: showHeatmap ? 0.7 : 0,
+            opacity: showHeatmap && hasZones ? 1 : 0,
             transition: "opacity 0.3s ease",
-            mixBlendMode: "multiply",
           }}
         />
+
+        {/* Heatmap loading overlay */}
+        {heatmapLoading && !hasZones && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full border"
+            style={{
+              background: "rgba(0,0,0,0.7)",
+              borderColor: "rgba(255,255,255,0.1)",
+              backdropFilter: "blur(8px)",
+            }}
+          >
+            <div className="h-3.5 w-3.5 border-2 border-white/20 border-t-white/70 rounded-full animate-spin" />
+            <span className="text-[11px] text-white/80 font-medium">
+              AI analyzing visual attention...
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Legend */}
-      {showHeatmap && (
-        <div className="flex items-center justify-center gap-4 text-[12px] text-foreground/40">
+      {showHeatmap && hasZones && (
+        <div className="flex items-center justify-center gap-5 text-[12px] text-foreground/40">
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-red-500/70" />
+            <div
+              className="w-3 h-3 rounded-[3px]"
+              style={{ background: "rgba(255, 59, 48, 0.75)", border: "1px solid rgba(255, 59, 48, 0.9)" }}
+            />
             <span>High attention</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-orange-400/70" />
+            <div
+              className="w-3 h-3 rounded-[3px]"
+              style={{ background: "rgba(255, 179, 0, 0.65)", border: "1px solid rgba(255, 179, 0, 0.8)" }}
+            />
             <span>Medium</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-green-500/70" />
+            <div
+              className="w-3 h-3 rounded-[3px]"
+              style={{ background: "rgba(50, 173, 230, 0.55)", border: "1px solid rgba(50, 173, 230, 0.7)" }}
+            />
             <span>Low</span>
           </div>
         </div>
