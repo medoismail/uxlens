@@ -392,6 +392,54 @@
 .score-mid  { color: var(--score-mid); }
 .score-low  { color: var(--score-low); }
 
+/* ── Scroll reveal animation ───────────────────────────── */
+
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 32px, 0);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    filter: blur(0);
+  }
+}
+
+/* Before revealed — hidden state */
+.scroll-reveal {
+  opacity: 0;
+  transform: translate3d(0, 32px, 0);
+  filter: blur(2px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              filter 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  filter: blur(0);
+}
+
+/* Stagger delays for child elements */
+.scroll-reveal.delay-1 { transition-delay: 80ms; }
+.scroll-reveal.delay-2 { transition-delay: 160ms; }
+.scroll-reveal.delay-3 { transition-delay: 240ms; }
+.scroll-reveal.delay-4 { transition-delay: 320ms; }
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+}
+
 /* Landing page mock utilities */
 @media (min-width: 1024px) {
   .perspective-tilt {

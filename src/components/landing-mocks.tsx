@@ -1,6 +1,7 @@
 "use client";
 
 import { Sparkles, Check } from "lucide-react";
+import { ScrollReveal } from "@/components/scroll-reveal";
 
 /* ── Shared ── */
 
@@ -617,7 +618,7 @@ export function FeatureSection({
         className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center`}
       >
         {/* Copy side */}
-        <div className={`space-y-4 ${reversed ? "lg:order-2" : ""}`}>
+        <ScrollReveal className={`space-y-4 ${reversed ? "lg:order-2" : ""}`}>
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/25">
               {label}
@@ -654,10 +655,12 @@ export function FeatureSection({
               </li>
             ))}
           </ul>
-        </div>
+        </ScrollReveal>
 
         {/* Mock side */}
-        <div className={reversed ? "lg:order-1" : ""}>{children}</div>
+        <ScrollReveal delay={1} className={reversed ? "lg:order-1" : ""}>
+          {children}
+        </ScrollReveal>
       </div>
     </section>
   );

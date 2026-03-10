@@ -257,8 +257,8 @@ function ManualCompetitorInput({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="w-full flex items-center justify-center gap-2 rounded-xl border py-3 text-[12px] font-medium transition-all duration-150 hover:border-foreground/15 active:scale-[0.99]"
-        style={{ borderColor: "var(--border)", color: "var(--foreground)", opacity: 0.5 }}
+        className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-[12px] font-bold transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
+        style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
       >
         <Plus className="h-3.5 w-3.5" />
         Compare with specific competitors
@@ -269,8 +269,8 @@ function ManualCompetitorInput({
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-xl border p-5 space-y-3"
-      style={{ borderColor: "var(--brand-glow)", background: "var(--s1)" }}
+      className="rounded-lg border p-4 space-y-3 mt-1"
+      style={{ borderColor: "var(--brand-glow)", background: "var(--s2)" }}
     >
       <div className="flex items-center gap-2 mb-1">
         <Link2 className="h-3.5 w-3.5" style={{ color: "var(--brand)" }} />
@@ -367,18 +367,13 @@ export function CompetitorSection({
 
   return (
     <div className="space-y-4 animate-fade-in">
-      {/* Manual Competitor Input (Pro+ only) */}
-      {onManualCompetitors && (
-        <ManualCompetitorInput onSubmit={onManualCompetitors} isLoading={false} />
-      )}
-
       {/* Competitive Position Summary */}
       <div className="rounded-xl border p-5" style={{ borderColor: "var(--border)", background: "var(--s1)" }}>
         <div className="flex items-center gap-3 mb-4">
           <div className="w-9 h-9 rounded-lg grid place-items-center" style={{ background: "var(--brand-dim)" }}>
             <Swords className="h-4 w-4" style={{ color: "var(--brand)" }} />
           </div>
-          <div>
+          <div className="flex-1">
             <h3 className="text-[13px] font-semibold">Competitive Position</h3>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span style={{ color: gap.color }}>{gap.icon}</span>
@@ -387,7 +382,12 @@ export function CompetitorSection({
             </div>
           </div>
         </div>
-        <p className="text-[12px] text-foreground/50 leading-relaxed">{data.competitivePosition}</p>
+        <p className="text-[12px] text-foreground/50 leading-relaxed mb-4">{data.competitivePosition}</p>
+
+        {/* Manual Competitor Input (Pro+ only) */}
+        {onManualCompetitors && (
+          <ManualCompetitorInput onSubmit={onManualCompetitors} isLoading={false} />
+        )}
       </div>
 
       {/* Score Comparison */}

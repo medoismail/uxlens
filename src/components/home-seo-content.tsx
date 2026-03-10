@@ -20,6 +20,7 @@ import {
   RewriteMock,
   FeatureSection,
 } from "@/components/landing-mocks";
+import { ScrollReveal } from "@/components/scroll-reveal";
 
 /* ── Social Proof Bar ── */
 
@@ -38,27 +39,29 @@ function SocialProofBar() {
   }, []);
 
   return (
-    <div
-      className="border-y py-5"
-      style={{ borderColor: "rgba(0,0,0,0.05)" }}
-    >
-      <div className="max-w-[960px] mx-auto px-7 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[12px] text-foreground/30">
-        {count !== null && (
-          <span className="flex items-center gap-1.5 font-medium text-foreground/50">
-            <Users className="h-3.5 w-3.5" />
-            {count.toLocaleString()}+ audits completed
+    <ScrollReveal>
+      <div
+        className="border-y py-5"
+        style={{ borderColor: "rgba(0,0,0,0.05)" }}
+      >
+        <div className="max-w-[960px] mx-auto px-7 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[12px] text-foreground/30">
+          {count !== null && (
+            <span className="flex items-center gap-1.5 font-medium text-foreground/50">
+              <Users className="h-3.5 w-3.5" />
+              {count.toLocaleString()}+ audits completed
+            </span>
+          )}
+          <span className="flex items-center gap-1.5">
+            <Zap className="h-3 w-3" style={{ color: "var(--brand)" }} />
+            Results in under 30 seconds
           </span>
-        )}
-        <span className="flex items-center gap-1.5">
-          <Zap className="h-3 w-3" style={{ color: "var(--brand)" }} />
-          Results in under 30 seconds
-        </span>
-        <span className="flex items-center gap-1.5">
-          <Shield className="h-3 w-3" style={{ color: "var(--score-high)" }} />
-          Free to start — no credit card
-        </span>
+          <span className="flex items-center gap-1.5">
+            <Shield className="h-3 w-3" style={{ color: "var(--score-high)" }} />
+            Free to start — no credit card
+          </span>
+        </div>
       </div>
-    </div>
+    </ScrollReveal>
   );
 }
 
@@ -66,13 +69,13 @@ function SocialProofBar() {
 
 function Divider({ label }: { label: string }) {
   return (
-    <div className="max-w-[960px] mx-auto px-7">
-      <div className="flex items-center gap-4 text-foreground/12 text-[11px] uppercase tracking-[2.5px]">
-        <div className="flex-1 h-px" style={{ background: "rgba(0,0,0,0.05)" }} />
+    <ScrollReveal className="max-w-[960px] mx-auto px-7">
+      <div className="flex items-center gap-4 text-foreground/30 text-[11px] uppercase tracking-[2.5px] font-medium">
+        <div className="flex-1 h-px" style={{ background: "rgba(0,0,0,0.08)" }} />
         {label}
-        <div className="flex-1 h-px" style={{ background: "rgba(0,0,0,0.05)" }} />
+        <div className="flex-1 h-px" style={{ background: "rgba(0,0,0,0.08)" }} />
       </div>
-    </div>
+    </ScrollReveal>
   );
 }
 
@@ -188,7 +191,7 @@ export function HomeSEOContent() {
 
       {/* ── Product Preview (the big visual hero) ── */}
       <section className="max-w-[960px] mx-auto px-7 pt-14 pb-20">
-        <div className="text-center mb-8">
+        <ScrollReveal className="text-center mb-8">
           <p className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/25 mb-2">
             Sample Audit Report
           </p>
@@ -199,9 +202,11 @@ export function HomeSEOContent() {
             Every audit delivers a comprehensive report with scores, heatmaps,
             conversion killers, and actionable fixes.
           </p>
-        </div>
+        </ScrollReveal>
 
-        <ProductPreviewMock />
+        <ScrollReveal>
+          <ProductPreviewMock />
+        </ScrollReveal>
       </section>
 
       {/* ── How It Works ── */}
@@ -209,8 +214,8 @@ export function HomeSEOContent() {
 
       <section className="max-w-[960px] mx-auto px-7 py-14 sm:py-20">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-          {STEPS.map((step) => (
-            <div key={step.num} className="space-y-3.5">
+          {STEPS.map((step, i) => (
+            <ScrollReveal key={step.num} delay={i} className="space-y-3.5">
               <span
                 className="inline-block text-[11px] font-mono font-bold px-2.5 py-1 rounded-md"
                 style={{
@@ -226,7 +231,7 @@ export function HomeSEOContent() {
               <p className="text-[12.5px] text-foreground/35 leading-relaxed">
                 {step.desc}
               </p>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
       </section>
@@ -386,7 +391,7 @@ export function HomeSEOContent() {
       <Divider label="AI Copy Optimization" />
 
       <section className="max-w-[960px] mx-auto px-7 py-12 sm:py-16">
-        <div className="text-center mb-8">
+        <ScrollReveal className="text-center mb-8">
           <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
             Your hero section, rewritten by AI
           </h2>
@@ -395,15 +400,17 @@ export function HomeSEOContent() {
             conversion principles and your page&apos;s specific context. Before and
             after, side by side.
           </p>
-        </div>
-        <RewriteMock />
+        </ScrollReveal>
+        <ScrollReveal>
+          <RewriteMock />
+        </ScrollReveal>
       </section>
 
       {/* ── Who Is It For ── */}
       <Divider label="Built for" />
 
       <section className="max-w-[960px] mx-auto px-7 py-12 sm:py-16">
-        <div className="text-center mb-10">
+        <ScrollReveal className="text-center mb-10">
           <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
             Built for teams that ship
           </h2>
@@ -412,29 +419,30 @@ export function HomeSEOContent() {
             clients, UXLens gives you the insights to fix conversion issues
             fast.
           </p>
-        </div>
+        </ScrollReveal>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {USE_CASES.map((uc) => (
-            <div
-              key={uc.title}
-              className="rounded-xl border p-6 transition-all duration-200 hover:border-[rgba(0,0,0,0.1)]"
-              style={{
-                borderColor: "rgba(0,0,0,0.06)",
-                background: "var(--s1)",
-              }}
-            >
-              <uc.icon
-                className="h-4 w-4 mb-3.5"
-                style={{ color: "var(--brand)" }}
-              />
-              <h3 className="text-[14px] font-semibold text-foreground mb-2">
-                {uc.title}
-              </h3>
-              <p className="text-[12.5px] text-foreground/35 leading-relaxed">
-                {uc.desc}
-              </p>
-            </div>
+          {USE_CASES.map((uc, i) => (
+            <ScrollReveal key={uc.title} delay={i}>
+              <div
+                className="rounded-xl border p-6 transition-all duration-200 hover:border-[rgba(0,0,0,0.1)]"
+                style={{
+                  borderColor: "rgba(0,0,0,0.06)",
+                  background: "var(--s1)",
+                }}
+              >
+                <uc.icon
+                  className="h-4 w-4 mb-3.5"
+                  style={{ color: "var(--brand)" }}
+                />
+                <h3 className="text-[14px] font-semibold text-foreground mb-2">
+                  {uc.title}
+                </h3>
+                <p className="text-[12.5px] text-foreground/35 leading-relaxed">
+                  {uc.desc}
+                </p>
+              </div>
+            </ScrollReveal>
           ))}
         </div>
       </section>
@@ -443,15 +451,16 @@ export function HomeSEOContent() {
       <Divider label="Pricing" />
 
       <section className="max-w-[960px] mx-auto px-7 py-12 sm:py-16">
-        <div className="text-center mb-10">
+        <ScrollReveal className="text-center mb-10">
           <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
             Simple, transparent pricing
           </h2>
           <p className="mt-2 text-[13px] text-foreground/40 max-w-md mx-auto leading-relaxed">
             Start free. Upgrade when you need more audits and advanced features.
           </p>
-        </div>
+        </ScrollReveal>
 
+        <ScrollReveal>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {PLANS.map((plan) => (
             <div
@@ -506,8 +515,9 @@ export function HomeSEOContent() {
             </div>
           ))}
         </div>
+        </ScrollReveal>
 
-        <div className="text-center mt-6">
+        <ScrollReveal className="text-center mt-6">
           <Link
             href="/pricing"
             className="inline-flex items-center gap-1.5 text-[13px] font-medium transition-colors hover:opacity-80"
@@ -516,11 +526,11 @@ export function HomeSEOContent() {
             Compare all plans
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* ── CTA Banner ── */}
-      <section className="max-w-[960px] mx-auto px-7 pb-20">
+      <ScrollReveal className="max-w-[960px] mx-auto px-7 pb-20">
         <div
           className="rounded-2xl border p-10 text-center"
           style={{
@@ -547,19 +557,19 @@ export function HomeSEOContent() {
             <ArrowRight className="h-3.5 w-3.5" />
           </button>
         </div>
-      </section>
+      </ScrollReveal>
 
       {/* ── FAQ ── */}
       <section className="max-w-[960px] mx-auto px-7 pb-20">
-        <div className="text-center mb-10">
+        <ScrollReveal className="text-center mb-10">
           <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
             Frequently asked questions
           </h2>
-        </div>
+        </ScrollReveal>
 
         <div className="max-w-2xl mx-auto space-y-6">
           {FAQS.map((faq) => (
-            <div key={faq.q}>
+            <ScrollReveal key={faq.q}>
               <h3 className="text-[14px] font-semibold text-foreground mb-2">
                 {faq.q}
               </h3>
@@ -577,7 +587,7 @@ export function HomeSEOContent() {
                   </>
                 )}
               </p>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
 
