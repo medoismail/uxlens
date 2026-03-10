@@ -75,7 +75,7 @@ export function HeatmapOverlay({
       <div
         ref={containerRef}
         className="relative rounded-xl border overflow-hidden"
-        style={{ borderColor: "var(--border)", maxHeight: "700px", overflowY: "auto" }}
+        style={{ borderColor: "var(--border)", maxHeight: "80vh", overflowY: "auto" }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img

@@ -33,6 +33,11 @@ function dedup(items: string[]): string[] {
 export function extractPageContent(html: string, url: string): ExtractedContent {
   const $ = cheerio.load(html);
 
+  // Detect page language from <html lang="..."> or Content-Language meta
+  const htmlLang = $("html").attr("lang")?.trim().split("-")[0]?.toLowerCase() || "";
+  const metaLang = $('meta[http-equiv="Content-Language"]').attr("content")?.trim().split(",")[0]?.split("-")[0]?.toLowerCase() || "";
+  const language = htmlLang || metaLang || "";
+
   // Remove scripts, styles, and hidden elements to clean the DOM
   $("script, style, noscript, svg, iframe, [hidden], [aria-hidden='true']").remove();
 
@@ -150,6 +155,7 @@ export function extractPageContent(html: string, url: string): ExtractedContent 
     forms: forms.slice(0, 10),
     trustSignals: dedup(trustSignals),
     bodyText,
+    language,
   };
 }
 

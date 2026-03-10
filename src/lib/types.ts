@@ -105,6 +105,7 @@ export interface ExtractedContent {
   forms: string[];
   trustSignals: string[];
   bodyText: string;
+  language?: string;
 }
 
 export interface AnalysisResponse {

@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   ChevronDown, Swords, Trophy, TrendingUp, TrendingDown,
   Minus, Lock, ArrowRight, ArrowUpRight, Target, ExternalLink,
+  Plus, Link2, Loader2,
 } from "lucide-react";
 import type { CompetitorAnalysis, CompetitorProfile, CategoryComparison } from "@/lib/types";
 
@@ -231,24 +232,131 @@ export function CompetitorLockedPreview() {
   );
 }
 
+/* ── Manual Competitor URL Input ── */
+
+function ManualCompetitorInput({
+  onSubmit,
+  isLoading,
+}: {
+  onSubmit: (urls: string[]) => void;
+  isLoading: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [url1, setUrl1] = useState("");
+  const [url2, setUrl2] = useState("");
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const urls = [url1.trim(), url2.trim()].filter(Boolean);
+    if (urls.length > 0) {
+      onSubmit(urls);
+    }
+  }
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="w-full flex items-center justify-center gap-2 rounded-xl border py-3 text-[12px] font-medium transition-all duration-150 hover:border-foreground/15 active:scale-[0.99]"
+        style={{ borderColor: "var(--border)", color: "var(--foreground)", opacity: 0.5 }}
+      >
+        <Plus className="h-3.5 w-3.5" />
+        Compare with specific competitors
+      </button>
+    );
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="rounded-xl border p-5 space-y-3"
+      style={{ borderColor: "var(--brand-glow)", background: "var(--s1)" }}
+    >
+      <div className="flex items-center gap-2 mb-1">
+        <Link2 className="h-3.5 w-3.5" style={{ color: "var(--brand)" }} />
+        <span className="text-[12px] font-semibold">Compare with your competitors</span>
+      </div>
+      <p className="text-[11px] text-foreground/35 leading-relaxed">
+        Enter competitor URLs to get a direct comparison. Leave the second field empty to compare with just one.
+      </p>
+      <div className="space-y-2">
+        <input
+          type="text"
+          value={url1}
+          onChange={(e) => setUrl1(e.target.value)}
+          placeholder="https://competitor1.com"
+          className="w-full rounded-lg border px-3 py-2 text-[12px] outline-none transition-colors focus:border-foreground/20"
+          style={{ borderColor: "var(--border)", background: "var(--s2)", color: "var(--foreground)" }}
+          disabled={isLoading}
+        />
+        <input
+          type="text"
+          value={url2}
+          onChange={(e) => setUrl2(e.target.value)}
+          placeholder="https://competitor2.com (optional)"
+          className="w-full rounded-lg border px-3 py-2 text-[12px] outline-none transition-colors focus:border-foreground/20"
+          style={{ borderColor: "var(--border)", background: "var(--s2)", color: "var(--foreground)" }}
+          disabled={isLoading}
+        />
+      </div>
+      <div className="flex items-center gap-2 pt-1">
+        <button
+          type="submit"
+          disabled={isLoading || (!url1.trim() && !url2.trim())}
+          className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-[12px] font-bold transition-all duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none"
+          style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              Analyzing…
+            </>
+          ) : (
+            <>
+              <Swords className="h-3.5 w-3.5" />
+              Run Comparison
+            </>
+          )}
+        </button>
+        {!isLoading && (
+          <button
+            type="button"
+            onClick={() => { setOpen(false); setUrl1(""); setUrl2(""); }}
+            className="text-[11px] text-foreground/30 hover:text-foreground/50 transition-colors px-2 py-2"
+          >
+            Cancel
+          </button>
+        )}
+      </div>
+    </form>
+  );
+}
+
 /* ── Main Component ── */
 
 export function CompetitorSection({
   data,
   status,
+  onManualCompetitors,
 }: {
   data?: CompetitorAnalysis;
   status: "loading" | "done" | "failed" | "locked";
+  onManualCompetitors?: (urls: string[]) => void;
 }) {
   if (status === "locked") return <CompetitorLockedPreview />;
   if (status === "loading") return <CompetitorSkeleton />;
   if (status === "failed" || !data) {
     return (
-      <div className="rounded-xl border p-5 text-center" style={{ borderColor: "var(--border)", background: "var(--s1)" }}>
-        <Swords className="h-5 w-5 mx-auto mb-2 text-foreground/20" />
-        <p className="text-[12px] text-foreground/35">
-          Competitor analysis couldn&apos;t be completed for this page.
-        </p>
+      <div className="space-y-3">
+        <div className="rounded-xl border p-5 text-center" style={{ borderColor: "var(--border)", background: "var(--s1)" }}>
+          <Swords className="h-5 w-5 mx-auto mb-2 text-foreground/20" />
+          <p className="text-[12px] text-foreground/35">
+            Competitor analysis couldn&apos;t be completed for this page.
+          </p>
+        </div>
+        {onManualCompetitors && (
+          <ManualCompetitorInput onSubmit={onManualCompetitors} isLoading={false} />
+        )}
       </div>
     );
   }
@@ -259,6 +367,11 @@ export function CompetitorSection({
 
   return (
     <div className="space-y-4 animate-fade-in">
+      {/* Manual Competitor Input (Pro+ only) */}
+      {onManualCompetitors && (
+        <ManualCompetitorInput onSubmit={onManualCompetitors} isLoading={false} />
+      )}
+
       {/* Competitive Position Summary */}
       <div className="rounded-xl border p-5" style={{ borderColor: "var(--border)", background: "var(--s1)" }}>
         <div className="flex items-center gap-3 mb-4">

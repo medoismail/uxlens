@@ -43,7 +43,7 @@ async function checkCompetitorRateLimit(request: Request): Promise<boolean> {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { url, auditId, overallScore, categories, headline, executiveSummary } = body;
+    const { url, auditId, overallScore, categories, headline, executiveSummary, competitorUrls } = body;
 
     if (!url || !overallScore || !categories) {
       return err("Missing required fields: url, overallScore, categories");
@@ -92,44 +92,101 @@ export async function POST(request: Request) {
       return err("Rate limit reached. Please wait before running another competitor analysis.", 429);
     }
 
-    // 4. Identify competitors via AI
-    const competitorSuggestions = await identifyCompetitors(
-      url,
-      headline || "",
-      executiveSummary || ""
-    );
-
-    if (!competitorSuggestions.length) {
-      return err("Could not identify competitors for this site", 422);
+    // 4. Fetch user's own page content FIRST (needed for both AI identification and comparison)
+    let userContent;
+    try {
+      const userHtml = await fetchPageHTML(url);
+      userContent = extractPageContent(userHtml, url);
+    } catch {
+      return err("Could not fetch your page for comparison", 500);
     }
 
-    // 5. Validate competitor URLs with HEAD requests (hallucination protection)
-    const validatedCompetitors: typeof competitorSuggestions = [];
-    for (const comp of competitorSuggestions) {
-      try {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 4000);
-        const headRes = await fetch(comp.url, {
-          method: "HEAD",
-          signal: controller.signal,
-          redirect: "follow",
-          headers: {
-            "User-Agent": "Mozilla/5.0 (compatible; UXLensBot/1.0; +https://www.uxlens.pro)",
-          },
-        });
-        clearTimeout(timer);
-        if (headRes.ok || headRes.status === 405 || headRes.status === 403) {
-          // 405 = method not allowed (but site exists), 403 = blocked bots (but exists)
-          validatedCompetitors.push(comp);
+    // 5. Identify or validate competitors
+    let validatedCompetitors: { url: string; name: string; reasoning: string }[];
+
+    // If user provided competitor URLs (Pro+ feature), skip AI identification
+    const userProvidedUrls = Array.isArray(competitorUrls)
+      ? competitorUrls.filter((u: unknown) => typeof u === "string" && u.trim()).slice(0, 2)
+      : [];
+
+    if (userProvidedUrls.length > 0) {
+      // Validate user-provided URLs with HEAD requests
+      validatedCompetitors = [];
+      for (const rawUrl of userProvidedUrls) {
+        try {
+          const normalizedUrl = rawUrl.startsWith("http") ? rawUrl : `https://${rawUrl}`;
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 4000);
+          const headRes = await fetch(normalizedUrl, {
+            method: "HEAD",
+            signal: controller.signal,
+            redirect: "follow",
+            headers: {
+              "User-Agent": "Mozilla/5.0 (compatible; UXLensBot/1.0; +https://www.uxlens.pro)",
+            },
+          });
+          clearTimeout(timer);
+          if (headRes.ok || headRes.status === 405 || headRes.status === 403) {
+            let name = "Competitor";
+            try { name = new URL(normalizedUrl).hostname.replace("www.", ""); } catch {}
+            validatedCompetitors.push({
+              url: normalizedUrl,
+              name,
+              reasoning: "User-provided competitor URL",
+            });
+          }
+        } catch {
+          console.warn(`[CompetitorAnalysis] Skipping unreachable user URL: ${rawUrl}`);
         }
-      } catch {
-        // Skip unreachable URLs
-        console.warn(`[CompetitorAnalysis] Skipping unreachable: ${comp.url}`);
       }
-    }
 
-    if (!validatedCompetitors.length) {
-      return err("Could not reach any identified competitor websites", 422);
+      if (!validatedCompetitors.length) {
+        return err("Could not reach the competitor URLs you provided. Please check they are valid.", 422);
+      }
+    } else {
+      // AI-powered competitor identification with enriched context
+      const competitorSuggestions = await identifyCompetitors(
+        url,
+        headline || "",
+        executiveSummary || "",
+        {
+          metaDescription: userContent.metaDescription,
+          subheadings: userContent.subheadings,
+          buttons: userContent.buttons,
+          title: userContent.title,
+        }
+      );
+
+      if (!competitorSuggestions.length) {
+        return err("Could not identify competitors for this site", 422);
+      }
+
+      // Validate AI-suggested competitor URLs with HEAD requests (hallucination protection)
+      validatedCompetitors = [];
+      for (const comp of competitorSuggestions) {
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 4000);
+          const headRes = await fetch(comp.url, {
+            method: "HEAD",
+            signal: controller.signal,
+            redirect: "follow",
+            headers: {
+              "User-Agent": "Mozilla/5.0 (compatible; UXLensBot/1.0; +https://www.uxlens.pro)",
+            },
+          });
+          clearTimeout(timer);
+          if (headRes.ok || headRes.status === 405 || headRes.status === 403) {
+            validatedCompetitors.push(comp);
+          }
+        } catch {
+          console.warn(`[CompetitorAnalysis] Skipping unreachable: ${comp.url}`);
+        }
+      }
+
+      if (!validatedCompetitors.length) {
+        return err("Could not reach any identified competitor websites", 422);
+      }
     }
 
     // 6. Fetch competitor HTML in parallel
@@ -158,16 +215,7 @@ export async function POST(request: Request) {
       return err("Could not fetch content from competitor websites", 422);
     }
 
-    // 7. Fetch user's own page content (we need it for comparison)
-    let userContent;
-    try {
-      const userHtml = await fetchPageHTML(url);
-      userContent = extractPageContent(userHtml, url);
-    } catch {
-      return err("Could not re-fetch your page for comparison", 500);
-    }
-
-    // 8. Run deep competitor comparison via AI
+    // 7. Run deep competitor comparison via AI
     const analysis: CompetitorAnalysis = await generateCompetitorComparison(
       url,
       userContent,
@@ -175,7 +223,7 @@ export async function POST(request: Request) {
       competitorsWithContent
     );
 
-    // 9. Save to Supabase if auditId provided (must await — Vercel kills function after response)
+    // 8. Save to Supabase if auditId provided (must await — Vercel kills function after response)
     if (auditId && clerkUserId) {
       try {
         await updateCompetitorAnalysis(auditId, clerkUserId, analysis);
@@ -184,7 +232,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // 10. Return result
+    // 9. Return result
     return NextResponse.json({ success: true, data: analysis });
   } catch (error) {
     console.error("[CompetitorAnalysis] Unexpected error:", error);

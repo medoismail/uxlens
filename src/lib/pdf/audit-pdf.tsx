@@ -6,34 +6,58 @@ import {
   View,
   Image,
   StyleSheet,
+  Font,
 } from "@react-pdf/renderer";
 import type { UXAuditResult, CompetitorAnalysis, VisualAnalysis } from "@/lib/types";
+
+/* ── Register Noto Sans for Unicode support (Arabic, CJK, Cyrillic, etc.) ── */
+Font.register({
+  family: "NotoSans",
+  fonts: [
+    {
+      src: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans@latest/latin-400-normal.ttf",
+      fontWeight: 400,
+    },
+    {
+      src: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans@latest/latin-700-normal.ttf",
+      fontWeight: 700,
+    },
+    {
+      src: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-arabic@latest/arabic-400-normal.ttf",
+      fontWeight: 400,
+    },
+    {
+      src: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-arabic@latest/arabic-700-normal.ttf",
+      fontWeight: 700,
+    },
+  ],
+});
 
 const BRAND = "#4C2CFF";
 const BRAND_LIGHT = "#EDEAFF";
 
 const styles = StyleSheet.create({
-  page: { padding: 40, paddingBottom: 60, fontSize: 10, fontFamily: "Helvetica", color: "#1a1a2e" },
+  page: { padding: 40, paddingBottom: 60, fontSize: 10, fontFamily: "NotoSans", color: "#1a1a2e" },
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 30, borderBottom: "2px solid " + BRAND, paddingBottom: 15 },
-  logo: { fontSize: 20, fontFamily: "Helvetica-Bold", color: BRAND },
+  logo: { fontSize: 20, fontFamily: "NotoSans", fontWeight: 700, color: BRAND },
   subtitle: { fontSize: 9, color: "#888" },
   scoreBox: { alignItems: "center", padding: 20, backgroundColor: BRAND_LIGHT, borderRadius: 8, marginBottom: 20 },
-  bigScore: { fontSize: 48, fontFamily: "Helvetica-Bold", color: BRAND },
-  grade: { fontSize: 14, fontFamily: "Helvetica-Bold", color: BRAND, marginTop: 4 },
-  sectionTitle: { fontSize: 14, fontFamily: "Helvetica-Bold", color: BRAND, marginTop: 20, marginBottom: 8 },
-  sectionSubtitle: { fontSize: 11, fontFamily: "Helvetica-Bold", color: "#1a1a2e", marginTop: 14, marginBottom: 6 },
+  bigScore: { fontSize: 48, fontFamily: "NotoSans", fontWeight: 700, color: BRAND },
+  grade: { fontSize: 14, fontFamily: "NotoSans", fontWeight: 700, color: BRAND, marginTop: 4 },
+  sectionTitle: { fontSize: 14, fontFamily: "NotoSans", fontWeight: 700, color: BRAND, marginTop: 20, marginBottom: 8 },
+  sectionSubtitle: { fontSize: 11, fontFamily: "NotoSans", fontWeight: 700, color: "#1a1a2e", marginTop: 14, marginBottom: 6 },
   text: { fontSize: 10, lineHeight: 1.5, color: "#333", marginBottom: 4 },
   bulletItem: { flexDirection: "row", marginBottom: 4, paddingLeft: 8 },
   bullet: { width: 12, fontSize: 10, color: BRAND },
   bulletText: { flex: 1, fontSize: 10, lineHeight: 1.5, color: "#333" },
   categoryRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 6, borderBottom: "1px solid #eee" },
   categoryLabel: { fontSize: 10, color: "#555" },
-  categoryScore: { fontSize: 10, fontFamily: "Helvetica-Bold" },
+  categoryScore: { fontSize: 10, fontFamily: "NotoSans", fontWeight: 700 },
   findingBox: { marginBottom: 6, padding: 8, backgroundColor: "#f9f9fb", borderRadius: 4, borderLeft: "3px solid " + BRAND },
-  findingTitle: { fontSize: 10, fontFamily: "Helvetica-Bold", color: "#1a1a2e" },
+  findingTitle: { fontSize: 10, fontFamily: "NotoSans", fontWeight: 700, color: "#1a1a2e" },
   findingDesc: { fontSize: 9, color: "#555", marginTop: 2, lineHeight: 1.4 },
   rewriteBox: { padding: 10, backgroundColor: BRAND_LIGHT, borderRadius: 6, marginTop: 6 },
-  rewriteLabel: { fontSize: 8, fontFamily: "Helvetica-Bold", color: BRAND, marginBottom: 3 },
+  rewriteLabel: { fontSize: 8, fontFamily: "NotoSans", fontWeight: 700, color: BRAND, marginBottom: 3 },
   rewriteText: { fontSize: 10, color: "#333", lineHeight: 1.4 },
   footer: { position: "absolute", bottom: 25, left: 40, right: 40, flexDirection: "row", justifyContent: "space-between", fontSize: 8, color: "#aaa" },
   divider: { borderBottom: "1px solid #eee", marginVertical: 12 },
@@ -85,7 +109,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
             <Text style={styles.subtitle}>Diagnostic Engine v4 — Full UX Report</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
-            <Text style={{ fontSize: 10, fontFamily: "Helvetica-Bold" }}>{domain}</Text>
+            <Text style={{ fontSize: 10, fontFamily: "NotoSans", fontWeight: 700 }}>{domain}</Text>
             <Text style={{ fontSize: 8, color: "#888", marginTop: 2 }}>
               {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
             </Text>
@@ -255,11 +279,11 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
                 {section.rewrite.items.slice(0, 3).map((item, ii) => (
                   <View key={ii} style={{ flexDirection: "row", gap: 8, marginBottom: 6 }}>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 8, fontFamily: "Helvetica-Bold", color: "#888", marginBottom: 2 }}>{item.label} — BEFORE</Text>
+                      <Text style={{ fontSize: 8, fontFamily: "NotoSans", fontWeight: 700, color: "#888", marginBottom: 2 }}>{item.label} — BEFORE</Text>
                       <Text style={[styles.text, { fontSize: 9, color: "#999" }]}>{item.before}</Text>
                     </View>
                     <View style={[{ flex: 1 }, styles.rewriteBox]}>
-                      <Text style={{ fontSize: 8, fontFamily: "Helvetica-Bold", color: BRAND, marginBottom: 2 }}>{item.label} — AFTER</Text>
+                      <Text style={{ fontSize: 8, fontFamily: "NotoSans", fontWeight: 700, color: BRAND, marginBottom: 2 }}>{item.label} — AFTER</Text>
                       <Text style={[styles.rewriteText, { fontSize: 9 }]}>{item.after}</Text>
                     </View>
                   </View>
@@ -271,7 +295,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
                 <Text style={[styles.rewriteLabel, { fontSize: 9, marginBottom: 4 }]}>STRUCTURE REWRITE</Text>
                 {section.rewrite.suggestedOrder.length > 0 && (
                   <View style={{ marginBottom: 4 }}>
-                    <Text style={{ fontSize: 8, fontFamily: "Helvetica-Bold", color: "#555", marginBottom: 2 }}>Suggested Order</Text>
+                    <Text style={{ fontSize: 8, fontFamily: "NotoSans", fontWeight: 700, color: "#555", marginBottom: 2 }}>Suggested Order</Text>
                     {section.rewrite.suggestedOrder.map((s, si) => (
                       <View key={si} style={styles.bulletItem}>
                         <Text style={[styles.bullet, { color: BRAND }]}>{si + 1}.</Text>
@@ -282,7 +306,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
                 )}
                 {section.rewrite.additions.length > 0 && (
                   <View style={{ marginBottom: 4 }}>
-                    <Text style={{ fontSize: 8, fontFamily: "Helvetica-Bold", color: "#22c55e", marginBottom: 2 }}>Add</Text>
+                    <Text style={{ fontSize: 8, fontFamily: "NotoSans", fontWeight: 700, color: "#22c55e", marginBottom: 2 }}>Add</Text>
                     {section.rewrite.additions.map((a, ai) => (
                       <View key={ai} style={styles.bulletItem}>
                         <Text style={[styles.bullet, { color: "#22c55e" }]}>+</Text>
@@ -293,7 +317,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
                 )}
                 {section.rewrite.removals.length > 0 && (
                   <View style={{ marginBottom: 4 }}>
-                    <Text style={{ fontSize: 8, fontFamily: "Helvetica-Bold", color: "#ef4444", marginBottom: 2 }}>Remove / Reword</Text>
+                    <Text style={{ fontSize: 8, fontFamily: "NotoSans", fontWeight: 700, color: "#ef4444", marginBottom: 2 }}>Remove / Reword</Text>
                     {section.rewrite.removals.map((r, ri) => (
                       <View key={ri} style={styles.bulletItem}>
                         <Text style={[styles.bullet, { color: "#ef4444" }]}>−</Text>
@@ -355,7 +379,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
             </View>
           ))}
           <View style={styles.categoryRow}>
-            <Text style={[styles.categoryLabel, { fontFamily: "Helvetica-Bold" }]}>Score Gap</Text>
+            <Text style={[styles.categoryLabel, { fontFamily: "NotoSans", fontWeight: 700 }]}>Score Gap</Text>
             <Text style={[styles.categoryScore, { color: competitorAnalysis.scoreGap >= 0 ? "#22c55e" : "#ef4444" }]}>
               {competitorAnalysis.scoreGap >= 0 ? "+" : ""}{competitorAnalysis.scoreGap} points
             </Text>

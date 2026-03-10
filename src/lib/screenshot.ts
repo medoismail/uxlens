@@ -47,13 +47,12 @@ async function captureWithMicrolink(url: string): Promise<ScreenshotResult> {
   apiUrl.searchParams.set("url", url);
   apiUrl.searchParams.set("screenshot", "true");
   apiUrl.searchParams.set("meta", "false");
-  apiUrl.searchParams.set("embed", "screenshot.url");
   apiUrl.searchParams.set("viewport.width", String(VIEWPORT_WIDTH));
   apiUrl.searchParams.set("viewport.height", String(VIEWPORT_HEIGHT));
   apiUrl.searchParams.set("screenshot.fullPage", "true");
   apiUrl.searchParams.set("screenshot.type", "jpeg");
   apiUrl.searchParams.set("screenshot.quality", "85");
-  apiUrl.searchParams.set("waitForTimeout", "3000");
+  apiUrl.searchParams.set("waitForTimeout", "5000");
 
   // Add Microlink API key if available (for higher rate limits)
   const microlinkKey = process.env.MICROLINK_API_KEY;
@@ -72,23 +71,7 @@ async function captureWithMicrolink(url: string): Promise<ScreenshotResult> {
     throw new Error(`Microlink API error: HTTP ${res.status} - ${text.slice(0, 200)}`);
   }
 
-  // Microlink with embed=screenshot.url returns the raw image
-  const contentType = res.headers.get("content-type") || "";
-
-  if (contentType.includes("image")) {
-    // Direct image response (embed mode)
-    const arrayBuffer = await res.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    return {
-      buffer,
-      pageHeight: 3000,
-      viewportWidth: VIEWPORT_WIDTH,
-      viewportHeight: VIEWPORT_HEIGHT,
-    };
-  }
-
-  // JSON response (non-embed mode fallback)
+  // JSON response with screenshot URL and metadata
   const data = await res.json() as {
     status?: string;
     message?: string;

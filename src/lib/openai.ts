@@ -23,7 +23,9 @@ const SYSTEM_PROMPT = `You are UXLens — the world's most rigorous AI-powered U
 
 Your diagnostic process runs in 9 sequential layers. You must complete ALL layers and return a single structured JSON report.
 
-Do NOT invent missing information. Do NOT produce generic UX advice. Every finding must cite specific evidence from the provided content. Return STRICT JSON only.`;
+Do NOT invent missing information. Do NOT produce generic UX advice. Every finding must cite specific evidence from the provided content. Return STRICT JSON only.
+
+CRITICAL LANGUAGE RULE: If the page content is in a non-English language (detected from the lang attribute or the actual content), you MUST provide ALL analysis, findings, recommendations, rewrites, executive summary, and every text value in that SAME language. JSON keys must stay in English (they are part of the schema), but ALL string values must be in the website's language. If the page is in Arabic, respond in Arabic. If in French, respond in French. Only use English if the page is in English or if the language cannot be determined.`;
 
 function buildUserPrompt(content: ExtractedContent): string {
   return `Analyze this landing page using the full 9-Layer Diagnostic Algorithm, then return only the final output as JSON.
@@ -31,6 +33,7 @@ function buildUserPrompt(content: ExtractedContent): string {
 ═══════════════════════════════════════════
 LANDING PAGE CONTENT TO AUDIT:
 URL: ${content.url}
+DETECTED LANGUAGE: ${content.language || "not detected (assume English)"}
 
 PAGE TITLE:
 ${content.title || "(none)"}
@@ -552,8 +555,22 @@ Return STRICT JSON only.`,
 export async function identifyCompetitors(
   url: string,
   headline: string,
-  executiveSummary: string
+  executiveSummary: string,
+  additionalContext?: {
+    metaDescription?: string;
+    subheadings?: string[];
+    buttons?: string[];
+    title?: string;
+  }
 ): Promise<{ url: string; name: string; reasoning: string }[]> {
+  // Build rich context for better identification
+  const extraContext = [
+    additionalContext?.title ? `PAGE TITLE: ${additionalContext.title}` : "",
+    additionalContext?.metaDescription ? `META DESCRIPTION: ${additionalContext.metaDescription}` : "",
+    additionalContext?.subheadings?.length ? `KEY SUBHEADINGS: ${additionalContext.subheadings.slice(0, 5).join(" | ")}` : "",
+    additionalContext?.buttons?.length ? `CTA BUTTONS: ${additionalContext.buttons.slice(0, 5).join(" | ")}` : "",
+  ].filter(Boolean).join("\n");
+
   const response = await withRetry(() =>
     getClient().chat.completions.create({
       model: "gpt-4o",
@@ -563,7 +580,14 @@ export async function identifyCompetitors(
       messages: [
         {
           role: "system",
-          content: `You are a market research analyst. Given a landing page URL, headline, and summary, identify the 2 biggest direct competitors in the same market. Return their actual, real website URLs — NOT made-up URLs. Only return competitors that are real, well-known companies with live websites. Return STRICT JSON only.`,
+          content: `You are a senior market research analyst specializing in competitive intelligence. Given detailed information about a landing page, you must identify the 2 most direct competitors in the EXACT same market niche.
+
+Your process:
+1. First, determine the specific industry/niche and the exact product category
+2. Then identify competitors that serve the SAME audience with a SIMILAR product
+3. Only return real, well-known companies with live websites
+
+Return STRICT JSON only.`,
         },
         {
           role: "user",
@@ -572,6 +596,7 @@ export async function identifyCompetitors(
 URL: ${url}
 HEADLINE: ${headline}
 SUMMARY: ${executiveSummary}
+${extraContext}
 
 Return JSON:
 {
@@ -584,7 +609,8 @@ Return JSON:
 Rules:
 - Only return REAL companies with live, public websites
 - URLs must be the main marketing/landing page (not a subpage)
-- Competitors must be in the SAME market/category, not just tangentially related
+- Competitors must be in the SAME market/category with similar products, not just tangentially related
+- Consider the specific product type, target audience, and pricing tier when selecting competitors
 - If the site is too niche to identify 2 competitors, return just 1`,
         },
       ],
@@ -651,7 +677,9 @@ ${summarizeContent(c.content)}`
 3. Provide 5 actionable competitive advantages the user can implement
 4. Give a 2-3 sentence competitive position summary
 
-Be specific: cite actual content from each site. Do not give generic advice. Return STRICT JSON only.`,
+Be specific: cite actual content from each site. Do not give generic advice. Return STRICT JSON only.
+
+If the user's site is in a non-English language, provide all insights, strengths, weaknesses, competitive advantages, and position summary in that same language. JSON keys stay English, only values change.`,
         },
         {
           role: "user",

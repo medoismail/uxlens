@@ -65,15 +65,13 @@ export default async function OGImage() {
           {/* Tagline */}
           <div
             style={{
-              fontSize: "22px",
+              fontSize: "28px",
               fontWeight: 600,
               color: "#4C2CFF",
-              letterSpacing: "3px",
-              textTransform: "uppercase" as const,
               marginBottom: "20px",
             }}
           >
-            AI UX Audit Platform
+            AI-Powered UX Audit Platform
           </div>
 
           {/* Description */}

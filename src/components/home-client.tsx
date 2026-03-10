@@ -242,6 +242,60 @@ export function HomeClient() {
     }
   }
 
+  /** Re-run competitor analysis with user-provided competitor URLs */
+  async function handleManualCompetitors(competitorUrls: string[]) {
+    if (state.status !== "success") return;
+
+    // Set loading state for competitor section
+    setState((prev) => {
+      if (prev.status !== "success") return prev;
+      return { ...prev, competitorStatus: "loading", competitorAnalysis: undefined };
+    });
+
+    try {
+      const res = await fetch("/api/competitor-analysis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: state.url,
+          auditId: state.auditId,
+          overallScore: state.data.overallScore,
+          categories: state.data.categories,
+          headline: state.data.rewrite?.beforeHeadline || "",
+          executiveSummary: state.data.executiveSummary,
+          competitorUrls,
+        }),
+      });
+
+      if (!res.ok) {
+        setState((prev) => {
+          if (prev.status !== "success") return prev;
+          return { ...prev, competitorStatus: "failed" };
+        });
+        return;
+      }
+
+      const result = await res.json();
+
+      if (result.success && result.data) {
+        setState((prev) => {
+          if (prev.status !== "success") return prev;
+          return { ...prev, competitorAnalysis: result.data, competitorStatus: "done" };
+        });
+      } else {
+        setState((prev) => {
+          if (prev.status !== "success") return prev;
+          return { ...prev, competitorStatus: "failed" };
+        });
+      }
+    } catch {
+      setState((prev) => {
+        if (prev.status !== "success") return prev;
+        return { ...prev, competitorStatus: "failed" };
+      });
+    }
+  }
+
   function handleHumanAuditRequested(url: string, email: string) {
     setState({ status: "human_audit_requested", url: normalizeUrl(url), email });
   }
@@ -292,6 +346,7 @@ export function HomeClient() {
             visualAnalysisStatus={state.visualAnalysisStatus}
             competitorAnalysis={state.competitorAnalysis}
             competitorStatus={state.competitorStatus}
+            onManualCompetitors={handleManualCompetitors}
           />
         )}
         {state.status === "human_audit_requested" && (

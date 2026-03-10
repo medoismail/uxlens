@@ -35,6 +35,7 @@ interface ResultsReportProps {
   visualAnalysisStatus?: "loading" | "done" | "failed";
   competitorAnalysis?: CompetitorAnalysis;
   competitorStatus?: "loading" | "done" | "failed" | "locked";
+  onManualCompetitors?: (urls: string[]) => void;
 }
 
 /* ── Helpers ── */
@@ -141,7 +142,7 @@ export function ResultsReport({
   data, url, onReset, onHumanAuditRequested, plan,
   auditId, screenshotUrl, heatmapZones, pageHeight, viewportWidth, screenshotStatus,
   heatmapStatus, visualAnalysis, visualAnalysisStatus,
-  competitorAnalysis, competitorStatus,
+  competitorAnalysis, competitorStatus, onManualCompetitors,
 }: ResultsReportProps) {
   const features = PLAN_FEATURES[plan];
   let domain = url;
@@ -552,7 +553,7 @@ export function ResultsReport({
       {/* ─── Competitor Analysis ─── */}
       <ReportDivider label="Competitor Analysis" />
       {competitorStatus && competitorStatus !== "locked" ? (
-        <CompetitorSection data={competitorAnalysis} status={competitorStatus} />
+        <CompetitorSection data={competitorAnalysis} status={competitorStatus} onManualCompetitors={onManualCompetitors} />
       ) : (
         <CompetitorLockedPreview />
       )}
