@@ -6,7 +6,7 @@ import {
   Target, Zap, Shield, Eye, Search, Layers, Pen,
   ChevronDown, RotateCcw, ArrowRight, User, Lock,
   Flame, Brain, HelpCircle, Heart, LogOut,
-  X, AlertTriangle, Check,
+  X, AlertTriangle, Check, ListChecks, Sparkles,
 } from "lucide-react";
 import { Footer } from "@/components/footer";
 import { ScreenshotSection } from "@/components/screenshot-section";
@@ -14,7 +14,7 @@ import { PdfExportButton } from "@/components/pdf-export-button";
 import { ChatWidget } from "@/components/chat-widget";
 import { PLAN_FEATURES } from "@/lib/types";
 import { CompetitorSection, CompetitorLockedPreview } from "@/components/competitor-section";
-import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone, CompetitorAnalysis, VisualAnalysis, SectionRewrite } from "@/lib/types";
+import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone, CompetitorAnalysis, VisualAnalysis, SectionRewrite, HeuristicScore } from "@/lib/types";
 
 interface ResultsReportProps {
   data: UXAuditResult;
@@ -58,6 +58,25 @@ function confusionColor(s: number) {
   if (inverted >= 40) return "var(--score-mid)";
   return "var(--score-low)";
 }
+
+function heuristicColor(s: number) {
+  if (s >= 7) return "var(--score-high)";
+  if (s >= 4) return "var(--score-mid)";
+  return "var(--score-low)";
+}
+
+function heuristicBg(s: number) {
+  if (s >= 7) return "oklch(0.623 0.178 145 / 8%)";
+  if (s >= 4) return "oklch(0.725 0.187 91 / 8%)";
+  return "oklch(0.647 0.176 17 / 8%)";
+}
+
+const SEVERITY_STYLES: Record<string, React.CSSProperties> = {
+  critical: { background: "oklch(0.647 0.176 17 / 15%)", color: "var(--score-low)", borderColor: "oklch(0.647 0.176 17 / 30%)" },
+  high: { background: "oklch(0.647 0.176 17 / 10%)", color: "var(--score-low)", borderColor: "oklch(0.647 0.176 17 / 20%)" },
+  medium: { background: "oklch(0.725 0.187 91 / 10%)", color: "var(--score-mid)", borderColor: "oklch(0.725 0.187 91 / 20%)" },
+  low: { background: "oklch(0.623 0.178 145 / 10%)", color: "var(--score-high)", borderColor: "oklch(0.623 0.178 145 / 20%)" },
+};
 
 const SECTION_ICONS: Record<string, React.ReactNode> = {
   hero: <Target className="h-4 w-4" />,
@@ -157,7 +176,7 @@ export function ResultsReport({
       {/* Report header */}
       <div className="text-center animate-fade-in mb-6">
         <p className="text-[12px] font-mono uppercase tracking-[2px] text-foreground/30 mb-2">
-          Diagnostic Engine v4 — Full UX Report
+          Diagnostic Engine v5 — Full UX Report
         </p>
         <h1 className="text-xl font-semibold tracking-tight text-foreground">{domain}</h1>
 
@@ -436,6 +455,25 @@ export function ResultsReport({
         {!features.improvements && data.strategicFixes.length > 0 && (
           <LockedHint count={data.strategicFixes.length} label="strategic fixes" />
         )}
+
+        {/* UX Strengths */}
+        {data.uxStrengths && data.uxStrengths.length > 0 && (
+          <>
+            <div className="mt-4" />
+            <p className="text-[12px] uppercase tracking-[2px] mb-2.5 flex items-center gap-1.5" style={{ color: "var(--score-high)" }}>
+              <Sparkles className="h-3 w-3" />
+              UX Strengths
+            </p>
+            <div className="flex flex-col gap-2">
+              {data.uxStrengths.map((s, i) => (
+                <div key={i} className="flex gap-2.5 text-[12px] leading-relaxed text-foreground/50 p-2.5 px-3.5 rounded-[7px] border-l-2" style={{ background: "oklch(0.623 0.178 145 / 4%)", borderColor: "var(--score-high)" }}>
+                  <Check className="h-3 w-3 shrink-0 mt-0.5" style={{ color: "var(--score-high)" }} />
+                  <span>{s}</span>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </AccordionSection>
 
       {/* ─── Upgrade Card (free users who can't see improvements) ─── */}
@@ -508,6 +546,38 @@ export function ResultsReport({
           ))}
         </div>
       </AccordionSection>
+
+      {/* ─── Heuristic Evaluation (all tiers) ─── */}
+      {data.heuristicEvaluation && (
+        <>
+          <ReportDivider label="Heuristic Evaluation" />
+          <AccordionSection
+            icon={<ListChecks className="h-4 w-4" style={{ color: "var(--accent-purple, var(--brand))" }} />}
+            name="Nielsen's Heuristic Evaluation"
+            subtitle={`10 usability heuristics — Overall: ${data.heuristicEvaluation.overallHeuristicScore.toFixed(1)}/10`}
+            defaultOpen
+            className="fu fu-9"
+          >
+            {/* Overall score badge */}
+            <div className="flex items-center gap-3 mb-5 p-3.5 rounded-lg border" style={{ background: "var(--s2)", borderColor: "var(--border)" }}>
+              <div className="text-[28px] font-bold font-mono" style={{ color: heuristicColor(data.heuristicEvaluation.overallHeuristicScore) }}>
+                {data.heuristicEvaluation.overallHeuristicScore.toFixed(1)}
+              </div>
+              <div>
+                <div className="text-[12px] font-semibold">Overall Heuristic Score</div>
+                <div className="text-[11px] text-foreground/35">Average across 10 Nielsen usability heuristics (0-10)</div>
+              </div>
+            </div>
+
+            {/* Heuristic cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {data.heuristicEvaluation.heuristics.map((h) => (
+                <HeuristicCard key={h.id} heuristic={h} />
+              ))}
+            </div>
+          </AccordionSection>
+        </>
+      )}
 
       {/* ─── Divider ─── */}
       <ReportDivider label="Optimized Copy" />
@@ -735,9 +805,72 @@ function FindingCard({ finding }: { finding: Finding }) {
               {finding.impact}
             </span>
           )}
+          {finding.severity && (
+            <span className="text-[10px] px-[6px] py-[1px] rounded ml-1.5 uppercase tracking-wider align-middle border" style={SEVERITY_STYLES[finding.severity] || {}}>
+              {finding.severity}
+            </span>
+          )}
         </div>
         <div className="text-foreground/45">{finding.desc}</div>
+        {finding.category && (
+          <div className="text-[10px] text-foreground/25 mt-1 font-mono">{finding.category}</div>
+        )}
+        {finding.whyItMatters && (
+          <div className="text-[11px] text-foreground/35 mt-1.5 italic">{finding.whyItMatters}</div>
+        )}
+        {finding.recommendedFix && (
+          <div className="text-[11px] mt-1.5 p-2 rounded" style={{ background: "oklch(0.623 0.178 145 / 4%)", color: "var(--foreground)", opacity: 0.55 }}>
+            <span className="font-semibold" style={{ color: "var(--score-high)" }}>Fix: </span>{finding.recommendedFix}
+          </div>
+        )}
       </div>
+    </div>
+  );
+}
+
+/* ──────────────────────────────────────────────────────── */
+/* Heuristic Score Card                                     */
+/* ──────────────────────────────────────────────────────── */
+
+function HeuristicCard({ heuristic }: { heuristic: HeuristicScore }) {
+  const color = heuristicColor(heuristic.score);
+  return (
+    <div className="rounded-lg border p-3.5" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+      <div className="flex items-start justify-between gap-2 mb-2.5">
+        <div className="text-[12px] font-semibold leading-snug flex-1">{heuristic.name}</div>
+        <span
+          className="text-[14px] font-bold font-mono px-2 py-0.5 rounded-[5px] shrink-0"
+          style={{ color, background: heuristicBg(heuristic.score) }}
+        >
+          {heuristic.score}/10
+        </span>
+      </div>
+      <div className="h-[3px] rounded-full overflow-hidden mb-2.5" style={{ background: "var(--s3)" }}>
+        <div
+          className="h-full rounded-full animate-bar-width"
+          style={{ background: color, width: `${heuristic.score * 10}%`, "--bar-width": `${heuristic.score * 10}%` } as React.CSSProperties}
+        />
+      </div>
+      {heuristic.issues.length > 0 && (
+        <div className="flex flex-col gap-1 mb-1.5">
+          {heuristic.issues.map((issue, i) => (
+            <div key={i} className="flex gap-1.5 text-[11px] leading-relaxed">
+              <X className="h-3 w-3 shrink-0 mt-0.5" style={{ color: "var(--score-low)" }} />
+              <span className="text-foreground/45">{issue}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {heuristic.passes.length > 0 && (
+        <div className="flex flex-col gap-1">
+          {heuristic.passes.map((pass, i) => (
+            <div key={i} className="flex gap-1.5 text-[11px] leading-relaxed">
+              <Check className="h-3 w-3 shrink-0 mt-0.5" style={{ color: "var(--score-high)" }} />
+              <span className="text-foreground/45">{pass}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

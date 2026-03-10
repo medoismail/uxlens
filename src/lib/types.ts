@@ -1,4 +1,4 @@
-/** Core types for the UXLens 9-Layer Diagnostic Engine */
+/** Core types for the UXLens 10-Layer Diagnostic Engine */
 
 export interface CategoryScore {
   score: number;
@@ -10,6 +10,10 @@ export interface Finding {
   title: string;
   desc: string;
   impact: "high" | "medium" | "low";
+  severity?: "low" | "medium" | "high" | "critical";
+  category?: string;
+  whyItMatters?: string;
+  recommendedFix?: string;
 }
 
 export interface AuditSection {
@@ -41,6 +45,21 @@ export interface ConfusionMap {
 export interface TrustMatrixItem {
   label: string;
   score: number;
+}
+
+/* ── Heuristic Evaluation (Nielsen's 10 Usability Heuristics) ── */
+
+export interface HeuristicScore {
+  id: string;
+  name: string;
+  score: number;    // 0-10
+  issues: string[];
+  passes: string[];
+}
+
+export interface HeuristicEvaluation {
+  heuristics: HeuristicScore[];
+  overallHeuristicScore: number; // 0-10
 }
 
 export interface Rewrite {
@@ -92,6 +111,8 @@ export interface UXAuditResult {
   confusionMap: ConfusionMap;
   trustMatrix: TrustMatrixItem[];
   rewrite: Rewrite;
+  heuristicEvaluation?: HeuristicEvaluation;
+  uxStrengths?: string[];
 }
 
 export interface ExtractedContent {

@@ -75,6 +75,37 @@ function formatCategories(categories: UXAuditResult["categories"]): string {
     .join("\n");
 }
 
+function formatHeuristics(audit: UXAuditResult): string {
+  if (!audit.heuristicEvaluation) return "";
+
+  const he = audit.heuristicEvaluation;
+  let text = `\n## Heuristic Evaluation — ${he.overallHeuristicScore.toFixed(1)}/10\n\n`;
+  text += `| Heuristic | Score |\n|-----------|-------|\n`;
+  for (const h of he.heuristics) {
+    const emoji = h.score >= 7 ? "✅" : h.score >= 4 ? "⚠️" : "❌";
+    text += `| ${emoji} ${h.name} | ${h.score}/10 |\n`;
+  }
+
+  // Show top issues for low-scoring heuristics
+  const lowScoring = he.heuristics.filter((h) => h.score < 5);
+  if (lowScoring.length) {
+    text += `\n### Key Issues\n\n`;
+    for (const h of lowScoring) {
+      text += `**${h.name}** (${h.score}/10):\n`;
+      h.issues.forEach((issue) => { text += `- ${issue}\n`; });
+    }
+  }
+
+  return text;
+}
+
+function formatUxStrengths(audit: UXAuditResult): string {
+  if (!audit.uxStrengths?.length) return "";
+  let text = `\n## ✨ UX Strengths\n\n`;
+  audit.uxStrengths.forEach((s, i) => { text += `${i + 1}. ${s}\n`; });
+  return text;
+}
+
 /* ── Create MCP Server with Tools ────────────────────── */
 
 function createSkillServer(userId: string, keyId: string) {
@@ -86,7 +117,7 @@ function createSkillServer(userId: string, keyId: string) {
   // ── Tool 1: audit_url ──────────────────────────────
   server.tool(
     "audit_url",
-    "Run a comprehensive 9-layer UX audit on a website. Returns overall score, category scores, conversion killers, quick wins, and strategic fixes.",
+    "Run a comprehensive 10-layer UX audit on a website. Returns overall score, category scores, heuristic evaluation, conversion killers, quick wins, strategic fixes, and UX strengths.",
     { url: z.string().url().describe("The website URL to audit") },
     async ({ url }) => {
       const allowed = await checkMcpRateLimit(keyId, "audit", 20);
@@ -137,6 +168,9 @@ function createSkillServer(userId: string, keyId: string) {
         text += `\n## 🎯 Strategic Fixes\n\n`;
         audit.strategicFixes.forEach((f: string, i: number) => { text += `${i + 1}. ${f}\n`; });
       }
+
+      text += formatHeuristics(audit);
+      text += formatUxStrengths(audit);
 
       return { content: [{ type: "text" as const, text }] };
     }
@@ -296,7 +330,7 @@ function createSkillServer(userId: string, keyId: string) {
   // ── Tool 4: full_audit ─────────────────────────────
   server.tool(
     "full_audit",
-    "Complete UXLens analysis: 9-layer audit + screenshot + visual analysis + heatmap. The most comprehensive tool — use when you want everything.",
+    "Complete UXLens analysis: 10-layer audit + heuristic evaluation + screenshot + visual analysis + heatmap. The most comprehensive tool — use when you want everything.",
     { url: z.string().url().describe("The website URL to fully audit") },
     async ({ url }) => {
       const allowed = await checkMcpRateLimit(keyId, "full", 10);
@@ -337,6 +371,9 @@ function createSkillServer(userId: string, keyId: string) {
         text += `\n### Quick Wins\n`;
         audit.quickWins.forEach((w: string, i: number) => { text += `${i + 1}. ${w}\n`; });
       }
+
+      text += formatHeuristics(audit);
+      text += formatUxStrengths(audit);
 
       // Part 2: Visual
       text += `\n---\n\n## Visual Analysis\n\n`;

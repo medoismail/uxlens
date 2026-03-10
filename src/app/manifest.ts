@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "UXLens — AI UX Audit",
     short_name: "UXLens",
     description:
-      "AI-powered UX audit platform with screenshot heatmaps, 9-layer diagnostic, and actionable fixes.",
+      "AI-powered UX audit platform with screenshot heatmaps, 10-layer diagnostic, heuristic evaluation, and actionable fixes.",
     start_url: "/",
     display: "standalone",
     background_color: "#0a0a0a",

@@ -76,6 +76,10 @@ const findingSchema = z.object({
   title: z.string(),
   desc: z.string(),
   impact: z.enum(["high", "medium", "low"]),
+  severity: z.enum(["low", "medium", "high", "critical"]).optional(),
+  category: z.string().optional(),
+  whyItMatters: z.string().optional(),
+  recommendedFix: z.string().optional(),
 });
 
 const textRewriteSchema = z.object({
@@ -110,7 +114,22 @@ const categoryScoreSchema = z.object({
   note: z.string(),
 });
 
-/** Schema for the 9-Layer Diagnostic Engine response */
+/* ── Heuristic Evaluation Schemas ─────────────────────── */
+
+const heuristicScoreSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  score: z.number().min(0).max(10),
+  issues: z.array(z.string()),
+  passes: z.array(z.string()),
+});
+
+const heuristicEvaluationSchema = z.object({
+  heuristics: z.array(heuristicScoreSchema),
+  overallHeuristicScore: z.number().min(0).max(10),
+});
+
+/** Schema for the 10-Layer Diagnostic Engine response */
 export const uxAuditSchema = z.object({
   overallScore: z.number().min(0).max(100),
   grade: z.string(),
@@ -156,6 +175,8 @@ export const uxAuditSchema = z.object({
     afterCTA: z.string(),
     rewriteRationale: z.string(),
   }),
+  heuristicEvaluation: heuristicEvaluationSchema.optional(),
+  uxStrengths: z.array(z.string()).optional(),
 });
 
 /** API request body schema */

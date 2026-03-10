@@ -136,10 +136,10 @@ export function PricingClient({
             <ul className="mt-4 space-y-2">
               {[
                 "Full scores & 6 categories",
+                "Heuristic evaluation (10 heuristics)",
                 "Screenshot + 1 AI vision heatmap",
                 "All conversion killers & quick wins",
                 "Trust signal matrix",
-                "Confusion detection map",
                 "Audit history dashboard",
               ].map((f) => (
                 <li key={f} className="flex items-start gap-2 text-[12px] text-muted-foreground">

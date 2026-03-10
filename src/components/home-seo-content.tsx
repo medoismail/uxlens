@@ -87,7 +87,7 @@ const STEPS = [
   {
     num: "02",
     title: "AI sees, analyzes & scores",
-    desc: "Our engine captures a full-page screenshot, uses UXLens AI to generate an attention heatmap, runs a visual design analysis, and audits 9 diagnostic layers with self-critique.",
+    desc: "Our engine captures a full-page screenshot, uses UXLens AI to generate an attention heatmap, runs a visual design analysis, and audits 10 diagnostic layers including Nielsen's heuristic evaluation.",
   },
   {
     num: "03",
@@ -128,7 +128,7 @@ const PLANS = [
     name: "Free",
     price: "$0",
     audits: "5 audits / month",
-    features: ["Full 9-layer scores", "1 AI vision heatmap", "Conversion killers", "Audit dashboard"],
+    features: ["Full 10-layer scores", "Heuristic evaluation", "1 AI vision heatmap", "Audit dashboard"],
     popular: false,
   },
   {
@@ -152,11 +152,11 @@ const PLANS = [
 const FAQS = [
   {
     q: "What is a UX audit and why does it matter?",
-    a: "A UX audit identifies usability issues, conversion barriers, and trust gaps on your website. UXLens automates this with a 9-layer AI diagnostic powered by UXLens AI v4 — delivering results in seconds instead of days.",
+    a: "A UX audit identifies usability issues, conversion barriers, and trust gaps on your website. UXLens automates this with a 10-layer AI diagnostic powered by UXLens AI v5 — including Nielsen's heuristic evaluation, delivering results in seconds instead of days.",
   },
   {
     q: "How does the AI analysis work?",
-    a: "UXLens captures a full-page screenshot, sends it to UXLens AI for attention heatmap generation and visual design analysis, then runs your content through 9 specialized audit layers with a self-critique loop. You get scores, heatmaps, visual analysis, and actionable fixes.",
+    a: "UXLens captures a full-page screenshot, sends it to UXLens AI for attention heatmap generation and visual design analysis, then runs your content through 10 specialized audit layers — including Nielsen's heuristic evaluation — with a self-critique loop. You get scores, heatmaps, visual analysis, and actionable fixes.",
   },
   {
     q: "Is it really free?",
@@ -172,7 +172,7 @@ const FAQS = [
   },
   {
     q: "What makes UXLens different?",
-    a: "UXLens is the only tool that combines AI vision analysis (real AI heatmaps, not fake patterns) with a structured 9-layer diagnostic and visual design scoring. Each audit delivers fixes tailored to your page — not generic advice. Plus dashboard, PDF export, AI chat, and competitor analysis make it a complete platform.",
+    a: "UXLens is the only tool that combines AI vision analysis (real AI heatmaps, not fake patterns) with a structured 10-layer diagnostic, Nielsen's heuristic evaluation, and visual design scoring. Each audit delivers fixes tailored to your page — not generic advice. Plus dashboard, PDF export, AI chat, and competitor analysis make it a complete platform.",
   },
 ];
 
@@ -250,7 +250,7 @@ export function HomeSEOContent() {
 
       {/* Feature 2: Score + Categories */}
       <FeatureSection
-        label="9-Layer Diagnostic"
+        label="10-Layer Diagnostic"
         headline="One score. Six dimensions. Zero guesswork."
         description="Your page gets a single UX score broken down across six critical dimensions. Each category shows exactly where you're strong and where you're bleeding conversions."
         bullets={[

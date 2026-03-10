@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: "%s | UXLens",
   },
   description:
-    "AI-powered UX audit platform with screenshot heatmaps, 9-layer diagnostic, trust analysis, and actionable fixes. Save audits to your dashboard, export PDF reports, and chat with AI.",
+    "AI-powered UX audit platform with screenshot heatmaps, 10-layer diagnostic, heuristic evaluation, trust analysis, and actionable fixes. Save audits to your dashboard, export PDF reports, and chat with AI.",
   keywords: [
     "ux audit tool",
     "website ux analysis",
@@ -77,7 +77,7 @@ export const metadata: Metadata = {
     siteName: "UXLens",
     title: "UXLens — AI UX Audit Platform | Heatmaps, Dashboard & PDF Export",
     description:
-      "AI UX audit platform with screenshot heatmaps, 9-layer diagnostic, and actionable fixes. Save audits, export PDFs, and chat with AI about your findings.",
+      "AI UX audit platform with screenshot heatmaps, 10-layer diagnostic, heuristic evaluation, and actionable fixes. Save audits, export PDFs, and chat with AI about your findings.",
     images: [
       {
         url: "/opengraph-image",
@@ -91,7 +91,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "UXLens — AI UX Audit Platform",
     description:
-      "AI UX audit platform with screenshot heatmaps, 9-layer diagnostic, dashboard, PDF export, and AI chat.",
+      "AI UX audit platform with screenshot heatmaps, 10-layer diagnostic, heuristic evaluation, dashboard, PDF export, and AI chat.",
     images: ["/opengraph-image"],
   },
   category: "technology",
@@ -113,7 +113,7 @@ const jsonLd = {
   name: "UXLens",
   url: SITE_URL,
   description:
-    "AI-powered UX audit platform with screenshot heatmaps, 9-layer diagnostic, audit dashboard, PDF export, and AI chat assistant for discussing findings.",
+    "AI-powered UX audit platform with screenshot heatmaps, 10-layer diagnostic, heuristic evaluation, audit dashboard, PDF export, and AI chat assistant for discussing findings.",
   applicationCategory: "DesignApplication",
   operatingSystem: "Web",
   offers: [
@@ -147,7 +147,8 @@ const jsonLd = {
     },
   ],
   featureList: [
-    "9-Layer UX Diagnostic",
+    "10-Layer UX Diagnostic",
+    "Nielsen's Heuristic Evaluation",
     "Page Screenshot + Attention Heatmap",
     "AI-Powered Conversion Killer Detection",
     "Trust Signal Matrix",
@@ -191,7 +192,7 @@ export default function RootLayout({
         <noscript>
           <div style={{ padding: "2rem", textAlign: "center", fontFamily: "system-ui, sans-serif" }}>
             <h1>UXLens — AI-Powered UX Audit Tool</h1>
-            <p>Analyze any landing page with our 9-layer UX diagnostic. Get conversion killers, trust signal analysis, confusion detection, and actionable fixes.</p>
+            <p>Analyze any landing page with our 10-layer UX diagnostic. Get heuristic evaluation, conversion killers, trust signal analysis, confusion detection, and actionable fixes.</p>
             <p>Please enable JavaScript to use UXLens.</p>
           </div>
         </noscript>

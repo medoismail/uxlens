@@ -13,6 +13,7 @@ const PIPELINE_STEPS = [
   { num: "07", name: "First-Screen Hypothesis", desc: "Simulating above-the-fold clarity for cold-traffic visitors" },
   { num: "08", name: "Self-Critique Refinement", desc: "Challenging initial findings & eliminating false positives" },
   { num: "09", name: "Synthesis & Rewrite Engine", desc: "Generating actionable priorities & optimized copy rewrites" },
+  { num: "10", name: "Heuristic Evaluation", desc: "Scoring 10 Nielsen usability heuristics with issues & passes" },
 ];
 
 export function LoadingState() {
@@ -40,7 +41,7 @@ export function LoadingState() {
 
       <h2 className="text-lg font-semibold tracking-tight text-foreground mb-1">Analyzing your page</h2>
       <p className="text-[12px] text-foreground/40 font-mono mb-8">
-        9-layer structured audit — usually takes 15-25 seconds
+        10-layer structured audit — usually takes 15-25 seconds
       </p>
 
       {/* Pipeline steps */}

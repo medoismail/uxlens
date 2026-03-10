@@ -574,7 +574,7 @@ export function ProductPreviewMock() {
             {/* Report header */}
             <div className="text-center mb-2">
               <p className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/25 mb-1">
-                9-Layer UX Audit Report
+                10-Layer UX Audit Report
               </p>
               <p className="text-[14px] font-semibold text-foreground">
                 demo-landing-page.com

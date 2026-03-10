@@ -7,7 +7,7 @@ function getClient() {
 }
 
 /**
- * 9-Layer Diagnostic Engine system prompt.
+ * 10-Layer Diagnostic Engine system prompt.
  * Simulates a multi-stage audit pipeline:
  * 1. Structural Decomposition
  * 2. Message Clarity Analysis
@@ -18,17 +18,20 @@ function getClient() {
  * 7. First-Screen Hypothesis
  * 8. Self-Critique Refinement
  * 9. Synthesis & Rewrite Engine
+ * 10. Nielsen's Heuristic Evaluation
  */
-const SYSTEM_PROMPT = `You are UXLens — the world's most rigorous AI-powered UX diagnostic engine. You conduct structured, multi-layer landing page audits with the precision of a senior conversion rate optimization specialist combined with a cognitive psychologist and a direct-response copywriter.
+const SYSTEM_PROMPT = `You are UXLens — the world's most rigorous AI-powered UX diagnostic engine. You conduct structured, multi-layer landing page audits with the precision of a senior conversion rate optimization specialist combined with a cognitive psychologist, a direct-response copywriter, and a professional UX auditor.
 
-Your diagnostic process runs in 9 sequential layers. You must complete ALL layers and return a single structured JSON report.
+Your diagnostic process runs in 10 sequential layers. You must complete ALL layers and return a single structured JSON report.
+
+You are also a senior UX auditor performing a professional UX audit. For each finding, you MUST provide: severity (low/medium/high/critical), a professional UX category, why it matters, and a recommended fix. This produces consultancy-grade output.
 
 Do NOT invent missing information. Do NOT produce generic UX advice. Every finding must cite specific evidence from the provided content. Return STRICT JSON only.
 
 CRITICAL LANGUAGE RULE: If the page content is in a non-English language (detected from the lang attribute or the actual content), you MUST provide ALL analysis, findings, recommendations, rewrites, executive summary, and every text value in that SAME language. JSON keys must stay in English (they are part of the schema), but ALL string values must be in the website's language. If the page is in Arabic, respond in Arabic. If in French, respond in French. Only use English if the page is in English or if the language cannot be determined.`;
 
 function buildUserPrompt(content: ExtractedContent): string {
-  return `Analyze this landing page using the full 9-Layer Diagnostic Algorithm, then return only the final output as JSON.
+  return `Analyze this landing page using the full 10-Layer Diagnostic Algorithm, then return only the final output as JSON.
 
 ═══════════════════════════════════════════
 LANDING PAGE CONTENT TO AUDIT:
@@ -64,7 +67,7 @@ ${content.bodyText || "(none)"}
 ═══════════════════════════════════════════
 
 ═══════════════════════════════════════════
-THE 9-LAYER DIAGNOSTIC ALGORITHM
+THE 10-LAYER DIAGNOSTIC ALGORITHM
 ═══════════════════════════════════════════
 
 LAYER 1 — STRUCTURAL DECOMPOSITION
@@ -158,6 +161,37 @@ Generate:
 
    Every rewrite must reference specific content from the page — no generic advice.
 
+LAYER 10 — NIELSEN'S HEURISTIC EVALUATION
+Evaluate the page against all 10 of Jakob Nielsen's usability heuristics. For each heuristic, provide:
+- A score from 0 (severe violation) to 10 (excellent compliance)
+- 1-3 specific issues found (cite evidence from the page content)
+- 0-2 things the page does well for this heuristic
+
+The 10 heuristics:
+1. Visibility of System Status (id: "visibility") — Does the page communicate what's happening? Loading indicators, progress states, action feedback?
+2. Match Between System and Real World (id: "match") — Does the language match the user's mental model? Familiar metaphors and terms?
+3. User Control & Freedom (id: "control") — Can users undo, go back, or escape? Clear exit points and navigation?
+4. Consistency & Standards (id: "consistency") — Does the page follow platform conventions? Consistent terminology and UI patterns?
+5. Error Prevention (id: "error-prevention") — Does the design prevent mistakes? Good form validation and input constraints?
+6. Recognition Rather Than Recall (id: "recognition") — Is information visible when needed? Minimal memory load?
+7. Flexibility & Efficiency of Use (id: "flexibility") — Shortcuts for power users? Efficient for both novice and expert?
+8. Aesthetic & Minimalist Design (id: "aesthetic") — Is irrelevant information minimized? Clean, focused visual design?
+9. Help Users Recognize, Diagnose, and Recover from Errors (id: "error-recovery") — Clear, constructive error messages? Solution-oriented guidance?
+10. Help & Documentation (id: "help") — Is help available if needed? Easy to find and task-focused?
+
+Score 5 = adequate, below 5 = problems found, above 7 = good, 10 = exceptional. Be critical but fair.
+
+Also identify 3-5 UX Strengths — positive UX decisions the page makes well. These are things the page does RIGHT.
+
+PROFESSIONAL UX AUDIT CATEGORIES — For EACH finding in every section, you MUST assign these additional fields:
+- "severity": "low" | "medium" | "high" | "critical" — how severe is this issue?
+- "category": one of these professional audit categories:
+  Information Hierarchy, UX Microcopy & Messaging, CTA Clarity, Visual Hierarchy,
+  Interaction & Feedback, Navigation & Flow, Trust & Credibility Signals,
+  Accessibility, Conversion Optimization, Performance & Loading UX, Consistency & Design System
+- "whyItMatters": 1 sentence explaining the UX impact of this issue
+- "recommendedFix": 1-2 sentence actionable fix recommendation
+
 ═══════════════════════════════════════════
 OUTPUT INSTRUCTIONS
 ═══════════════════════════════════════════
@@ -188,7 +222,7 @@ The JSON structure must be exactly:
       "score": <0-100>,
       "subtitle": <string>,
       "findings": [
-        { "type": <"issue"|"warning"|"positive">, "title": <string>, "desc": <string>, "impact": <"high"|"medium"|"low"> }
+        { "type": <"issue"|"warning"|"positive">, "title": <string>, "desc": <string>, "impact": <"high"|"medium"|"low">, "severity": <"low"|"medium"|"high"|"critical">, "category": <string: professional UX audit category>, "whyItMatters": <string: 1 sentence UX impact>, "recommendedFix": <string: actionable fix> }
       ],
       "recommendations": [<string>, <string>],
       "rewrite": {
@@ -296,7 +330,23 @@ The JSON structure must be exactly:
     "afterSubheadline": <string: optimized subheadline>,
     "afterCTA": <string: optimized CTA>,
     "rewriteRationale": <string: why the rewrite is better>
-  }
+  },
+  "heuristicEvaluation": {
+    "heuristics": [
+      { "id": "visibility", "name": "Visibility of System Status", "score": <0-10>, "issues": ["<specific issue>"], "passes": ["<what works>"] },
+      { "id": "match", "name": "Match Between System and Real World", "score": <0-10>, "issues": ["..."], "passes": ["..."] },
+      { "id": "control", "name": "User Control & Freedom", "score": <0-10>, "issues": ["..."], "passes": ["..."] },
+      { "id": "consistency", "name": "Consistency & Standards", "score": <0-10>, "issues": ["..."], "passes": ["..."] },
+      { "id": "error-prevention", "name": "Error Prevention", "score": <0-10>, "issues": ["..."], "passes": ["..."] },
+      { "id": "recognition", "name": "Recognition Rather Than Recall", "score": <0-10>, "issues": ["..."], "passes": ["..."] },
+      { "id": "flexibility", "name": "Flexibility & Efficiency of Use", "score": <0-10>, "issues": ["..."], "passes": ["..."] },
+      { "id": "aesthetic", "name": "Aesthetic & Minimalist Design", "score": <0-10>, "issues": ["..."], "passes": ["..."] },
+      { "id": "error-recovery", "name": "Error Recovery", "score": <0-10>, "issues": ["..."], "passes": ["..."] },
+      { "id": "help", "name": "Help & Documentation", "score": <0-10>, "issues": ["..."], "passes": ["..."] }
+    ],
+    "overallHeuristicScore": <0-10, average of all 10 heuristic scores>
+  },
+  "uxStrengths": ["<positive UX decision 1>", "<positive UX decision 2>", "<positive UX decision 3>"]
 }`;
 }
 
@@ -341,7 +391,7 @@ async function withRetry<T>(
 
 /**
  * Send extracted page content to OpenAI and get a structured UX audit
- * using the 9-Layer Diagnostic Engine.
+ * using the 10-Layer Diagnostic Engine.
  * Retries up to 2 times on transient failures (rate limits, server errors).
  */
 export async function generateUXAudit(
@@ -352,7 +402,7 @@ export async function generateUXAudit(
       model: "gpt-4o",
       response_format: { type: "json_object" },
       temperature: 0.4,
-      max_tokens: 8192,
+      max_tokens: 12288,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: buildUserPrompt(content) },
@@ -371,7 +421,7 @@ export async function generateUXAudit(
 }
 
 /* ─────────────────────────────────────────────────────────
-   AI Vision: Heatmap + Visual Analysis (Diagnostic Engine v4)
+   AI Vision: Heatmap + Visual Analysis (Diagnostic Engine v5)
    ───────────────────────────────────────────────────────── */
 
 /**

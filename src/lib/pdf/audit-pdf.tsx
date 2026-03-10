@@ -69,6 +69,19 @@ function scoreColorStr(s: number): string {
   return "#ef4444";
 }
 
+function heuristicColorStr(s: number): string {
+  if (s >= 7) return "#22c55e";
+  if (s >= 4) return "#eab308";
+  return "#ef4444";
+}
+
+const SEVERITY_COLORS: Record<string, string> = {
+  critical: "#dc2626",
+  high: "#ef4444",
+  medium: "#eab308",
+  low: "#3b82f6",
+};
+
 function PageFooter() {
   return (
     <View style={styles.footer} fixed>
@@ -106,7 +119,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
         <View style={styles.header}>
           <View>
             <Text style={styles.logo}>UXLens</Text>
-            <Text style={styles.subtitle}>Diagnostic Engine v4 — Full UX Report</Text>
+            <Text style={styles.subtitle}>Diagnostic Engine v5 — Full UX Report</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
             <Text style={{ fontSize: 10, fontFamily: "NotoSans", fontWeight: 700 }}>{domain}</Text>
@@ -165,6 +178,19 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
             <Text style={styles.bulletText}>{f}</Text>
           </View>
         ))}
+
+        {/* UX Strengths */}
+        {data.uxStrengths && data.uxStrengths.length > 0 && (
+          <>
+            <Text style={styles.sectionTitle}>UX Strengths</Text>
+            {data.uxStrengths.map((s, i) => (
+              <View key={i} style={styles.bulletItem}>
+                <Text style={[styles.bullet, { color: "#22c55e" }]}>✓</Text>
+                <Text style={styles.bulletText}>{s}</Text>
+              </View>
+            ))}
+          </>
+        )}
 
         <PageFooter />
       </Page>
@@ -255,10 +281,22 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
             </Text>
             {section.findings.slice(0, 3).map((finding, fi) => (
               <View key={fi} style={styles.findingBox}>
-                <Text style={styles.findingTitle}>
-                  {finding.type === "issue" ? "⚠" : finding.type === "positive" ? "✓" : "!"} {finding.title}
-                </Text>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 2 }}>
+                  <Text style={styles.findingTitle}>
+                    {finding.type === "issue" ? "⚠" : finding.type === "positive" ? "✓" : "!"} {finding.title}
+                  </Text>
+                  {finding.severity && (
+                    <Text style={{ fontSize: 7, fontFamily: "NotoSans", fontWeight: 700, color: SEVERITY_COLORS[finding.severity] || "#888", textTransform: "uppercase" }}>
+                      {finding.severity}
+                    </Text>
+                  )}
+                </View>
                 <Text style={styles.findingDesc}>{finding.desc}</Text>
+                {finding.recommendedFix && (
+                  <Text style={{ fontSize: 8, color: "#22c55e", marginTop: 3, lineHeight: 1.4 }}>
+                    Fix: {finding.recommendedFix}
+                  </Text>
+                )}
               </View>
             ))}
             {section.recommendations.length > 0 && (
@@ -350,6 +388,44 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
 
         <PageFooter />
       </Page>
+
+      {/* Heuristic Evaluation Page */}
+      {data.heuristicEvaluation && data.heuristicEvaluation.heuristics.length > 0 && (
+        <Page size="A4" style={styles.page} wrap>
+          <View style={styles.header} fixed>
+            <Text style={styles.logo}>UXLens</Text>
+            <Text style={{ fontSize: 9, color: "#888" }}>{domain} — Heuristic Evaluation</Text>
+          </View>
+
+          <Text style={styles.sectionTitle}>
+            Nielsen&apos;s Heuristic Evaluation — {data.heuristicEvaluation.overallHeuristicScore.toFixed(1)}/10
+          </Text>
+          <Text style={[styles.text, { marginBottom: 12 }]}>
+            Each of Nielsen&apos;s 10 usability heuristics scored 0-10, with detected issues and positive observations.
+          </Text>
+
+          {data.heuristicEvaluation.heuristics.map((h, hi) => (
+            <View key={hi} wrap={false} minPresenceAhead={40} style={{ marginBottom: 10, padding: 8, backgroundColor: "#f9f9fb", borderRadius: 4, borderLeft: `3px solid ${heuristicColorStr(h.score)}` }}>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                <Text style={{ fontSize: 10, fontFamily: "NotoSans", fontWeight: 700, color: "#1a1a2e", flex: 1 }}>{h.name}</Text>
+                <Text style={{ fontSize: 11, fontFamily: "NotoSans", fontWeight: 700, color: heuristicColorStr(h.score) }}>{h.score}/10</Text>
+              </View>
+              {/* Progress bar */}
+              <View style={{ height: 3, backgroundColor: "#e5e7eb", borderRadius: 2, marginBottom: 4 }}>
+                <View style={{ height: 3, backgroundColor: heuristicColorStr(h.score), borderRadius: 2, width: `${(h.score / 10) * 100}%` }} />
+              </View>
+              {h.issues.length > 0 && h.issues.slice(0, 2).map((issue, ii) => (
+                <Text key={ii} style={{ fontSize: 8, color: "#ef4444", lineHeight: 1.4, marginLeft: 4 }}>✕ {issue}</Text>
+              ))}
+              {h.passes.length > 0 && h.passes.slice(0, 1).map((pass, pi) => (
+                <Text key={pi} style={{ fontSize: 8, color: "#22c55e", lineHeight: 1.4, marginLeft: 4 }}>✓ {pass}</Text>
+              ))}
+            </View>
+          ))}
+
+          <PageFooter />
+        </Page>
+      )}
 
       {/* Competitor Analysis Page (Pro+) */}
       {competitorAnalysis && competitorAnalysis.competitors.length > 0 && (

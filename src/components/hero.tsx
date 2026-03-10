@@ -83,7 +83,7 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
         className="animate-slide-up mt-4 text-[13px] leading-relaxed text-foreground/45 max-w-[520px]"
         style={{ animationDelay: "60ms" }}
       >
-        Paste any URL. Get a 9-layer AI audit with attention heatmaps,
+        Paste any URL. Get a 10-layer AI audit with heuristic evaluation, attention heatmaps,
         conversion killers, and an AI-rewritten hero — in under 30 seconds.
       </p>
 
@@ -101,9 +101,9 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
         style={{ animationDelay: "250ms" }}
       >
         {[
-          "9 LAYERS",
+          "10 LAYERS",
+          "HEURISTIC EVAL",
           "ATTENTION HEATMAP",
-          "CONTRADICTION SCAN",
           "AI CHAT",
           "PDF EXPORT",
         ].map((badge) => (
