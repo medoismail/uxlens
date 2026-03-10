@@ -4,11 +4,10 @@ import { useState, useEffect, useCallback } from "react";
 import { UrlForm } from "@/components/url-form";
 
 const ROTATING_WORDS = [
-  "conversion killer",
-  "missed opportunity",
-  "broken promise",
-  "trust gap",
-  "UX blind spot",
+  "in 30 seconds",
+  "with AI precision",
+  "before users leave",
+  "at every layer",
 ];
 
 const ROTATE_INTERVAL = 2800;
@@ -72,20 +71,20 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
       </div>
 
       {/* Headline — 2 lines + rotating word on line 3 */}
-      <h1 className="animate-slide-up text-[clamp(34px,5.5vw,56px)] font-bold tracking-[-1.5px] leading-[1.15] max-w-[720px] text-foreground">
-        AI-Powered UX Audits
+      <h1 className="animate-slide-up text-[clamp(34px,5.5vw,56px)] font-bold tracking-[-1.5px] leading-[1.15] max-w-[780px] text-foreground">
+        Your Page Is Losing Conversions
         <br />
-        in Seconds — Find Every
+        Find Out Why
         <RotatingText />
       </h1>
 
       {/* Subheadline */}
       <p
-        className="animate-slide-up mt-4 text-[12px] leading-relaxed text-foreground/45 max-w-[520px] font-mono"
+        className="animate-slide-up mt-4 text-[13px] leading-relaxed text-foreground/45 max-w-[520px]"
         style={{ animationDelay: "60ms" }}
       >
-        9-layer AI diagnostic with attention heatmaps, trust analysis, and
-        actionable fixes. Save every audit and export as PDF.
+        Paste any URL. Get a 9-layer AI audit with attention heatmaps,
+        conversion killers, and an AI-rewritten hero — in under 30 seconds.
       </p>
 
       {/* Form */}

@@ -378,3 +378,10 @@
 .score-high { color: var(--score-high); }
 .score-mid  { color: var(--score-mid); }
 .score-low  { color: var(--score-low); }
+
+/* Landing page mock utilities */
+@media (min-width: 1024px) {
+  .perspective-tilt {
+    transform: perspective(1200px) rotateX(2deg);
+  }
+}

@@ -1,165 +1,222 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  Layers,
-  ShieldCheck,
-  Brain,
-  Gauge,
-  MousePointerClick,
-  ScanEye,
-  LayoutGrid,
-  FileText,
-  Smartphone,
   ArrowRight,
   Target,
   Users,
   Briefcase,
   PenTool,
-  Camera,
-  BarChart3,
-  MessageSquare,
-  Download,
-  History,
-  LogIn,
+  Zap,
+  Shield,
+  Check,
 } from "lucide-react";
+import {
+  ProductPreviewMock,
+  HeatmapMock,
+  ChatMock,
+  CompetitorMock,
+  RewriteMock,
+  FeatureSection,
+} from "@/components/landing-mocks";
+
+/* ── Social Proof Bar ── */
+
+function SocialProofBar() {
+  const [count, setCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const c = new AbortController();
+    fetch("/api/views", { method: "POST", signal: c.signal })
+      .then((r) => r.json())
+      .then((d) => {
+        if (typeof d.count === "number") setCount(d.count);
+      })
+      .catch(() => {});
+    return () => c.abort();
+  }, []);
+
+  return (
+    <div
+      className="border-y py-4"
+      style={{ borderColor: "var(--border)" }}
+    >
+      <div className="max-w-[960px] mx-auto px-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[12px] text-foreground/35">
+        {count !== null && (
+          <span className="flex items-center gap-1.5 font-medium text-foreground/50">
+            <Users className="h-3.5 w-3.5" />
+            {count.toLocaleString()}+ audits completed
+          </span>
+        )}
+        <span className="flex items-center gap-1.5">
+          <Zap className="h-3 w-3" style={{ color: "var(--brand)" }} />
+          Results in under 30 seconds
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Shield className="h-3 w-3" style={{ color: "var(--score-high)" }} />
+          Free to start — no credit card
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ── Section Divider ── */
+
+function Divider({ label }: { label: string }) {
+  return (
+    <div className="max-w-[960px] mx-auto px-7">
+      <div className="flex items-center gap-4 text-foreground/15 text-[12px] uppercase tracking-[2px]">
+        <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+        {label}
+        <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+      </div>
+    </div>
+  );
+}
+
+/* ── How It Works ── */
 
 const STEPS = [
   {
     num: "01",
-    title: "Paste any website URL",
-    desc: "Enter any landing page or website URL into the UXLens analysis tool. No account needed for your first audit — or sign in with Google or GitHub to save every report to your personal dashboard.",
+    title: "Paste any URL",
+    desc: "Drop in a landing page URL. No signup needed for your first audit — just paste and go.",
   },
   {
     num: "02",
-    title: "AI runs a 9-layer audit with screenshot",
-    desc: "Our diagnostic engine captures a full-page screenshot with attention heatmap, then analyzes every reason your page might fail to convert — examining conversion architecture, trust signals, confusion patterns, cognitive load, and five additional critical UX layers.",
+    title: "AI audits 9 layers in 30 seconds",
+    desc: "Our engine captures a screenshot, generates an attention heatmap, and runs your page through 9 diagnostic layers with self-critique.",
   },
   {
     num: "03",
-    title: "Get your full report with fixes",
-    desc: "Receive a prioritized report with heatmap visualization, conversion killers, trust matrix, and actionable recommendations. Export as PDF, discuss findings with the AI chat assistant, or revisit any audit from your dashboard.",
+    title: "Get your report with fixes",
+    desc: "Prioritized conversion killers, trust scores, an AI-rewritten hero section, and a PDF you can share with your team.",
   },
 ];
 
-const PLATFORM_FEATURES = [
-  {
-    icon: Camera,
-    title: "Screenshot + Attention Heatmap",
-    desc: "Every audit captures a full-page screenshot overlaid with an AI-generated attention heatmap. See exactly where visitors focus — based on F-pattern analysis, CTA placement, and visual hierarchy.",
-    tier: "All plans",
-  },
-  {
-    icon: History,
-    title: "Audit History Dashboard",
-    desc: "Every audit you run is saved to your personal dashboard. Revisit past reports anytime, track improvements over time, and compare audits across different pages.",
-    tier: "All plans",
-  },
-  {
-    icon: BarChart3,
-    title: "Strategic Fixes & Hero Rewrite",
-    desc: "Go beyond diagnostics. Get strategic fixes prioritized by impact, and an AI-optimized rewrite of your hero section — headline, subheadline, and CTA — ready to copy and deploy.",
-    tier: "Starter+",
-  },
-  {
-    icon: Download,
-    title: "PDF Export",
-    desc: "Download your complete audit report as a professionally formatted PDF. Share with your team, attach to client deliverables, or archive for your records.",
-    tier: "Starter+",
-  },
-  {
-    icon: MessageSquare,
-    title: "AI Chat Assistant",
-    desc: "Discuss your audit findings in real-time with an AI assistant that knows your page inside out. Ask follow-up questions, get implementation guidance, or brainstorm improvements.",
-    tier: "Pro+",
-  },
-  {
-    icon: LogIn,
-    title: "Google & GitHub Sign-In",
-    desc: "Create your account in seconds with Google or GitHub. All your audits, chat history, and exports are tied to your account and accessible from any device.",
-    tier: "All plans",
-  },
-];
-
-const LAYERS = [
-  { icon: MousePointerClick, title: "Conversion Architecture", desc: "Find every element that guides or blocks visitors from taking action. This analysis identifies drop-off points, friction areas, and conversion path failures on your page." },
-  { icon: ShieldCheck, title: "Trust Signal Matrix", desc: "Audit the credibility indicators that build or break user confidence. From social proof to security badges, find reasons visitors hesitate to convert." },
-  { icon: ScanEye, title: "Confusion Detection", desc: "Detect mixed signals, contradictory messaging, and unclear navigation that creates cognitive friction and causes user hesitation on your website." },
-  { icon: Brain, title: "Cognitive Load Score", desc: "Measure the mental effort required to process your page content and make a decision. High cognitive load is a top reason pages fail to convert." },
-  { icon: Layers, title: "Hero Effectiveness", desc: "Analyze first-screen impact, value proposition clarity, and above-fold engagement. The hero section is where most conversion failures begin." },
-  { icon: LayoutGrid, title: "Visual Hierarchy", desc: "Evaluate layout flow, attention distribution, and information architecture patterns across your entire website page design." },
-  { icon: Gauge, title: "CTA Optimization", desc: "Audit call-to-action placement, copy strength, and conversion potential. A weak CTA is one of the top reasons landing pages fail to convert." },
-  { icon: FileText, title: "Content Clarity", desc: "Analyze message coherence, readability, and alignment between your promise and proof. Unclear content is a conversion killer on any website." },
-  { icon: Smartphone, title: "Mobile Experience", desc: "Evaluate responsive design quality, touch target sizing, and mobile-specific UX issues that cause visitors to abandon your page on mobile devices." },
-];
+/* ── Who Is It For ── */
 
 const USE_CASES = [
   {
     icon: Target,
     title: "Startup Founders",
-    desc: "Find every conversion issue before your next launch. Get a screenshot heatmap showing where visitors focus, pinpoint conversion killers, and fix what fails to convert — before spending on ads.",
+    desc: "Find every conversion barrier before spending on ads. Get a heatmap showing where visitors look, and fixes prioritized by impact.",
   },
   {
     icon: PenTool,
     title: "UX Designers & Freelancers",
-    desc: "Run professional UX audits for every client project. Export polished PDF reports, discuss findings with the AI assistant, and save every audit to your dashboard for easy access.",
+    desc: "Run professional audits for client projects in seconds. Export polished PDF reports and discuss findings with the AI assistant.",
   },
   {
     icon: Briefcase,
-    title: "Marketing Teams & Agencies",
-    desc: "Audit landing pages at scale with your team. Track all audits in a shared dashboard, export PDF reports for client presentations, and use AI chat to brainstorm optimization strategies.",
+    title: "Marketing Teams",
+    desc: "Audit landing pages at scale. Track all audits on a shared dashboard, benchmark against competitors, and optimize conversion rates.",
   },
   {
     icon: Users,
     title: "Product Managers",
-    desc: "Get data-driven UX insights without waiting for a full research cycle. Visualize attention patterns with heatmaps, identify high-impact fixes, and share PDF reports with stakeholders.",
+    desc: "Get data-driven UX insights without waiting for research. Visualize attention patterns and share PDF reports with stakeholders.",
   },
 ];
 
+/* ── Pricing Preview ── */
+
+const PLANS = [
+  {
+    name: "Free",
+    price: "$0",
+    audits: "5 audits / month",
+    features: ["Full 9-layer scores", "Attention heatmap", "Conversion killers", "Audit dashboard"],
+    popular: false,
+  },
+  {
+    name: "Starter",
+    price: "$12",
+    audits: "50 audits / month",
+    features: ["Everything in Free", "Strategic fixes", "AI hero rewrite", "PDF export"],
+    popular: false,
+  },
+  {
+    name: "Pro",
+    price: "$29",
+    audits: "200 audits / month",
+    features: ["Everything in Starter", "AI chat assistant", "Competitor analysis", "Priority queue"],
+    popular: true,
+  },
+];
+
+/* ── FAQ ── */
+
 const FAQS = [
   {
-    q: "What is a UX audit and why does it matter for conversion?",
-    a: "A UX audit is a systematic evaluation of your website's user experience that helps you find every reason visitors fail to convert. It identifies usability issues, conversion barriers, trust gaps, and areas where users struggle or abandon your page. UXLens automates this with a 9-layer AI diagnostic, attention heatmap, and actionable recommendations — delivering results in seconds rather than days.",
+    q: "What is a UX audit and why does it matter?",
+    a: "A UX audit identifies usability issues, conversion barriers, and trust gaps on your website. UXLens automates this with a 9-layer AI diagnostic — delivering results in seconds instead of days.",
   },
   {
-    q: "How does the AI-powered website analysis work?",
-    a: "UXLens captures a full-page screenshot of your URL, generates an attention heatmap from the page layout, then runs the content through 9 specialized audit layers with a self-critique loop to catch contradictions. The result is a comprehensive report with scores, conversion killers, trust matrix, confusion map, and AI-optimized copy suggestions — all generated in under 30 seconds.",
+    q: "How does the AI analysis work?",
+    a: "UXLens captures a full-page screenshot, generates an attention heatmap, then runs your content through 9 specialized audit layers with a self-critique loop. You get scores, conversion killers, and actionable fixes in under 30 seconds.",
   },
   {
-    q: "Is UXLens free to use as a UX audit tool?",
-    a: "Yes! The free plan includes 5 audits per month with full scores, screenshot heatmaps, all conversion killers, quick wins, trust matrix, confusion map, and a personal audit dashboard. Paid plans unlock strategic fixes, AI hero rewrites, PDF export, and an AI chat assistant for discussing your audit findings.",
+    q: "Is it really free?",
+    a: "Yes. The free plan includes 5 audits per month with full scores, heatmaps, conversion killers, and a personal dashboard. Paid plans unlock strategic fixes, PDF export, AI chat, and competitor analysis.",
   },
   {
     q: "What does the attention heatmap show?",
-    a: "The attention heatmap overlays your page screenshot with color-coded zones showing where visitors are most likely to focus. It uses F-pattern reading analysis, CTA detection, headline placement, and visual weight to predict attention distribution — helping you see if your key messages and buttons are in the right spots.",
+    a: "The heatmap overlays your screenshot with color-coded zones showing where visitors are most likely to focus — based on F-pattern analysis, CTA placement, and visual hierarchy.",
   },
   {
-    q: "Can I save and revisit my audit reports?",
-    a: "Yes. Sign in with Google or GitHub and every audit is automatically saved to your personal dashboard. You can revisit any past report, view the full analysis with heatmap, and track how your pages improve over time. Paid plans also let you export any report as a PDF.",
+    q: "Can I save and share my reports?",
+    a: "Yes. Sign in with Google or GitHub and every audit is saved to your dashboard. Paid plans let you export any report as a professionally formatted PDF.",
   },
   {
-    q: "What makes UXLens different from other website audit tools?",
-    a: "UXLens combines visual analysis (screenshot heatmaps) with a structured 9-layer AI diagnostic and built-in self-critique. Each audit delivers specific fixes tailored to your page, not generic advice. Plus, with a dashboard, PDF export, and AI chat assistant, it is a complete UX audit platform rather than a one-off analysis tool.",
+    q: "What makes UXLens different?",
+    a: "UXLens combines visual analysis (heatmaps) with a structured 9-layer AI diagnostic and built-in self-critique. Each audit delivers fixes tailored to your page — not generic advice. Plus dashboard, PDF export, and AI chat make it a complete platform.",
   },
 ];
+
+/* ────────────────────────────────────────────── */
+/* ── Main Component ── */
+/* ────────────────────────────────────────────── */
 
 export function HomeSEOContent() {
   return (
     <div className="relative z-[1]">
-      {/* How It Works */}
-      <section className="max-w-[960px] mx-auto px-7 pt-8 pb-16">
-        <div className="flex items-center gap-4 mb-10 text-foreground/15 text-[12px] uppercase tracking-[2px]">
-          <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
-          How it works
-          <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+      {/* ── Social Proof ── */}
+      <SocialProofBar />
+
+      {/* ── Product Preview (the big visual hero) ── */}
+      <section className="max-w-[960px] mx-auto px-7 pt-12 pb-16">
+        <div className="text-center mb-8">
+          <p className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/25 mb-2">
+            Sample Audit Report
+          </p>
+          <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
+            See exactly what you get
+          </h2>
+          <p className="mt-2 text-[13px] text-foreground/40 max-w-md mx-auto leading-relaxed">
+            Every audit delivers a comprehensive report with scores, heatmaps,
+            conversion killers, and actionable fixes.
+          </p>
         </div>
 
+        <ProductPreviewMock />
+      </section>
+
+      {/* ── How It Works ── */}
+      <Divider label="How it works" />
+
+      <section className="max-w-[960px] mx-auto px-7 py-12 sm:py-16">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {STEPS.map((step) => (
             <div key={step.num} className="space-y-3">
               <span
                 className="inline-block text-[12px] font-mono font-bold px-2 py-0.5 rounded"
-                style={{ background: "var(--brand-dim)", color: "var(--brand)" }}
+                style={{
+                  background: "var(--brand-dim)",
+                  color: "var(--brand)",
+                }}
               >
                 {step.num}
               </span>
@@ -174,82 +231,186 @@ export function HomeSEOContent() {
         </div>
       </section>
 
-      {/* Platform Features */}
-      <section className="max-w-[960px] mx-auto px-7 pb-16">
-        <div className="text-center mb-10">
-          <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
-            A complete UX audit platform
-          </h2>
-          <p className="mt-2 text-[12px] text-foreground/40 max-w-lg mx-auto leading-relaxed">
-            More than a one-off analysis tool. Screenshot heatmaps, a personal dashboard, PDF reports, and an AI chat assistant to discuss your findings.
-          </p>
-        </div>
+      {/* ── Feature Sections (alternating layout) ── */}
+      <Divider label="Features" />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {PLATFORM_FEATURES.map((feat) => (
-            <div
-              key={feat.title}
-              className="rounded-xl border p-5 transition-all duration-200 hover:shadow-elevation-1"
-              style={{ borderColor: "var(--border)", background: "var(--s1)" }}
-            >
-              <div className="flex items-center gap-2.5 mb-3">
-                <feat.icon className="h-4 w-4" style={{ color: "var(--brand)" }} />
+      {/* Feature 1: Heatmap */}
+      <FeatureSection
+        label="Visual Analysis"
+        headline="See where visitors actually look"
+        description="Every audit generates an attention heatmap overlay on your real screenshot. Know instantly if your CTA, headline, and value proposition are visible — or getting ignored."
+        bullets={[
+          "F-pattern reading analysis",
+          "CTA visibility scoring",
+          "Visual hierarchy mapping",
+        ]}
+      >
+        <HeatmapMock />
+      </FeatureSection>
+
+      {/* Feature 2: Score + Categories */}
+      <FeatureSection
+        label="9-Layer Diagnostic"
+        headline="One score. Six dimensions. Zero guesswork."
+        description="Your page gets a single UX score broken down across six critical dimensions. Each category shows exactly where you're strong and where you're bleeding conversions."
+        bullets={[
+          "Message Clarity & Cognitive Load",
+          "Trust Signals & Contradictions",
+          "Conversion Architecture & First Screen",
+        ]}
+        reversed
+      >
+        <div className="space-y-4">
+          {/* Mini score ring */}
+          <div
+            className="flex items-center gap-4 rounded-xl border p-4"
+            style={{
+              background: "var(--s1)",
+              borderColor: "var(--border2)",
+            }}
+          >
+            <div className="relative w-14 h-14 shrink-0">
+              <svg
+                className="-rotate-90 w-full h-full"
+                viewBox="0 0 100 100"
+              >
+                <circle
+                  cx="50" cy="50" r="44" fill="none" strokeWidth="8"
+                  style={{ stroke: "var(--s3)" }}
+                />
+                <circle
+                  cx="50" cy="50" r="44" fill="none"
+                  strokeWidth="8" strokeLinecap="round"
+                  strokeDasharray={2 * Math.PI * 44}
+                  strokeDashoffset={
+                    2 * Math.PI * 44 - (82 / 100) * 2 * Math.PI * 44
+                  }
+                  className="animate-ring-fill"
+                  style={{
+                    stroke: "var(--score-high)",
+                    "--ring-circumference": 2 * Math.PI * 44,
+                    "--ring-offset":
+                      2 * Math.PI * 44 - (82 / 100) * 2 * Math.PI * 44,
+                  } as React.CSSProperties}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
                 <span
-                  className="text-[12px] font-mono px-1.5 py-0.5 rounded tracking-wide"
-                  style={{ color: "var(--brand)", background: "var(--brand-dim)", fontSize: "10px" }}
+                  className="text-[18px] font-bold tabular-nums"
+                  style={{ color: "var(--score-high)" }}
                 >
-                  {feat.tier}
+                  82
                 </span>
               </div>
-              <h3 className="text-[13px] font-semibold text-foreground mb-1.5">
-                {feat.title}
-              </h3>
-              <p className="text-[12px] text-foreground/35 leading-relaxed">
-                {feat.desc}
+            </div>
+            <div>
+              <p className="text-[13px] font-semibold text-foreground">
+                Overall UX Score
+              </p>
+              <p className="text-[11px] text-foreground/40">
+                Across 6 diagnostic categories
               </p>
             </div>
-          ))}
+          </div>
+          {/* Category bars */}
+          <div className="space-y-2.5">
+            {[
+              { label: "Message Clarity", score: 88, color: "var(--brand)" },
+              { label: "Cognitive Load", score: 72, color: "var(--accent-blue)" },
+              { label: "Conversion Arch.", score: 79, color: "var(--accent-purple)" },
+              { label: "Trust Signals", score: 70, color: "var(--score-high)" },
+              { label: "Contradictions", score: 85, color: "var(--score-low)" },
+              { label: "First Screen", score: 76, color: "var(--brand-strong)" },
+            ].map((cat) => (
+              <div key={cat.label} className="flex items-center gap-3">
+                <span className="text-[11px] text-foreground/40 w-28 shrink-0">
+                  {cat.label}
+                </span>
+                <div
+                  className="flex-1 h-[5px] rounded-full overflow-hidden"
+                  style={{ background: "var(--s3)" }}
+                >
+                  <div
+                    className="h-full rounded-full animate-bar-width"
+                    style={{
+                      background: cat.color,
+                      width: `${cat.score}%`,
+                      "--bar-width": `${cat.score}%`,
+                    } as React.CSSProperties}
+                  />
+                </div>
+                <span
+                  className="text-[12px] font-mono font-bold w-7 text-right"
+                  style={{ color: cat.color }}
+                >
+                  {cat.score}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-      </section>
+      </FeatureSection>
 
-      {/* 9 Diagnostic Layers */}
-      <section className="max-w-[960px] mx-auto px-7 pb-16">
-        <div className="text-center mb-10">
+      {/* Feature 3: AI Chat */}
+      <FeatureSection
+        label="AI Assistant"
+        headline="Ask AI anything about your results"
+        description="The AI chat knows your page inside out. Ask follow-up questions, get implementation details, or brainstorm copy alternatives — all with full context from your audit."
+        bullets={[
+          "Context-aware answers about your page",
+          "Copy suggestions on demand",
+          "Implementation guidance & prioritization",
+        ]}
+        tier="Pro+"
+      >
+        <ChatMock />
+      </FeatureSection>
+
+      {/* Feature 4: Competitor Analysis */}
+      <FeatureSection
+        label="Competitive Intelligence"
+        headline="Benchmark against your competitors"
+        description="See how your UX stacks up against the two biggest players in your market. Category-by-category scoring reveals exactly where you can overtake them."
+        bullets={[
+          "Auto-detected competitors",
+          "6-category comparison",
+          "Actionable competitive advantages",
+        ]}
+        reversed
+        tier="Pro+"
+      >
+        <CompetitorMock />
+      </FeatureSection>
+
+      {/* ── Before / After Rewrite ── */}
+      <Divider label="AI Copy Optimization" />
+
+      <section className="max-w-[960px] mx-auto px-7 py-12 sm:py-16">
+        <div className="text-center mb-8">
           <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
-            9 layers of instant UX analysis
+            Your hero section, rewritten by AI
           </h2>
-          <p className="mt-2 text-[12px] text-foreground/40 max-w-lg mx-auto leading-relaxed">
-            Every audit runs your page through nine diagnostic layers — the most comprehensive AI-powered website analysis tool available. Find every reason your page fails to convert.
+          <p className="mt-2 text-[13px] text-foreground/40 max-w-lg mx-auto leading-relaxed">
+            UXLens rewrites your headline, subheadline, and CTA based on
+            conversion principles and your page&apos;s specific context. Before and
+            after, side by side.
           </p>
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {LAYERS.map((layer) => (
-            <div
-              key={layer.title}
-              className="rounded-xl border p-4 transition-all duration-200 hover:shadow-elevation-1"
-              style={{ borderColor: "var(--border)", background: "var(--s1)" }}
-            >
-              <layer.icon className="h-4 w-4 mb-3" style={{ color: "var(--brand)" }} />
-              <h3 className="text-[13px] font-semibold text-foreground mb-1">
-                {layer.title}
-              </h3>
-              <p className="text-[12px] text-foreground/35 leading-relaxed">
-                {layer.desc}
-              </p>
-            </div>
-          ))}
-        </div>
+        <RewriteMock />
       </section>
 
-      {/* Who is it for */}
-      <section className="max-w-[960px] mx-auto px-7 pb-16">
+      {/* ── Who Is It For ── */}
+      <Divider label="Built for" />
+
+      <section className="max-w-[960px] mx-auto px-7 py-12 sm:py-16">
         <div className="text-center mb-10">
           <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
             Built for teams that ship
           </h2>
-          <p className="mt-2 text-[12px] text-foreground/40 max-w-lg mx-auto leading-relaxed">
-            Whether you are a solo founder or an agency managing dozens of websites, UXLens gives you heatmaps, AI diagnostics, and a dashboard to find and fix conversion issues fast.
+          <p className="mt-2 text-[13px] text-foreground/40 max-w-lg mx-auto leading-relaxed">
+            Whether you&apos;re a solo founder or an agency managing dozens of
+            clients, UXLens gives you the insights to fix conversion issues
+            fast.
           </p>
         </div>
 
@@ -258,9 +419,15 @@ export function HomeSEOContent() {
             <div
               key={uc.title}
               className="rounded-xl border p-5 transition-all duration-200 hover:shadow-elevation-1"
-              style={{ borderColor: "var(--border)", background: "var(--s1)" }}
+              style={{
+                borderColor: "var(--border)",
+                background: "var(--s1)",
+              }}
             >
-              <uc.icon className="h-4 w-4 mb-3" style={{ color: "var(--brand)" }} />
+              <uc.icon
+                className="h-4 w-4 mb-3"
+                style={{ color: "var(--brand)" }}
+              />
               <h3 className="text-[14px] font-semibold text-foreground mb-1.5">
                 {uc.title}
               </h3>
@@ -272,30 +439,117 @@ export function HomeSEOContent() {
         </div>
       </section>
 
-      {/* CTA banner */}
+      {/* ── Pricing Preview ── */}
+      <Divider label="Pricing" />
+
+      <section className="max-w-[960px] mx-auto px-7 py-12 sm:py-16">
+        <div className="text-center mb-10">
+          <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
+            Simple, transparent pricing
+          </h2>
+          <p className="mt-2 text-[13px] text-foreground/40 max-w-md mx-auto leading-relaxed">
+            Start free. Upgrade when you need more audits and advanced features.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {PLANS.map((plan) => (
+            <div
+              key={plan.name}
+              className="rounded-xl border p-5 relative"
+              style={{
+                borderColor: plan.popular
+                  ? "var(--brand-glow)"
+                  : "var(--border)",
+                background: plan.popular
+                  ? "linear-gradient(135deg, var(--brand-dim), var(--s1))"
+                  : "var(--s1)",
+              }}
+            >
+              {plan.popular && (
+                <span
+                  className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-wide px-2.5 py-0.5 rounded-full"
+                  style={{
+                    background: "var(--brand)",
+                    color: "var(--brand-fg)",
+                  }}
+                >
+                  Popular
+                </span>
+              )}
+              <p className="text-[13px] font-semibold text-foreground mb-1">
+                {plan.name}
+              </p>
+              <p className="text-[28px] font-bold text-foreground tracking-tight">
+                {plan.price}
+                <span className="text-[12px] font-normal text-foreground/35">
+                  /mo
+                </span>
+              </p>
+              <p className="text-[11px] text-foreground/35 mb-4">
+                {plan.audits}
+              </p>
+              <ul className="space-y-2">
+                {plan.features.map((f) => (
+                  <li
+                    key={f}
+                    className="flex items-center gap-2 text-[12px] text-foreground/45"
+                  >
+                    <Check
+                      className="h-3 w-3 shrink-0"
+                      style={{ color: "var(--brand)" }}
+                    />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div className="text-center mt-6">
+          <Link
+            href="/pricing"
+            className="inline-flex items-center gap-1.5 text-[13px] font-medium transition-colors hover:opacity-80"
+            style={{ color: "var(--brand)" }}
+          >
+            Compare all plans
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      </section>
+
+      {/* ── CTA Banner ── */}
       <section className="max-w-[960px] mx-auto px-7 pb-16">
         <div
           className="rounded-xl border p-8 text-center"
-          style={{ background: "var(--brand-dim)", borderColor: "var(--brand-glow)" }}
+          style={{
+            background: "var(--brand-dim)",
+            borderColor: "var(--brand-glow)",
+          }}
         >
           <h2 className="text-[20px] font-bold tracking-tight text-foreground mb-2">
-            Ready to find every reason your page fails to convert?
+            Stop guessing. Start auditing.
           </h2>
-          <p className="text-[12px] text-foreground/40 mb-5 max-w-md mx-auto leading-relaxed">
-            Run your AI-powered UX audit now — get a screenshot heatmap, 9-layer diagnostic, and actionable fixes in under 30 seconds.
+          <p className="text-[13px] text-foreground/40 mb-5 max-w-md mx-auto leading-relaxed">
+            Run your first AI-powered UX audit in 30 seconds. Free, no credit
+            card, no signup required.
           </p>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-[13px] font-bold transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
-            style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
+            style={{
+              background: "var(--brand)",
+              color: "var(--brand-fg)",
+            }}
           >
-            Start Free Website Audit
+            Audit Your Page Now
             <ArrowRight className="h-3.5 w-3.5" />
           </button>
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* ── FAQ ── */}
       <section className="max-w-[960px] mx-auto px-7 pb-20">
         <div className="text-center mb-10">
           <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
@@ -327,8 +581,11 @@ export function HomeSEOContent() {
           ))}
         </div>
 
-        {/* Additional context + external link for SEO */}
-        <div className="max-w-2xl mx-auto mt-10 pt-8" style={{ borderTop: "1px solid var(--border)" }}>
+        {/* SEO context */}
+        <div
+          className="max-w-2xl mx-auto mt-10 pt-8"
+          style={{ borderTop: "1px solid var(--border)" }}
+        >
           <p className="text-[12px] text-foreground/25 leading-relaxed text-center">
             UXLens applies{" "}
             <a
