@@ -71,11 +71,11 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
         </span>
       </div>
 
-      {/* Headline — 3 lines, rotating word isolated on line 3 */}
+      {/* Headline — 2 lines + rotating word on line 3 */}
       <h1 className="animate-slide-up text-[clamp(34px,5.5vw,56px)] font-bold tracking-[-1.5px] leading-[1.15] max-w-[720px] text-foreground">
-        Instant website analysis
+        AI-Powered UX Audits
         <br />
-        to find every
+        in Seconds — Find Every
         <RotatingText />
       </h1>
 
