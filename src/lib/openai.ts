@@ -319,18 +319,15 @@ Score 5 = adequate, below 5 = problems found, above 7 = good, 10 = exceptional. 
 
 Also identify 3-5 UX Strengths — positive UX decisions the page makes well. These are things the page does RIGHT.
 
-PROFESSIONAL UX AUDIT CATEGORIES — For EACH finding in every section, you MUST assign these additional fields:
-- "severity": "low" | "medium" | "high" | "critical" — how severe is this issue?
-- "category": one of these professional audit categories:
-  Information Hierarchy, UX Microcopy & Messaging, CTA Clarity, Visual Hierarchy,
-  Interaction & Feedback, Navigation & Flow, Trust & Credibility Signals,
-  Accessibility, Conversion Optimization, Performance & Loading UX, Consistency & Design System
-- "whyItMatters": 1 sentence explaining the behavioral consequence — not "this is confusing" but "visitors at the evaluation stage need this to justify commitment, and its absence forces them back to comparison-shopping mode"
-- "recommendedFix": 1-2 sentences with a specific, implementable change. Reference the actual element and describe exactly what to change. Good: "Replace 'Get Started' with 'Start Free — No Card Required' to address commitment anxiety at the action stage." Bad: "Improve the CTA."
-- "userExperience": 1-2 sentences narrating the visitor's internal experience at this friction point. Write as their inner monologue: "I see several pricing options but I can't tell which applies to my team size — do I need Pro or Business?" or "The headline mentions 'AI-powered' but doesn't explain what problem it solves for me specifically." Ground this in observable page evidence.
-- "behavioralMechanism": Name the principle AND explain how it operates here. Not just "cognitive fluency violation" but "cognitive fluency violation — the abstract headline requires interpretation, and visitors unconsciously attribute processing difficulty to the product itself." Use terms like: loss aversion, cognitive fluency, credibility gap, specification gap, choice overload, commitment anxiety, attention depletion, signal absence bias, familiarity bias gap, mental model mismatch, construal level mismatch, progressive disclosure violation, Hick's Law, Miller's Law, anchoring absence, social proof vacuum, authority signal gap
-- "journeyStage": Which decision stage this affects — "awareness" (what is this?), "consideration" (is this for me?), "evaluation" (is it worth it?), "conviction" (can I trust it?), "action" (should I act now?). Explain why this issue specifically blocks THAT stage.
-- "frictionCascade": 1-2 sentences tracing the downstream damage. Be specific: "Unclear value prop blocks awareness → visitor never enters consideration → the pricing section, testimonials, and features below are never evaluated against the right frame → effective bounce rate increases even for visitors who scroll." Show the domino effect.
+PROFESSIONAL UX AUDIT CATEGORIES — For EACH finding, include these fields (detailed instructions are in the system prompt):
+- "severity": "low" | "medium" | "high" | "critical"
+- "category": Information Hierarchy | UX Microcopy & Messaging | CTA Clarity | Visual Hierarchy | Interaction & Feedback | Navigation & Flow | Trust & Credibility Signals | Accessibility | Conversion Optimization | Performance & Loading UX | Consistency & Design System
+- "whyItMatters": 1 sentence — behavioral consequence, not label
+- "recommendedFix": specific implementable change referencing the actual element
+- "userExperience": visitor's inner experience at this friction point
+- "behavioralMechanism": principle name + how it operates here
+- "journeyStage": "awareness" | "consideration" | "evaluation" | "conviction" | "action"
+- "frictionCascade": downstream cascade through decision stages
 
 ═══════════════════════════════════════════
 OUTPUT INSTRUCTIONS
@@ -341,24 +338,24 @@ The JSON structure must be exactly:
 {
   "overallScore": <number 0-100>,
   "grade": <string: "Critical", "Poor", "Needs Work", "Decent", "Good", "Strong", "Excellent">,
-  "executiveSummary": <string: 2-3 sentences that read like a senior consultant's verdict. Not "the page has some clarity issues" but "Cold-traffic visitors can identify the product category within 5 seconds but cannot determine the specific outcome or whether it applies to their use case — this awareness-stage gap means the majority of below-fold content is evaluated against an incomplete mental model, reducing the effectiveness of otherwise strong trust signals and pricing.">,
+  "executiveSummary": <string: 2-3 sentences — senior consultant's behavioral verdict, not generic summary>,
   "conversionKillers": [
-    { "title": <string: specific blocker name — not generic like "poor clarity" but specific like "Headline communicates category instead of outcome">, "description": <string: 2-3 sentences explaining what's broken, citing the specific page element, the behavioral mechanism it triggers, and what the visitor experiences as a result. Ground this in observable evidence.>, "affectedVisitors": <string: be specific about which visitors and why — e.g. "First-time visitors from paid channels who arrive with high intent but no brand familiarity — approximately 70% of cold traffic">, "behavioralCascade": <string: trace the full cascade through decision stages — e.g. "Abstract headline blocks awareness (visitor can't form a mental model) → prevents self-qualification at consideration → pricing section is evaluated without value context → visitor defaults to price-comparison mode → bounces to competitor with clearer positioning">, "expectedLift": <string: estimated conversion lift if fixed, grounded in the behavioral change — e.g. "+10-15% first-screen retention by reducing time-to-understand from ~8s to ~2s"> }
+    { "title": <string: specific blocker name>, "description": <string: 2-3 sentences citing evidence + mechanism + visitor experience>, "affectedVisitors": <string: which visitors and why>, "behavioralCascade": <string: trace through decision stages>, "expectedLift": <string: estimated lift if fixed> }
   ],
   "quickWins": [
-    { "text": <string: specific, implementable fix achievable in under 1 hour — not "improve the CTA" but "Change 'Get Started' to 'Start Free Trial — No Credit Card' to make the risk reversal visible at the action point">, "expectedImpact": <string: the specific behavioral shift this creates — e.g. "Removes commitment anxiety at the action stage — visitors who currently hesitate at the CTA because they assume payment is required will now see the zero-risk signal at the exact decision point"> }
+    { "text": <string: specific implementable fix under 1 hour>, "expectedImpact": <string: the behavioral shift this creates> }
   ],
   "strategicFixes": [
-    { "text": <string: fix requiring deeper work — be specific about what needs to change and why, referencing the behavioral principle — e.g. "Restructure the page to follow the visitor's natural question sequence: What is this? → Who is it for? → Why is it better? → Can I trust it? → What does it cost? → What do I do next? Currently, pricing appears before trust signals, asking for commitment before credibility is established.">, "expectedImpact": <string: the behavioral shift at the journey level — e.g. "Aligning page structure with the decision journey means each section builds on the previous one's resolution — visitors arrive at pricing already convinced of value, shifting the decision from 'is this worth it?' to 'which plan fits me?'"> }
+    { "text": <string: deeper fix with behavioral rationale>, "expectedImpact": <string: journey-level behavioral shift> }
   ],
   "flags": [<string: short flag label, max 4>],
   "categories": {
-    "messageClarity":    { "score": <0-100>, "note": <string: 3-4 sentences. (1) Describe what a first-time visitor understands within 5 seconds — cite the specific headline/subheadline and explain what mental model it creates. (2) Identify the gap between what the page communicates and what the visitor needs to know to enter consideration — reference cognitive fluency or specification gap. (3) Explain the behavioral consequence: do visitors decode, misinterpret, or bounce? What does their inner monologue sound like? (4) Prescribe a specific messaging change and explain the behavioral shift it would cause — e.g. "Leading with the outcome rather than the category would cut interpretation time from ~6s to ~2s, keeping visitors in the evaluation path."> },
-    "cognitiveLoad":     { "score": <0-100>, "note": <string: 3-4 sentences. (1) Identify the specific cognitive demands the page places on visitors — count distinct concepts, jargon terms, or decision points visible per viewport. (2) Explain how this density interacts with scanning behavior — cite Miller's Law, Hick's Law, or attention depletion as applicable. (3) Describe what happens in the visitor's experience: do they switch from reading to skimming to skipping? At what point does information stop being processed? (4) Prescribe a specific simplification — e.g. "Reducing the feature grid from 12 to 5 hero features with a 'See all features' expand would keep the page within working memory limits and let visitors evaluate without overwhelm."> },
-    "conversionArch":    { "score": <0-100>, "note": <string: 3-4 sentences. (1) Map the actual conversion pathway: what does a visitor encounter between interest and action? Cite the specific CTAs, their labels, and their positions. (2) Identify where the pathway creates friction — competing CTAs, unclear next steps, premature commitment asks, or missing micro-commitments. Reference Hick's Law or commitment anxiety as applicable. (3) Describe the visitor's decision experience: at what point do they hesitate, and what triggers the hesitation? (4) Prescribe a specific pathway improvement — e.g. "A single primary CTA with the label 'Start Free Trial' above the fold, with secondary actions demoted to text links, would reduce decision points from 4 to 1 and increase click-through probability."> },
-    "trustSignals":      { "score": <0-100>, "note": <string: 3-4 sentences. (1) Inventory what trust evidence is present and what's missing — be specific about social proof count, authority signals, risk reversal, and human identity. (2) Explain how visitors interpret the trust gap — reference signal absence bias: missing proof is not neutral, visitors actively read it as negative evidence. (3) Describe the conviction-stage experience: what specific doubt forms, and how does it interact with the commitment ask? (4) Prescribe the highest-impact trust addition — e.g. "Adding 3 specific customer outcomes with names and companies immediately below the hero would intercept doubt at the exact moment it forms, before visitors reach pricing."> },
-    "contradictions":    { "score": <0-100>, "note": <string: 3-4 sentences. (1) Identify specific contradictions — quote the conflicting claims or mismatches between promise and evidence. (2) Explain the credibility erosion: one contradiction can undo multiple positive trust signals because visitors weight negative evidence more heavily (negativity bias). (3) Describe what the visitor experiences: the shift from evaluation mode to skepticism mode, where every subsequent claim is scrutinized rather than accepted. (4) Prescribe the resolution — e.g. "Remove the 'simple' claim from the hero and replace with 'powerful but intuitive' to align with the visible feature complexity, or reduce the feature list to match the simplicity promise."> },
-    "firstScreen":       { "score": <0-100>, "note": <string: 3-4 sentences. (1) Describe the cold-traffic 5-second experience: what does the visitor see first (visual hierarchy), what do they read first (scanning pattern), and what conclusion do they draw? (2) Identify the mental model formed — does it match reality? If there's a mismatch, explain what the visitor THINKS the page is about vs. what it actually is. (3) Explain the stay/leave trigger — cite cognitive fluency, visual scanning patterns, or information scent as applicable. What makes them decide in 3-5 seconds? (4) Prescribe the above-fold change with highest impact — e.g. "Moving the social proof logos from below-fold to directly under the headline would provide immediate credibility at the exact moment the visitor is deciding whether to invest attention."> }
+    "messageClarity":    { "score": <0-100>, "note": <string: 3-4 sentences — (1) what visitor understands in 5s citing headline, (2) awareness-stage gap, (3) behavioral consequence with mechanism, (4) specific fix with expected shift> },
+    "cognitiveLoad":     { "score": <0-100>, "note": <string: 3-4 sentences — (1) cognitive demands with counts, (2) scanning behavior impact citing Miller/Hick, (3) visitor experience shift, (4) specific simplification> },
+    "conversionArch":    { "score": <0-100>, "note": <string: 3-4 sentences — (1) map conversion pathway citing CTAs, (2) friction points with mechanism, (3) hesitation trigger, (4) specific pathway fix> },
+    "trustSignals":      { "score": <0-100>, "note": <string: 3-4 sentences — (1) trust inventory present vs missing, (2) signal absence interpretation, (3) conviction-stage doubt, (4) highest-impact trust addition> },
+    "contradictions":    { "score": <0-100>, "note": <string: 3-4 sentences — (1) specific contradictions quoted, (2) credibility erosion via negativity bias, (3) skepticism mode shift, (4) specific resolution> },
+    "firstScreen":       { "score": <0-100>, "note": <string: 3-4 sentences — (1) 5-second experience with scanning pattern, (2) mental model match/mismatch, (3) stay/leave trigger with mechanism, (4) highest-impact above-fold change> }
   },
   "sections": [
     {
@@ -368,7 +365,7 @@ The JSON structure must be exactly:
       "score": <0-100>,
       "subtitle": <string>,
       "findings": [
-        { "type": <"issue"|"warning"|"positive">, "title": <string>, "desc": <string>, "impact": <"high"|"medium"|"low">, "severity": <"low"|"medium"|"high"|"critical">, "category": <string: professional UX audit category>, "whyItMatters": <string: 1 sentence UX impact>, "recommendedFix": <string: actionable fix>, "userExperience": <string: 1-2 sentences describing what the visitor feels, thinks, or struggles with at this friction point>, "behavioralMechanism": <string: the psychological principle being violated — e.g. "loss-aversion trigger", "cognitive fluency violation", "credibility gap", "specification gap", "choice overload", "commitment anxiety">, "journeyStage": <"awareness"|"consideration"|"evaluation"|"conviction"|"action": which stage of the visitor decision journey this affects>, "frictionCascade": <string: 1 sentence on how this issue cascades to impact subsequent decision stages> }
+        { "type": <"issue"|"warning"|"positive">, "title": <string>, "desc": <string>, "impact": <"high"|"medium"|"low">, "severity": <"low"|"medium"|"high"|"critical">, "category": <string>, "whyItMatters": <string>, "recommendedFix": <string>, "userExperience": <string: visitor inner experience>, "behavioralMechanism": <string: principle + how it operates here>, "journeyStage": <"awareness"|"consideration"|"evaluation"|"conviction"|"action">, "frictionCascade": <string: downstream cascade> }
       ],
       "recommendations": [<string>, <string>],
       "rewrite": {
@@ -449,31 +446,31 @@ The JSON structure must be exactly:
     }
   ],
   "firstScreenAnalysis": {
-    "immediateUnderstanding": <string: what a cold-traffic visitor grasps within 5 seconds — describe their understanding, not the page content. E.g. "This appears to be some kind of analytics tool, but the specific use case and target audience are unclear. The visitor knows the category but not the value.">,
-    "unansweredQuestion": <string: the single most critical question the first screen fails to answer — the one that, if answered, would most increase engagement. Frame it as the visitor would think it: "What specific problem does this solve that my current tool doesn't?">,
-    "dominantEmotion": <string: the primary emotional response AND why — not just "confusion" but "mild confusion mixed with curiosity — the visual design suggests professionalism, but the headline doesn't clarify what this does, creating a tension between 'this looks credible' and 'I don't understand it'">,
-    "exitReason": <string: the behavioral trigger for leaving — ground in psychology, e.g. "Cognitive effort exceeds expected reward — the visitor calculates that understanding this page requires more investment than checking the next search result. The 'back button cost' is lower than the 'comprehension cost.'">,
+    "immediateUnderstanding": <string: what visitor grasps in 5s — describe their understanding, not page content>,
+    "unansweredQuestion": <string: most critical unanswered question, framed as visitor's thought>,
+    "dominantEmotion": <string: primary emotion AND why — not just label but cause>,
+    "exitReason": <string: behavioral trigger for leaving, grounded in psychology>,
     "clarityConfidence": <0-100>,
-    "visitorMentalModel": <string: what visitors THINK this page is about in the first 5 seconds — their initial frame, which may differ from reality. E.g. "Visitors likely categorize this as 'another project management tool' because the headline uses generic productivity language, when it's actually a specialized design collaboration platform. This misclassification means they evaluate it against the wrong competitors.">,
-    "decisionBarrier": <string: the primary unresolved question blocking engagement — frame as the visitor's inner monologue: "I can see this is a deployment tool, but I can't tell if it works with my stack — do I need to change my entire workflow to use this?">,
-    "attentionSequence": [<string: 1st element they notice and why — e.g. "Logo/brand name (top-left, highest position)">, <string: 2nd — e.g. "Headline (largest text, center)">, <string: 3rd — e.g. "Hero image (dominant visual mass)">]
+    "visitorMentalModel": <string: what visitors THINK the page is about — may differ from reality>,
+    "decisionBarrier": <string: primary unresolved question blocking engagement>,
+    "attentionSequence": [<string: 1st element noticed and why>, <string: 2nd>, <string: 3rd>]
   },
   "confusionMap": {
     "jargonScore": <0-100>,
     "densityScore": <0-100>,
     "frictionWords": <0-100>,
     "decisionParalysis": <0-100>,
-    "jargonImpact": <string: 2-3 sentences. Identify specific jargon terms found on the page. Explain the behavioral impact: each unfamiliar term forces the visitor from fast-scanning mode into slow-decoding mode (~2-3 additional seconds per term). Quantify: "Terms like 'orchestration layer' and 'event-driven pipeline' require domain expertise — visitors without this background lose comprehension at these points and start skimming, meaning any information after the jargon is effectively unread.">,
-    "densityImpact": <string: 2-3 sentences. Count the distinct concepts or features visible per viewport. Reference Miller's Law (7±2 items) and explain what happens when the limit is exceeded: "The features section presents 14 items in a single grid — beyond ~7 items, visitors stop encoding individual features and switch to gestalt impression ('there's a lot here'). The specific differentiators that would drive conversion are lost in the noise.">,
-    "frictionImpact": <string: 2-3 sentences. Identify specific friction language found on the page (hedging words, uncertainty markers, complexity signals). Explain the behavioral consequence: "Phrases like 'you might want to consider' and 'could potentially help' signal that the product team itself isn't confident in the value proposition. Visitors mirror this uncertainty — if the company hedges, the visitor hedges too.">,
-    "paralysisImpact": <string: 2-3 sentences. Count the decision points and choices the visitor faces. Reference Hick's Law and explain the consequence: "4 pricing tiers with 15+ feature differences require the visitor to make ~60 mental comparisons. At this complexity level, decision time increases logarithmically and many visitors default to the 'safe' choice (leaving) rather than risk choosing wrong.">
+    "jargonImpact": <string: 1-2 sentences — cite specific jargon terms found, explain scanning behavior impact>,
+    "densityImpact": <string: 1-2 sentences — count concepts per viewport, reference Miller's Law>,
+    "frictionImpact": <string: 1-2 sentences — cite specific friction language found, explain confidence impact>,
+    "paralysisImpact": <string: 1-2 sentences — count decision points, reference Hick's Law>
   },
   "trustMatrix": [
-    { "label": "Social proof", "score": <0-100>, "behavioralNote": <string: 2-3 sentences. Count the specific proof signals present (testimonials, logos, ratings, case studies). Explain the behavioral gap: "2 testimonials without names or companies provide weak social proof — visitors at the conviction stage need specificity (named person + company + quantified outcome) to transfer trust. Generic quotes read as fabricated, which is worse than no testimonials at all (signal absence vs. negative signal)."> },
-    { "label": "Authority signals", "score": <0-100>, "behavioralNote": <string: 2-3 sentences. Identify what authority evidence exists (logos, press mentions, certifications, awards). Explain the visitor's credibility assessment: "Without recognizable brand logos or press mentions, visitors must evaluate credibility from the page itself — which creates a circular trust problem. Authority signals serve as external validation that breaks this loop."> },
-    { "label": "Risk reversal", "score": <0-100>, "behavioralNote": <string: 2-3 sentences. Identify guarantees, free trials, refund policies present or absent. Explain the loss aversion dynamic: "No visible money-back guarantee or free trial means the visitor weighs the potential loss (wasted money/time) at 2x the potential gain. The commitment ask exceeds the trust earned — visitors who are 70% convinced will still not act because the remaining 30% doubt is amplified by the absence of a safety net."> },
-    { "label": "Recency signals", "score": <0-100>, "behavioralNote": <string: 2-3 sentences. Look for dates, recent updates, activity indicators. Explain the 'dead product' risk: "No visible dates or activity signals — visitors cannot determine if this product is actively maintained. In SaaS, recency signals (recent blog posts, 'Updated 2024', active user counts) serve as 'proof of life' that reduces abandonment risk perception."> },
-    { "label": "Human identity", "score": <0-100>, "behavioralNote": <string: 2-3 sentences. Look for team photos, founder names, personal stories. Explain the trust dynamic: "No visible human presence — visitors are being asked to trust an anonymous entity. Human identity signals (founder photo, team page, personal message) activate the reciprocity principle and make accountability tangible. Anonymous products trigger higher skepticism thresholds."> }
+    { "label": "Social proof", "score": <0-100>, "behavioralNote": <string: 1-2 sentences — count proof signals, explain conviction-stage gap> },
+    { "label": "Authority signals", "score": <0-100>, "behavioralNote": <string: 1-2 sentences — identify authority evidence, explain credibility assessment> },
+    { "label": "Risk reversal", "score": <0-100>, "behavioralNote": <string: 1-2 sentences — identify guarantees present/absent, explain loss aversion dynamic> },
+    { "label": "Recency signals", "score": <0-100>, "behavioralNote": <string: 1-2 sentences — identify activity signals, explain abandonment risk> },
+    { "label": "Human identity", "score": <0-100>, "behavioralNote": <string: 1-2 sentences — identify human presence signals, explain trust dynamic> }
   ],
   "rewrite": {
     "beforeHeadline": <string: original or reconstructed headline>,
@@ -499,31 +496,21 @@ The JSON structure must be exactly:
     ],
     "overallHeuristicScore": <0-10, average of all 10 heuristic scores>
   },
-  "uxStrengths": ["<positive UX decision — explain WHY it works psychologically, not just that it exists. E.g. 'Social proof logos placed immediately below the hero intercept doubt at the exact moment it forms — visitors who just processed the value prop get immediate external validation before skepticism can escalate.'>", "<positive UX decision 2>", "<positive UX decision 3>"]
+  "uxStrengths": ["<positive UX decision — explain WHY it works psychologically>", "<positive UX decision 2>", "<positive UX decision 3>"]
 }
 
 ═══════════════════════════════════════════
 QUALITY REMINDERS
 ═══════════════════════════════════════════
 
-Remember: you are a senior UX researcher and conversion strategist who has reviewed hundreds of landing pages and watched thousands of user testing sessions. Your analysis should demonstrate the depth of someone who can PREDICT user behavior from page structure alone.
-
-ANALYTICAL DEPTH REQUIREMENTS:
-- Every finding must cite SPECIFIC EVIDENCE from the page — quote actual text, reference actual element positions, describe actual layout patterns. No finding should be possible to write without having read the page.
-- For every issue, answer: What does the visitor SEE? → What do they THINK? → What do they FEEL? → What do they DO? → What's the BUSINESS IMPACT?
-- Use established UX principles as explanatory tools, not decorative labels. Don't just name "cognitive fluency" — explain HOW cognitive fluency operates on THIS specific page element.
-- Every behavioral mechanism cited must include a brief explanation of WHY it matters here. "Loss aversion" alone is empty. "Loss aversion — without a free trial, the visitor weighs potential wasted money 2x heavier than potential benefit, so they need to be 2x more convinced than if a safety net existed" is analysis.
-- Category notes must read like a paragraph from a UX research report — grounded in evidence, connected to psychology, actionable in conclusion.
-- Confusion map impact strings must reference specific elements found on the page — count the jargon terms, count the features, identify the friction phrases. Quantify when possible.
-- Trust matrix behavioral notes must inventory what's present AND what's absent, and explain how visitors interpret the gap.
-- First screen analysis must narrate the 5-second experience as if watching a user testing recording — what draws attention first, what conclusion forms, what triggers stay or leave.
-
-TONE CALIBRATION:
-- Write like a senior consultant presenting to a product team — authoritative, specific, respectful of their work, but unflinching about what needs to change
-- Avoid generic AI patterns: "could be improved", "consider adding", "might benefit from" → instead: "Replace X with Y because Z"
-- Every recommendation must be specific enough that a developer could implement it without asking follow-up questions
-- The 5 questions test: Does the page answer What is this? Who is it for? Why should I care? Why should I trust it? What should I do next?
-- If the page is in a non-English language, ALL text values in your JSON must be in that same language`;
+CRITICAL REMINDERS:
+- Cite SPECIFIC page evidence for every finding. No generic advice.
+- For every behavioral mechanism: name it AND explain how it operates on THIS page.
+- Category notes: evidence → psychology → consequence → specific fix.
+- Every recommendation: specific enough for a developer to implement without follow-up.
+- Avoid: "could be improved", "consider adding" → use: "Replace X with Y because Z"
+- The 5 questions test: What is this? Who is it for? Why should I care? Why trust it? What do I do?
+- If the page is in a non-English language, ALL text values must be in that same language`;
 }
 
 /**
