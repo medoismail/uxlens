@@ -80,6 +80,10 @@ const findingSchema = z.object({
   category: z.string().optional(),
   whyItMatters: z.string().optional(),
   recommendedFix: z.string().optional(),
+  userExperience: z.string().optional(),
+  behavioralMechanism: z.string().optional(),
+  journeyStage: z.enum(["awareness", "consideration", "evaluation", "conviction", "action"]).optional(),
+  frictionCascade: z.string().optional(),
 });
 
 const textRewriteSchema = z.object({
@@ -134,9 +138,24 @@ export const uxAuditSchema = z.object({
   overallScore: z.number().min(0).max(100),
   grade: z.string(),
   executiveSummary: z.string(),
-  conversionKillers: z.array(z.string()),
-  quickWins: z.array(z.string()),
-  strategicFixes: z.array(z.string()),
+  conversionKillers: z.array(z.union([
+    z.string(),
+    z.object({
+      title: z.string(),
+      description: z.string(),
+      affectedVisitors: z.string().optional(),
+      behavioralCascade: z.string().optional(),
+      expectedLift: z.string().optional(),
+    }),
+  ])),
+  quickWins: z.array(z.union([
+    z.string(),
+    z.object({ text: z.string(), expectedImpact: z.string().optional() }),
+  ])),
+  strategicFixes: z.array(z.union([
+    z.string(),
+    z.object({ text: z.string(), expectedImpact: z.string().optional() }),
+  ])),
   flags: z.array(z.string()),
   categories: z.object({
     messageClarity: categoryScoreSchema,
@@ -153,17 +172,25 @@ export const uxAuditSchema = z.object({
     dominantEmotion: z.string(),
     exitReason: z.string(),
     clarityConfidence: z.number().min(0).max(100),
+    visitorMentalModel: z.string().optional(),
+    decisionBarrier: z.string().optional(),
+    attentionSequence: z.array(z.string()).optional(),
   }),
   confusionMap: z.object({
     jargonScore: z.number().min(0).max(100),
     densityScore: z.number().min(0).max(100),
     frictionWords: z.number().min(0).max(100),
     decisionParalysis: z.number().min(0).max(100),
+    jargonImpact: z.string().optional(),
+    densityImpact: z.string().optional(),
+    frictionImpact: z.string().optional(),
+    paralysisImpact: z.string().optional(),
   }),
   trustMatrix: z.array(
     z.object({
       label: z.string(),
       score: z.number().min(0).max(100),
+      behavioralNote: z.string().optional(),
     })
   ),
   rewrite: z.object({

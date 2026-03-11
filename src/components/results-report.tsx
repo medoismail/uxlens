@@ -16,7 +16,7 @@ import { ChatWidget } from "@/components/chat-widget";
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { PLAN_FEATURES } from "@/lib/types";
 import { CompetitorSection, CompetitorLockedPreview } from "@/components/competitor-section";
-import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone, CompetitorAnalysis, VisualAnalysis, SectionRewrite, HeuristicScore, FirstScreenAnalysis } from "@/lib/types";
+import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone, CompetitorAnalysis, VisualAnalysis, SectionRewrite, HeuristicScore, FirstScreenAnalysis, ConversionKiller, ConversionKillerItem, ActionableItem, ActionItem } from "@/lib/types";
 
 interface ResultsReportProps {
   data: UXAuditResult;
@@ -135,6 +135,28 @@ function deriveScope(text: string): string {
   return "Strategic";
 }
 
+/* ── Union type helpers for backward compatibility ── */
+function getKillerText(k: ConversionKiller): string {
+  return typeof k === "string" ? k : k.title;
+}
+function getKillerDetail(k: ConversionKiller): ConversionKillerItem | null {
+  return typeof k === "string" ? null : k;
+}
+function getActionText(a: ActionableItem): string {
+  return typeof a === "string" ? a : a.text;
+}
+function getActionDetail(a: ActionableItem): ActionItem | null {
+  return typeof a === "string" ? null : a;
+}
+
+const JOURNEY_STAGE_COLORS: Record<string, { bg: string; color: string; label: string }> = {
+  awareness: { bg: "oklch(0.62 0.18 275 / 8%)", color: "oklch(0.62 0.18 275)", label: "Awareness" },
+  consideration: { bg: "oklch(0.62 0.14 245 / 8%)", color: "oklch(0.62 0.14 245)", label: "Consideration" },
+  evaluation: { bg: "oklch(0.58 0.16 75 / 8%)", color: "oklch(0.58 0.16 75)", label: "Evaluation" },
+  conviction: { bg: "oklch(0.62 0.15 160 / 8%)", color: "oklch(0.62 0.15 160)", label: "Conviction" },
+  action: { bg: "oklch(0.55 0.17 20 / 8%)", color: "oklch(0.55 0.17 20)", label: "Action" },
+};
+
 /* ── Sparkline data generator (unique pattern per category index) ── */
 const SPARK_PATTERNS = [
   [0.25, 0.50, 1.00, 0.60, 0.80],  // ramp up, peak middle
@@ -222,7 +244,7 @@ function LockedHint({ count, label }: { count: number; label: string }) {
 
 function UpgradeCard() {
   return (
-    <div className="rounded-xl border p-5 my-6 text-center" style={{ background: "linear-gradient(135deg, var(--brand-dim), var(--s1))", borderColor: "var(--brand-glow)" }}>
+    <div className="rounded-xl border p-4 my-5 text-center" style={{ background: "linear-gradient(135deg, var(--brand-dim), var(--s1))", borderColor: "var(--brand-glow)" }}>
       <Lock className="h-5 w-5 mx-auto mb-2" style={{ color: "var(--brand)" }} />
       <h3 className="text-[14px] font-semibold tracking-tight mb-1">Unlock strategic fixes & optimized copy</h3>
       <p className="text-[12px] text-foreground/40 leading-relaxed max-w-sm mx-auto mb-4">Upgrade to get strategic improvements, AI-optimized hero copy, and PDF export.</p>
@@ -279,11 +301,11 @@ export function ResultsReport({
   })).sort((a, b) => a.data.score - b.data.score);
 
   return (
-    <div className="w-full max-w-[960px] mx-auto py-10 px-7 relative z-[1]">
+    <div className="w-full max-w-[860px] mx-auto py-8 px-5 sm:px-6 relative z-[1]">
       {/* ─── Report Header ─── */}
-      <div className="text-center animate-fade-in mb-8">
-        <p className="text-[12px] font-mono uppercase tracking-[2px] text-foreground/30 mb-2">Diagnostic Engine v5 — UX Dashboard</p>
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">{domain}</h1>
+      <div className="text-center animate-fade-in mb-6">
+        <p className="text-[11px] font-mono uppercase tracking-[2px] text-foreground/30 mb-1.5">Diagnostic Engine v5 — UX Dashboard</p>
+        <h1 className="text-lg font-semibold tracking-tight text-foreground">{domain}</h1>
         {features.pdfExport && (
           <div className="mt-3">
             <PdfExportButton data={data} url={url} competitorAnalysis={competitorAnalysis} screenshotUrl={screenshotUrl} heatmapZones={heatmapZones} pageHeight={pageHeight} viewportWidth={viewportWidth} visualAnalysis={visualAnalysis} />
@@ -295,16 +317,16 @@ export function ResultsReport({
          1. EXECUTIVE SUMMARY ROW
          ═══════════════════════════════════════════════════════ */}
       <ScrollReveal>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 mb-5">
           {/* UX Score — large gauge card */}
-          <div className="col-span-2 sm:col-span-1 dash-card rounded-xl border p-4 flex flex-col items-center justify-center" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-            <div className="relative w-[72px] h-[72px] mb-2">
+          <div className="col-span-2 sm:col-span-1 dash-card rounded-xl border p-3.5 flex flex-col items-center justify-center" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+            <div className="relative w-[64px] h-[64px] mb-1.5">
               <svg className="-rotate-90 w-full h-full" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="44" fill="none" strokeWidth="7" style={{ stroke: "var(--s3)" }} />
                 <circle cx="50" cy="50" r="44" fill="none" strokeWidth="7" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={dashOffset} className="animate-ring-fill" style={{ stroke: dialColor, "--ring-circumference": circumference, "--ring-offset": dashOffset } as React.CSSProperties} />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-[22px] font-bold tabular-nums leading-none animate-count-up" style={{ color: dialColor }}>{data.overallScore}</span>
+                <span className="text-[20px] font-bold tabular-nums leading-none animate-count-up" style={{ color: dialColor }}>{data.overallScore}</span>
               </div>
             </div>
             <span className="text-[11px] text-foreground/40 font-medium">UX Score</span>
@@ -321,17 +343,17 @@ export function ResultsReport({
           <MetricCard label="Trust" value={trustScore} suffix="/100" color={scoreColor(trustScore)} />
 
           {/* UX Complexity */}
-          <div className="dash-card rounded-xl border p-4 flex flex-col items-center justify-center text-center" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-            <span className="text-[20px] font-bold animate-count-up mb-1" style={{ color: complexity.color }}>{complexity.label}</span>
-            <span className="text-[11px] text-foreground/40 font-medium">Complexity</span>
+          <div className="dash-card rounded-xl border p-3 flex flex-col items-center justify-center text-center" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+            <span className="text-[18px] font-bold animate-count-up mb-0.5" style={{ color: complexity.color }}>{complexity.label}</span>
+            <span className="text-[10px] text-foreground/45 font-medium">Complexity</span>
           </div>
         </div>
       </ScrollReveal>
 
       {/* Executive summary + flags */}
       <ScrollReveal>
-        <div className="rounded-xl border p-5 mb-6" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-          <p className="text-[12px] text-foreground/50 leading-relaxed mb-3.5">{data.executiveSummary}</p>
+        <div className="rounded-xl border p-4 mb-5" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+          <p className="text-[12px] text-foreground/55 leading-relaxed mb-3">{data.executiveSummary}</p>
           <div className="flex flex-wrap gap-1.5">
             {data.flags.map((flag, i) => (
               <span key={i} className="text-[11px] px-2.5 py-0.5 rounded-[5px] border" style={FLAG_STYLES[i % FLAG_STYLES.length]}>{flag}</span>
@@ -358,7 +380,7 @@ export function ResultsReport({
          ═══════════════════════════════════════════════════════ */}
       <ScrollReveal>
         <DashSection icon={<BarChart3 className="h-4 w-4" style={{ color: "var(--brand)" }} />} title="UX Metrics" subtitle="Six diagnostic categories">
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
             {CATEGORY_DEFS.map((cat, idx) => {
               const catData = data.categories[cat.key as keyof typeof data.categories];
               return <MetricGridCard key={cat.key} label={cat.label} score={catData.score} color={cat.color} icon={cat.icon} sparkData={generateSparkData(catData.score, idx)} note={catData.note} desc={cat.desc} />;
@@ -383,13 +405,40 @@ export function ResultsReport({
             {data.conversionKillers.length > 0 && (
               <div className="mt-4 pt-4 border-t" style={{ borderColor: "var(--border)" }}>
                 <p className="text-[11px] uppercase tracking-[2px] text-foreground/25 mb-2.5">Top conversion blockers</p>
-                <div className="flex flex-col gap-1.5">
-                  {data.conversionKillers.map((k, i) => (
-                    <div key={i} className="flex gap-2.5 text-[12px] leading-relaxed text-foreground/50 p-2 px-3 rounded-md" style={{ background: "var(--s2)" }}>
-                      <span className="font-bold shrink-0" style={{ color: "var(--score-low)" }}>{i + 1}.</span>
-                      <span>{k}</span>
-                    </div>
-                  ))}
+                <div className="flex flex-col gap-2">
+                  {data.conversionKillers.map((k, i) => {
+                    const detail = getKillerDetail(k);
+                    return (
+                      <div key={i} className="rounded-lg p-3 px-3.5" style={{ background: "var(--s2)", border: "1px solid oklch(0.55 0.17 20 / 8%)" }}>
+                        <div className="flex gap-2.5 text-[12px] leading-relaxed text-foreground/50">
+                          <span className="font-bold shrink-0" style={{ color: "var(--score-low)" }}>{i + 1}.</span>
+                          <div className="flex-1">
+                            {detail ? (
+                              <>
+                                <span className="font-semibold text-foreground/60">{detail.title}</span>
+                                <p className="text-[11px] text-foreground/40 mt-0.5">{detail.description}</p>
+                                {(detail.affectedVisitors || detail.behavioralCascade || detail.expectedLift) && (
+                                  <div className="flex flex-col gap-1 mt-2">
+                                    {detail.affectedVisitors && (
+                                      <p className="text-[10px] text-foreground/35"><span className="font-medium text-foreground/45">Affects:</span> {detail.affectedVisitors}</p>
+                                    )}
+                                    {detail.behavioralCascade && (
+                                      <p className="text-[10px] text-foreground/35"><span className="font-medium text-foreground/45">Cascade:</span> {detail.behavioralCascade}</p>
+                                    )}
+                                    {detail.expectedLift && (
+                                      <p className="text-[10px] font-medium" style={{ color: "var(--score-high)" }}>↑ {detail.expectedLift}</p>
+                                    )}
+                                  </div>
+                                )}
+                              </>
+                            ) : (
+                              <span>{getKillerText(k)}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -402,7 +451,7 @@ export function ResultsReport({
          ═══════════════════════════════════════════════════════ */}
       <ScrollReveal>
         <DashSection icon={<Layers className="h-4 w-4" style={{ color: "var(--brand)" }} />} title="Section Analysis" subtitle="Per-section scores and issue breakdown">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {data.sections.map((sec) => (
               <SectionCard
                 key={sec.id}
@@ -418,14 +467,14 @@ export function ResultsReport({
             const sec = data.sections.find(s => s.id === expandedSection);
             if (!sec) return null;
             return (
-              <div className="mt-4 rounded-xl border p-5 animate-fade-in" style={{ background: "var(--s2)", borderColor: "var(--border)" }}>
-                <div className="flex items-center justify-between mb-4">
+              <div className="mt-3 rounded-xl border p-4 animate-fade-in" style={{ background: "var(--s2)", borderColor: "var(--border)" }}>
+                <div className="flex items-center justify-between mb-3">
                   <h4 className="text-[13px] font-semibold">{sec.name}</h4>
                   <button onClick={() => setExpandedSection(null)} className="text-foreground/30 hover:text-foreground/50 transition-colors">
                     <X className="h-4 w-4" />
                   </button>
                 </div>
-                <div className="flex flex-col gap-2.5 mb-4">
+                <div className="flex flex-col gap-2 mb-3">
                   {sec.findings.map((f, i) => <FindingCard key={i} finding={f} />)}
                 </div>
                 {features.improvements && sec.recommendations.length > 0 && (
@@ -461,25 +510,25 @@ export function ResultsReport({
          ═══════════════════════════════════════════════════════ */}
       <ScrollReveal>
         <DashSection icon={<Activity className="h-4 w-4" style={{ color: "var(--accent-blue)" }} />} title="Visual Analytics" subtitle="UX quality breakdown and issue distribution">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             {/* Radar Chart */}
-            <div className="rounded-xl border p-5 flex flex-col items-center" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-              <p className="text-[11px] uppercase tracking-[2px] text-foreground/25 mb-4 self-start">UX Score Radar</p>
+            <div className="rounded-xl border p-4 flex flex-col items-center" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+              <p className="text-[11px] uppercase tracking-[2px] text-foreground/30 mb-3 self-start">UX Score Radar</p>
               <RadarChart categories={data.categories} />
             </div>
 
             {/* Severity Distribution + Visual Health */}
             <div className="flex flex-col gap-3">
               {/* Severity Distribution */}
-              <div className="rounded-xl border p-5" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-                <p className="text-[11px] uppercase tracking-[2px] text-foreground/25 mb-3">Issue Severity</p>
+              <div className="rounded-xl border p-4" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+                <p className="text-[11px] uppercase tracking-[2px] text-foreground/30 mb-2.5">Issue Severity</p>
                 <SeverityDistribution counts={severityCounts} />
               </div>
 
               {/* Visual Health (if available) */}
               {visualAnalysis && visualAnalysisStatus === "done" && (
-                <div className="rounded-xl border p-5" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-                  <p className="text-[11px] uppercase tracking-[2px] text-foreground/25 mb-3">Visual Health</p>
+                <div className="rounded-xl border p-4" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+                  <p className="text-[11px] uppercase tracking-[2px] text-foreground/30 mb-2.5">Visual Health</p>
                   <div className="flex flex-col gap-2">
                     {[
                       { label: "Layout", score: visualAnalysis.layoutScore },
@@ -515,50 +564,79 @@ export function ResultsReport({
       </ScrollReveal>
 
       {/* ═══════════════════════════════════════════════════════
-         6b. TRUST MATRIX
+         6b. TRUST MATRIX + CONFUSION MAP (side-by-side)
          ═══════════════════════════════════════════════════════ */}
-      {data.trustMatrix && data.trustMatrix.length > 0 && (
+      {(data.trustMatrix?.length > 0 || data.confusionMap) && (
         <ScrollReveal>
-          <DashSection icon={<Shield className="h-4 w-4" style={{ color: "var(--accent-blue)" }} />} title="Trust Matrix" subtitle="Five trust dimensions evaluated by the AI auditor">
-            <div className="flex flex-col gap-3">
-              {[...data.trustMatrix].sort((a, b) => a.score - b.score).map((item) => (
-                <div key={item.label} className="flex items-center gap-3">
-                  <span className="text-[11px] text-foreground/45 w-[130px] sm:w-[155px] shrink-0 truncate">{item.label}</span>
-                  <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
-                    <div className="h-full rounded-full animate-bar-width" style={{ background: scoreColor(item.score), width: `${item.score}%`, "--bar-width": `${item.score}%` } as React.CSSProperties} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+            {/* Trust Matrix */}
+            {data.trustMatrix && data.trustMatrix.length > 0 && (
+              <div className="rounded-xl border p-4" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+                <div className="flex items-center gap-2 mb-3.5">
+                  <div className="w-6 h-6 rounded-md grid place-items-center shrink-0" style={{ background: "var(--s2)" }}>
+                    <Shield className="h-3.5 w-3.5" style={{ color: "var(--accent-blue)" }} />
                   </div>
-                  <span className="text-[13px] font-bold font-mono w-8 text-right" style={{ color: scoreColor(item.score) }}>{item.score}</span>
+                  <div>
+                    <h3 className="text-[12px] font-semibold">Trust Matrix</h3>
+                    <p className="text-[10px] text-foreground/40">Five trust dimensions</p>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </DashSection>
-        </ScrollReveal>
-      )}
+                <div className="flex flex-col gap-2.5">
+                  {[...data.trustMatrix].sort((a, b) => a.score - b.score).map((item) => (
+                    <div key={item.label}>
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-[10px] text-foreground/45 w-[100px] shrink-0 truncate">{item.label}</span>
+                        <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
+                          <div className="h-full rounded-full animate-bar-width" style={{ background: scoreColor(item.score), width: `${item.score}%`, "--bar-width": `${item.score}%` } as React.CSSProperties} />
+                        </div>
+                        <span className="text-[12px] font-bold font-mono w-7 text-right" style={{ color: scoreColor(item.score) }}>{item.score}</span>
+                      </div>
+                      {item.behavioralNote && (
+                        <p className="text-[9px] text-foreground/30 leading-relaxed mt-0.5 ml-[112px]">{item.behavioralNote}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
-      {/* ═══════════════════════════════════════════════════════
-         6c. CONFUSION MAP
-         ═══════════════════════════════════════════════════════ */}
-      {data.confusionMap && (
-        <ScrollReveal>
-          <DashSection icon={<Brain className="h-4 w-4" style={{ color: "var(--accent-purple)" }} />} title="Confusion Map" subtitle="Cognitive friction breakdown across four dimensions">
-            <div className="flex flex-col gap-3">
-              {[
-                { label: "Jargon Level", score: data.confusionMap.jargonScore },
-                { label: "Information Density", score: data.confusionMap.densityScore },
-                { label: "Friction Language", score: data.confusionMap.frictionWords },
-                { label: "Decision Paralysis", score: data.confusionMap.decisionParalysis },
-              ].sort((a, b) => b.score - a.score).map((item) => (
-                <div key={item.label} className="flex items-center gap-3">
-                  <span className="text-[11px] text-foreground/45 w-[130px] sm:w-[155px] shrink-0 truncate">{item.label}</span>
-                  <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
-                    <div className="h-full rounded-full animate-bar-width" style={{ background: scoreColor(100 - item.score), width: `${item.score}%`, "--bar-width": `${item.score}%` } as React.CSSProperties} />
+            {/* Confusion Map */}
+            {data.confusionMap && (
+              <div className="rounded-xl border p-4" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+                <div className="flex items-center gap-2 mb-3.5">
+                  <div className="w-6 h-6 rounded-md grid place-items-center shrink-0" style={{ background: "var(--s2)" }}>
+                    <Brain className="h-3.5 w-3.5" style={{ color: "var(--accent-purple)" }} />
                   </div>
-                  <span className="text-[13px] font-bold font-mono w-8 text-right" style={{ color: scoreColor(100 - item.score) }}>{item.score}</span>
+                  <div>
+                    <h3 className="text-[12px] font-semibold">Confusion Map</h3>
+                    <p className="text-[10px] text-foreground/40">Cognitive friction breakdown</p>
+                  </div>
                 </div>
-              ))}
-            </div>
-            <p className="text-[10px] text-foreground/25 mt-3">Higher scores indicate greater cognitive friction.</p>
-          </DashSection>
+                <div className="flex flex-col gap-2.5">
+                  {[
+                    { label: "Jargon Level", score: data.confusionMap.jargonScore, impact: data.confusionMap.jargonImpact },
+                    { label: "Info Density", score: data.confusionMap.densityScore, impact: data.confusionMap.densityImpact },
+                    { label: "Friction Lang.", score: data.confusionMap.frictionWords, impact: data.confusionMap.frictionImpact },
+                    { label: "Decision Paralysis", score: data.confusionMap.decisionParalysis, impact: data.confusionMap.paralysisImpact },
+                  ].sort((a, b) => b.score - a.score).map((item) => (
+                    <div key={item.label}>
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-[10px] text-foreground/45 w-[100px] shrink-0 truncate">{item.label}</span>
+                        <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
+                          <div className="h-full rounded-full animate-bar-width" style={{ background: scoreColor(100 - item.score), width: `${item.score}%`, "--bar-width": `${item.score}%` } as React.CSSProperties} />
+                        </div>
+                        <span className="text-[12px] font-bold font-mono w-7 text-right" style={{ color: scoreColor(100 - item.score) }}>{item.score}</span>
+                      </div>
+                      {item.impact && (
+                        <p className="text-[9px] text-foreground/30 leading-relaxed mt-0.5 ml-[112px]">{item.impact}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[9px] text-foreground/25 mt-2.5">Higher scores = greater cognitive friction</p>
+              </div>
+            )}
+          </div>
         </ScrollReveal>
       )}
 
@@ -569,11 +647,20 @@ export function ResultsReport({
         <DashSection icon={<Eye className="h-4 w-4" style={{ color: "var(--brand)" }} />} title="Attention Insight" subtitle="Where visitors focus and what they miss">
           {/* First screen interpretation */}
           {data.firstScreenAnalysis.immediateUnderstanding && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3.5">
               <MiniInsight icon={<Eye className="h-3.5 w-3.5" />} label="First impression" value={data.firstScreenAnalysis.immediateUnderstanding} color="var(--brand)" hint="What visitors understand within 5 seconds" />
               <MiniInsight icon={<HelpCircle className="h-3.5 w-3.5" />} label="Unanswered" value={data.firstScreenAnalysis.unansweredQuestion} color="var(--score-mid)" hint="The question most likely to cause bounce" />
               <MiniInsight icon={<Heart className="h-3.5 w-3.5" />} label="Dominant emotion" value={data.firstScreenAnalysis.dominantEmotion} color="var(--accent-purple)" hint="The emotional response triggered by the first screen" />
               <MiniInsight icon={<LogOut className="h-3.5 w-3.5" />} label="#1 exit reason" value={data.firstScreenAnalysis.exitReason} color="var(--score-low)" hint="The primary reason a visitor would leave within 8 seconds" />
+              {data.firstScreenAnalysis.visitorMentalModel && (
+                <MiniInsight icon={<Brain className="h-3.5 w-3.5" />} label="Visitor mental model" value={data.firstScreenAnalysis.visitorMentalModel} color="oklch(0.62 0.14 245)" hint="What visitors THINK the page is about in the first 5 seconds" />
+              )}
+              {data.firstScreenAnalysis.decisionBarrier && (
+                <MiniInsight icon={<Lock className="h-3.5 w-3.5" />} label="Decision barrier" value={data.firstScreenAnalysis.decisionBarrier} color="oklch(0.58 0.16 75)" hint="The primary question blocking the visitor from engaging further" />
+              )}
+              {data.firstScreenAnalysis.attentionSequence && data.firstScreenAnalysis.attentionSequence.length > 0 && (
+                <MiniInsight icon={<Eye className="h-3.5 w-3.5" />} label="Attention sequence" value={data.firstScreenAnalysis.attentionSequence.map((s, i) => `${i + 1}. ${s}`).join(" → ")} color="var(--brand)" hint="What visitors look at first → second → third" />
+              )}
               {/* Clarity confidence score */}
               <div className="flex gap-2.5 p-3 rounded-lg text-[12px] leading-relaxed sm:col-span-2" style={{ background: "var(--s2)" }}>
                 <span className="shrink-0 mt-0.5" style={{ color: scoreColor(data.firstScreenAnalysis.clarityConfidence) }}>
@@ -624,16 +711,16 @@ export function ResultsReport({
         <ScrollReveal>
           <DashSection icon={<ListChecks className="h-4 w-4" style={{ color: "var(--accent-purple)" }} />} title="Heuristic Insights" subtitle={`Nielsen's 10 heuristics — Overall: ${data.heuristicEvaluation.overallHeuristicScore.toFixed(1)}/10`}>
             {/* Overall score */}
-            <div className="flex items-center gap-3 mb-5 p-3 rounded-lg border" style={{ background: "var(--s2)", borderColor: "var(--border)" }}>
-              <span className="text-[24px] font-bold font-mono" style={{ color: heuristicColor(data.heuristicEvaluation.overallHeuristicScore) }}>{data.heuristicEvaluation.overallHeuristicScore.toFixed(1)}</span>
+            <div className="flex items-center gap-3 mb-4 p-2.5 rounded-lg border" style={{ background: "var(--s2)", borderColor: "var(--border)" }}>
+              <span className="text-[22px] font-bold font-mono" style={{ color: heuristicColor(data.heuristicEvaluation.overallHeuristicScore) }}>{data.heuristicEvaluation.overallHeuristicScore.toFixed(1)}</span>
               <div>
                 <div className="text-[12px] font-semibold">Overall Heuristic Score</div>
-                <div className="text-[11px] text-foreground/35">Average across 10 heuristics (0-10)</div>
+                <div className="text-[10px] text-foreground/40">Average across 10 heuristics (0-10)</div>
               </div>
             </div>
 
             {/* Heuristic grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {[...data.heuristicEvaluation.heuristics].sort((a, b) => a.score - b.score).map((h) => (
                 <HeuristicCard key={h.id} heuristic={h} />
               ))}
@@ -652,12 +739,20 @@ export function ResultsReport({
             <>
               <p className="text-[11px] uppercase tracking-[2px] mb-2.5" style={{ color: "var(--score-high)" }}>Quick wins (under 1 hour)</p>
               <div className="flex flex-col gap-2 mb-5">
-                {data.quickWins.map((w, i) => (
-                  <div key={i} className="flex gap-2.5 text-[12px] leading-relaxed text-foreground/50 p-2.5 px-3.5 rounded-[7px] border-l-2" style={{ background: "var(--s2)", borderColor: "var(--score-high)" }}>
-                    <Check className="h-3.5 w-3.5 shrink-0 mt-0.5" style={{ color: "var(--score-high)" }} />
-                    <span>{w}</span>
-                  </div>
-                ))}
+                {data.quickWins.map((w, i) => {
+                  const detail = getActionDetail(w);
+                  return (
+                    <div key={i} className="flex gap-2.5 text-[12px] leading-relaxed text-foreground/50 p-2.5 px-3.5 rounded-[7px] border-l-2" style={{ background: "var(--s2)", borderColor: "var(--score-high)" }}>
+                      <Check className="h-3.5 w-3.5 shrink-0 mt-0.5" style={{ color: "var(--score-high)" }} />
+                      <div className="flex-1">
+                        <span>{getActionText(w)}</span>
+                        {detail?.expectedImpact && (
+                          <p className="text-[10px] text-foreground/30 mt-1 italic">→ {detail.expectedImpact}</p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </>
           )}
@@ -667,15 +762,22 @@ export function ResultsReport({
             <>
               <p className="text-[11px] uppercase tracking-[2px] mb-2.5" style={{ color: "var(--accent-purple)" }}>Strategic fixes</p>
               <div className="flex flex-col gap-2">
-                {data.strategicFixes.map((f, i) => (
-                  <div key={i} className="flex gap-2.5 text-[12px] leading-relaxed text-foreground/50 p-2.5 px-3.5 rounded-[7px] border-l-2" style={{ background: "var(--s2)", borderColor: "var(--accent-purple)" }}>
-                    <span className="font-medium shrink-0 min-w-[18px]" style={{ color: "var(--accent-purple)" }}>{i + 1}.</span>
-                    <div className="flex-1">
-                      <span>{f}</span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded ml-2 border" style={{ color: "var(--accent-purple)", borderColor: "oklch(0.637 0.185 295 / 20%)", background: "oklch(0.637 0.185 295 / 7%)" }}>{deriveScope(f)}</span>
+                {data.strategicFixes.map((f, i) => {
+                  const text = getActionText(f);
+                  const detail = getActionDetail(f);
+                  return (
+                    <div key={i} className="flex gap-2.5 text-[12px] leading-relaxed text-foreground/50 p-2.5 px-3.5 rounded-[7px] border-l-2" style={{ background: "var(--s2)", borderColor: "var(--accent-purple)" }}>
+                      <span className="font-medium shrink-0 min-w-[18px]" style={{ color: "var(--accent-purple)" }}>{i + 1}.</span>
+                      <div className="flex-1">
+                        <span>{text}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded ml-2 border" style={{ color: "var(--accent-purple)", borderColor: "oklch(0.637 0.185 295 / 20%)", background: "oklch(0.637 0.185 295 / 7%)" }}>{deriveScope(text)}</span>
+                        {detail?.expectedImpact && (
+                          <p className="text-[10px] text-foreground/30 mt-1 italic">→ {detail.expectedImpact}</p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </>
           )}
@@ -689,9 +791,9 @@ export function ResultsReport({
               <p className="text-[11px] uppercase tracking-[2px] mb-2.5 flex items-center gap-1.5" style={{ color: "var(--score-high)" }}>
                 <Sparkles className="h-3 w-3" /> UX Strengths
               </p>
-              <div className="flex flex-col gap-1.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                 {data.uxStrengths.map((s, i) => (
-                  <div key={i} className="flex gap-2 text-[12px] leading-relaxed text-foreground/50 p-2 px-3 rounded-md" style={{ background: "oklch(0.52 0.14 155 / 4%)" }}>
+                  <div key={i} className="flex gap-2 text-[11px] leading-relaxed text-foreground/50 p-2 px-2.5 rounded-md" style={{ background: "oklch(0.52 0.14 155 / 4%)" }}>
                     <Check className="h-3 w-3 shrink-0 mt-0.5" style={{ color: "var(--score-high)" }} />
                     <span>{s}</span>
                   </div>
@@ -732,7 +834,7 @@ export function ResultsReport({
       <HumanAuditCTA url={url} onRequested={onHumanAuditRequested} />
 
       {/* ─── Bottom CTA ─── */}
-      <div className="flex flex-col items-center pt-6 pb-8 text-center animate-fade-in">
+      <div className="flex flex-col items-center pt-5 pb-6 text-center animate-fade-in">
         <button onClick={onReset} className="inline-flex items-center gap-2 rounded-lg border px-6 py-2.5 text-[13px] font-medium text-foreground transition-all duration-150 hover:border-foreground/20 active:scale-[0.98]" style={{ borderColor: "var(--border2)", background: "var(--s1)" }}>
           <RotateCcw className="h-3.5 w-3.5" /> Analyze another page
         </button>
@@ -752,12 +854,12 @@ export function ResultsReport({
 /* ── Dashboard Section Wrapper ── */
 function DashSection({ icon, title, subtitle, children }: { icon: React.ReactNode; title: string; subtitle: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl border p-5 pb-6 mb-6" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-      <div className="flex items-center gap-3 pb-3.5 mb-4 border-b" style={{ borderColor: "var(--border)" }}>
-        <div className="w-8 h-8 rounded-[7px] grid place-items-center shrink-0" style={{ background: "var(--s2)" }}>{icon}</div>
+    <section className="rounded-xl border p-4 pb-5 mb-5" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+      <div className="flex items-center gap-2.5 pb-3 mb-3.5 border-b" style={{ borderColor: "var(--border)" }}>
+        <div className="w-7 h-7 rounded-md grid place-items-center shrink-0" style={{ background: "var(--s2)" }}>{icon}</div>
         <div>
           <h3 className="text-[13px] font-semibold">{title}</h3>
-          <p className="text-[11px] text-foreground/35">{subtitle}</p>
+          <p className="text-[11px] text-foreground/40">{subtitle}</p>
         </div>
       </div>
       {children}
@@ -768,12 +870,12 @@ function DashSection({ icon, title, subtitle, children }: { icon: React.ReactNod
 /* ── Metric Card ── */
 function MetricCard({ label, value, suffix = "", color }: { label: string; value: number; suffix?: string; color: string }) {
   return (
-    <div className="dash-card rounded-xl border p-4 flex flex-col items-center justify-center text-center" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-      <div className="flex items-baseline gap-0.5 mb-1">
-        <span className="text-[22px] font-bold tabular-nums animate-count-up" style={{ color }}>{value}</span>
-        {suffix && <span className="text-[11px] text-foreground/30">{suffix}</span>}
+    <div className="dash-card rounded-xl border p-3 flex flex-col items-center justify-center text-center" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+      <div className="flex items-baseline gap-0.5 mb-0.5">
+        <span className="text-[20px] font-bold tabular-nums animate-count-up" style={{ color }}>{value}</span>
+        {suffix && <span className="text-[10px] text-foreground/30">{suffix}</span>}
       </div>
-      <span className="text-[10px] text-foreground/40 font-medium leading-tight">{label}</span>
+      <span className="text-[10px] text-foreground/45 font-medium leading-tight">{label}</span>
     </div>
   );
 }
@@ -804,15 +906,15 @@ function BarChartRow({ label, score, color, note }: { label: string; score: numb
 /* ── Metric Grid Card with Sparkline ── */
 function MetricGridCard({ label, score, color, icon, sparkData, note, desc }: { label: string; score: number; color: string; icon: React.ReactNode; sparkData: number[]; note?: string; desc?: string }) {
   return (
-    <div className="dash-card rounded-xl border p-4" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-      <div className="flex items-center justify-between mb-1">
-        <div className="flex items-center gap-1.5 text-[11px] text-foreground/40">
+    <div className="dash-card rounded-xl border p-3.5" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+      <div className="flex items-center justify-between mb-0.5">
+        <div className="flex items-center gap-1.5 text-[11px] text-foreground/45">
           <span style={{ color }}>{icon}</span>
           <span className="truncate">{label}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-[18px] font-bold font-mono" style={{ color }}>{score}</span>
-          <span className="text-[9px] text-foreground/25 leading-none">{scoreInterpretation(score)}</span>
+          <span className="text-[17px] font-bold font-mono" style={{ color }}>{score}</span>
+          <span className="text-[9px] text-foreground/30 leading-none">{scoreInterpretation(score)}</span>
         </div>
       </div>
       {desc && <p className="text-[9px] text-foreground/25 mb-1.5 leading-snug">{desc}</p>}
@@ -859,10 +961,43 @@ function InsightDashCard({ finding, defaultOpen = false }: { finding: Finding; d
       </div>
       <div className={`insight-expand ${open ? "open" : ""}`}>
         <div>
-          <div className="px-3.5 pb-3.5 pt-0 text-[12px] text-foreground/45 leading-relaxed border-t" style={{ borderColor: s.border }}>
+          <div className="px-3.5 pb-3.5 pt-0 text-[12px] text-foreground/50 leading-relaxed border-t" style={{ borderColor: s.border }}>
             <p className="pt-3">{finding.desc}</p>
+
+            {/* Behavioral context block */}
+            {finding.userExperience && (
+              <div className="mt-2.5 p-2.5 rounded-md text-[11px] border-l-2" style={{ background: "oklch(0.62 0.18 275 / 4%)", borderColor: "oklch(0.62 0.18 275 / 30%)" }}>
+                <span className="font-semibold text-foreground/55 flex items-center gap-1 mb-0.5"><User className="h-3 w-3" style={{ color: "oklch(0.62 0.18 275)" }} /> User experience</span>
+                <span className="text-foreground/40">{finding.userExperience}</span>
+              </div>
+            )}
+
+            {/* Journey stage + behavioral mechanism badges */}
+            {(finding.journeyStage || finding.behavioralMechanism) && (
+              <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                {finding.journeyStage && JOURNEY_STAGE_COLORS[finding.journeyStage] && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ background: JOURNEY_STAGE_COLORS[finding.journeyStage].bg, color: JOURNEY_STAGE_COLORS[finding.journeyStage].color }}>
+                    {JOURNEY_STAGE_COLORS[finding.journeyStage].label} stage
+                  </span>
+                )}
+                {finding.behavioralMechanism && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-medium border" style={{ borderColor: "var(--border)", color: "var(--foreground)", opacity: 0.4 }}>
+                    {finding.behavioralMechanism}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Friction cascade */}
+            {finding.frictionCascade && (
+              <div className="mt-2 p-2.5 rounded-md text-[11px]" style={{ background: "oklch(0.55 0.17 20 / 4%)" }}>
+                <span className="font-semibold" style={{ color: "var(--score-low)" }}>Friction cascade: </span>
+                <span className="text-foreground/40">{finding.frictionCascade}</span>
+              </div>
+            )}
+
             {finding.whyItMatters && (
-              <div className="mt-2 p-2.5 rounded-md text-[11px]" style={{ background: "oklch(0.58 0.16 75 / 4%)" }}>
+              <div className="mt-1.5 p-2.5 rounded-md text-[11px]" style={{ background: "oklch(0.58 0.16 75 / 4%)" }}>
                 <span className="font-semibold" style={{ color: "var(--score-mid)" }}>Why it matters: </span>{finding.whyItMatters}
               </div>
             )}
@@ -882,17 +1017,17 @@ function InsightDashCard({ finding, defaultOpen = false }: { finding: Finding; d
 function SectionCard({ section, isExpanded, onClick }: { section: AuditSection; isExpanded: boolean; onClick: () => void }) {
   const issueCount = section.findings.filter(f => f.type === "issue").length;
   return (
-    <button onClick={onClick} className={`dash-card rounded-xl border p-3.5 text-left transition-all duration-200 w-full ${isExpanded ? "ring-2" : ""}`} style={{ background: "var(--s1)", borderColor: isExpanded ? "var(--brand-glow)" : "var(--border)", "--tw-ring-color": "var(--brand-glow)" } as React.CSSProperties}>
-      <div className="flex items-center gap-2 mb-2">
-        <div className="w-6 h-6 rounded-md grid place-items-center shrink-0" style={{ background: "var(--s2)" }}>
-          {SECTION_ICONS[section.id] || <Layers className="h-3.5 w-3.5" />}
+    <button onClick={onClick} className={`dash-card rounded-xl border p-3 text-left transition-all duration-200 w-full ${isExpanded ? "ring-2" : ""}`} style={{ background: "var(--s1)", borderColor: isExpanded ? "var(--brand-glow)" : "var(--border)", "--tw-ring-color": "var(--brand-glow)" } as React.CSSProperties}>
+      <div className="flex items-center gap-2 mb-1.5">
+        <div className="w-5.5 h-5.5 rounded-md grid place-items-center shrink-0" style={{ background: "var(--s2)" }}>
+          {SECTION_ICONS[section.id] || <Layers className="h-3 w-3" />}
         </div>
         <ChevronRight className={`h-3 w-3 text-foreground/20 ml-auto transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`} />
       </div>
-      <p className="text-[11px] font-semibold text-foreground/70 mb-1 truncate">{section.name}</p>
+      <p className="text-[11px] font-semibold text-foreground/70 mb-0.5 truncate">{section.name}</p>
       <div className="flex items-center gap-2">
         <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: scoreColor(section.score) }} />
-        <span className="text-[16px] font-bold font-mono" style={{ color: scoreColor(section.score) }}>{section.score}</span>
+        <span className="text-[15px] font-bold font-mono" style={{ color: scoreColor(section.score) }}>{section.score}</span>
         {issueCount > 0 && (
           <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: "oklch(0.55 0.17 20 / 8%)", color: "var(--score-low)" }}>{issueCount} issues</span>
         )}
@@ -904,10 +1039,10 @@ function SectionCard({ section, isExpanded, onClick }: { section: AuditSection; 
 
 /* ── Radar Chart (SVG) ── */
 function RadarChart({ categories }: { categories: UXAuditResult["categories"] }) {
-  const size = 280;
+  const size = 240;
   const cx = size / 2;
   const cy = size / 2;
-  const maxR = 80;
+  const maxR = 68;
   const cats = [
     { label: "Clarity", score: categories.messageClarity.score, color: "oklch(0.62 0.18 275)" },
     { label: "Cog Load", score: categories.cognitiveLoad.score, color: "oklch(0.62 0.14 245)" },
@@ -983,12 +1118,12 @@ function SeverityDistribution({ counts }: { counts: Record<string, number> }) {
 /* ── Mini Insight (for first-screen analysis) ── */
 function MiniInsight({ icon, label, value, color, hint }: { icon: React.ReactNode; label: string; value: string; color: string; hint?: string }) {
   return (
-    <div className="flex gap-2.5 p-3 rounded-lg text-[12px] leading-relaxed" style={{ background: "var(--s2)" }}>
+    <div className="flex gap-2 p-2.5 rounded-lg text-[11.5px] leading-relaxed" style={{ background: "var(--s2)" }}>
       <span className="shrink-0 mt-0.5" style={{ color }}>{icon}</span>
       <div>
         <span className="font-medium text-foreground/55">{label}: </span>
-        <span className="text-foreground/40">{value}</span>
-        {hint && <p className="text-[10px] text-foreground/25 mt-1">{hint}</p>}
+        <span className="text-foreground/45">{value}</span>
+        {hint && <p className="text-[9px] text-foreground/30 mt-0.5">{hint}</p>}
       </div>
     </div>
   );
@@ -998,12 +1133,12 @@ function MiniInsight({ icon, label, value, color, hint }: { icon: React.ReactNod
 function HeuristicCard({ heuristic }: { heuristic: HeuristicScore }) {
   const color = heuristicColor(heuristic.score);
   return (
-    <div className="rounded-lg border p-3.5" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <div className="text-[12px] font-semibold leading-snug flex-1">{heuristic.name}</div>
-        <span className="text-[13px] font-bold font-mono px-2 py-0.5 rounded-[5px] shrink-0" style={{ color, background: heuristicBg(heuristic.score) }}>{heuristic.score}/10</span>
+    <div className="rounded-lg border p-3" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+      <div className="flex items-start justify-between gap-2 mb-1.5">
+        <div className="text-[11px] font-semibold leading-snug flex-1">{heuristic.name}</div>
+        <span className="text-[12px] font-bold font-mono px-1.5 py-0.5 rounded-[5px] shrink-0" style={{ color, background: heuristicBg(heuristic.score) }}>{heuristic.score}/10</span>
       </div>
-      <div className="h-[3px] rounded-full overflow-hidden mb-2" style={{ background: "var(--s3)" }}>
+      <div className="h-[3px] rounded-full overflow-hidden mb-1.5" style={{ background: "var(--s3)" }}>
         <div className="h-full rounded-full animate-bar-width" style={{ background: color, width: `${heuristic.score * 10}%`, "--bar-width": `${heuristic.score * 10}%` } as React.CSSProperties} />
       </div>
       {heuristic.issues.length > 0 && (
@@ -1047,9 +1182,29 @@ function FindingCard({ finding }: { finding: Finding }) {
           {finding.severity && <span className="text-[10px] px-[5px] py-[1px] rounded ml-1.5 uppercase tracking-wider border" style={SEVERITY_STYLES[finding.severity] || {}}>{finding.severity}</span>}
           {finding.category && <span className="text-[10px] px-1.5 py-[1px] rounded ml-1.5 border text-foreground/30" style={{ borderColor: "var(--border)", background: "var(--s2)" }}>{finding.category}</span>}
         </div>
-        <div className="text-foreground/45">{finding.desc}</div>
+        <div className="text-foreground/50">{finding.desc}</div>
+        {/* Behavioral badges */}
+        {(finding.journeyStage || finding.behavioralMechanism) && (
+          <div className="flex flex-wrap items-center gap-1 mt-1.5">
+            {finding.journeyStage && JOURNEY_STAGE_COLORS[finding.journeyStage] && (
+              <span className="text-[9px] px-1.5 py-[2px] rounded-full font-medium" style={{ background: JOURNEY_STAGE_COLORS[finding.journeyStage].bg, color: JOURNEY_STAGE_COLORS[finding.journeyStage].color }}>
+                {JOURNEY_STAGE_COLORS[finding.journeyStage].label}
+              </span>
+            )}
+            {finding.behavioralMechanism && (
+              <span className="text-[9px] px-1.5 py-[2px] rounded-full border text-foreground/35" style={{ borderColor: "var(--border)" }}>
+                {finding.behavioralMechanism}
+              </span>
+            )}
+          </div>
+        )}
+        {finding.userExperience && (
+          <div className="mt-1.5 p-2 rounded-md text-[11px] border-l-2" style={{ background: "oklch(0.62 0.18 275 / 4%)", borderColor: "oklch(0.62 0.18 275 / 30%)" }}>
+            <span className="text-foreground/40">{finding.userExperience}</span>
+          </div>
+        )}
         {finding.whyItMatters && (
-          <div className="mt-2 p-2 rounded-md text-[11px]" style={{ background: "oklch(0.58 0.16 75 / 4%)" }}>
+          <div className="mt-1.5 p-2 rounded-md text-[11px]" style={{ background: "oklch(0.58 0.16 75 / 4%)" }}>
             <span className="font-semibold" style={{ color: "var(--score-mid)" }}>Why it matters: </span>
             <span className="text-foreground/40">{finding.whyItMatters}</span>
           </div>
@@ -1069,25 +1224,25 @@ function FindingCard({ finding }: { finding: Finding }) {
 function HeroRewrite({ rewrite, locked }: { rewrite: UXAuditResult["rewrite"]; locked: boolean }) {
   return (
     <div className="rounded-xl border overflow-hidden mb-4" style={{ background: "var(--s1)", borderColor: "var(--border2)" }}>
-      <div className="flex items-center gap-2.5 px-[18px] py-3.5 border-b" style={{ borderColor: "var(--border)" }}>
+      <div className="flex items-center gap-2.5 px-4 py-3 border-b" style={{ borderColor: "var(--border)" }}>
         <span className="font-semibold text-[13px]">Hero Rewrite</span>
-        <span className="text-[12px] px-2 py-0.5 rounded tracking-wide" style={{ color: "var(--brand)", background: "var(--brand-dim)", border: "1px solid var(--brand-glow)" }}>AI OPTIMIZED</span>
+        <span className="text-[11px] px-2 py-0.5 rounded tracking-wide" style={{ color: "var(--brand)", background: "var(--brand-dim)", border: "1px solid var(--brand-glow)" }}>AI OPTIMIZED</span>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2">
-        <div className="p-5 sm:border-r" style={{ borderColor: "var(--border)" }}>
-          <p className="text-[12px] uppercase tracking-[1.5px] text-foreground/30 mb-3">Before</p>
-          <p className="text-[18px] leading-tight mb-2 text-foreground/30 line-through">{rewrite.beforeHeadline || "\u2014"}</p>
-          <p className="text-[12px] text-foreground/50 leading-relaxed mb-3">{rewrite.beforeSubheadline || "\u2014"}</p>
+        <div className="p-4 sm:border-r" style={{ borderColor: "var(--border)" }}>
+          <p className="text-[11px] uppercase tracking-[1.5px] text-foreground/30 mb-2.5">Before</p>
+          <p className="text-[16px] leading-tight mb-2 text-foreground/30 line-through">{rewrite.beforeHeadline || "\u2014"}</p>
+          <p className="text-[12px] text-foreground/50 leading-relaxed mb-2.5">{rewrite.beforeSubheadline || "\u2014"}</p>
           <span className="inline-block px-4 py-2 rounded-md text-[12px] font-semibold text-foreground/30 border line-through" style={{ background: "var(--s2)", borderColor: "var(--border)" }}>{rewrite.beforeCTA || "\u2014"}</span>
         </div>
-        <div className="p-5 relative">
-          <p className="text-[12px] uppercase tracking-[1.5px] text-foreground/30 mb-3">After</p>
+        <div className="p-4 relative">
+          <p className="text-[11px] uppercase tracking-[1.5px] text-foreground/30 mb-2.5">After</p>
           {locked ? (
             <LockedOverlay message="AI-optimized copy is available on paid plans" />
           ) : (
             <>
-              <p className="text-[18px] leading-tight mb-2 text-foreground">{rewrite.afterHeadline || "\u2014"}</p>
-              <p className="text-[12px] text-foreground/50 leading-relaxed mb-3">{rewrite.afterSubheadline || "\u2014"}</p>
+              <p className="text-[16px] leading-tight mb-2 text-foreground">{rewrite.afterHeadline || "\u2014"}</p>
+              <p className="text-[12px] text-foreground/55 leading-relaxed mb-2.5">{rewrite.afterSubheadline || "\u2014"}</p>
               <span className="inline-block px-4 py-2 rounded-md text-[12px] font-bold" style={{ background: "var(--brand)", color: "var(--brand-fg)" }}>{rewrite.afterCTA || "\u2014"}</span>
             </>
           )}
@@ -1183,7 +1338,7 @@ function SectionRewriteBlock({ rewrite }: { rewrite: SectionRewrite }) {
 /* ── Report Divider ── */
 function ReportDivider({ label }: { label: string }) {
   return (
-    <div className="flex items-center gap-4 my-8 text-foreground/15 text-[12px] uppercase tracking-[2px]">
+    <div className="flex items-center gap-4 my-6 text-foreground/15 text-[11px] uppercase tracking-[2px]">
       <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
       {label}
       <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
@@ -1214,7 +1369,7 @@ function HumanAuditCTA({ url, onRequested }: { url: string; onRequested: (url: s
   }
 
   return (
-    <div className="mt-2 mb-8 rounded-xl border p-6" style={{ background: "linear-gradient(to bottom, var(--s1), transparent)", borderColor: "var(--border2)" }}>
+    <div className="mt-2 mb-6 rounded-xl border p-5" style={{ background: "linear-gradient(to bottom, var(--s1), transparent)", borderColor: "var(--border2)" }}>
       <div className="flex flex-col sm:flex-row sm:items-start gap-5">
         <div className="flex-1">
           <div className="flex items-center gap-2.5 mb-2">

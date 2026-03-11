@@ -39,9 +39,9 @@ function hasRTL(text: string | undefined | null): boolean {
 /** Check if audit data contains RTL content anywhere */
 function auditHasRTL(data: UXAuditResult): boolean {
   if (hasRTL(data.executiveSummary)) return true;
-  if (data.conversionKillers.some(hasRTL)) return true;
-  if (data.quickWins.some(hasRTL)) return true;
-  if (data.strategicFixes.some(hasRTL)) return true;
+  if (data.conversionKillers.some(k => hasRTL(typeof k === "string" ? k : k.title))) return true;
+  if (data.quickWins.some(w => hasRTL(typeof w === "string" ? w : w.text))) return true;
+  if (data.strategicFixes.some(f => hasRTL(typeof f === "string" ? f : f.text))) return true;
   if (data.sections.some(s => hasRTL(s.subtitle) || s.findings.some(f => hasRTL(f.title) || hasRTL(f.desc)))) return true;
   if (hasRTL(data.rewrite.beforeHeadline) || hasRTL(data.rewrite.afterHeadline)) return true;
   return false;
@@ -182,7 +182,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
         {data.conversionKillers.map((k, i) => (
           <View key={i} style={styles.bulletItem}>
             <Text style={styles.bullet}>•</Text>
-            <Text style={styles.bulletText}>{k}</Text>
+            <Text style={styles.bulletText}>{typeof k === "string" ? k : k.title}</Text>
           </View>
         ))}
 
@@ -191,7 +191,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
         {data.quickWins.map((w, i) => (
           <View key={i} style={styles.bulletItem}>
             <Text style={[styles.bullet, { color: "#22c55e" }]}>✓</Text>
-            <Text style={styles.bulletText}>{w}</Text>
+            <Text style={styles.bulletText}>{typeof w === "string" ? w : w.text}</Text>
           </View>
         ))}
 
@@ -200,7 +200,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
         {data.strategicFixes.map((f, i) => (
           <View key={i} style={styles.bulletItem}>
             <Text style={styles.bullet}>→</Text>
-            <Text style={styles.bulletText}>{f}</Text>
+            <Text style={styles.bulletText}>{typeof f === "string" ? f : f.text}</Text>
           </View>
         ))}
 

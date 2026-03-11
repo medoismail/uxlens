@@ -5,6 +5,8 @@ export interface CategoryScore {
   note: string;
 }
 
+export type JourneyStage = "awareness" | "consideration" | "evaluation" | "conviction" | "action";
+
 export interface Finding {
   type: "issue" | "warning" | "positive";
   title: string;
@@ -14,6 +16,14 @@ export interface Finding {
   category?: string;
   whyItMatters?: string;
   recommendedFix?: string;
+  /** What the visitor experiences at this friction point */
+  userExperience?: string;
+  /** Psychological principle being violated (e.g. "loss-aversion trigger", "cognitive fluency violation") */
+  behavioralMechanism?: string;
+  /** Which stage of the visitor decision journey this affects */
+  journeyStage?: JourneyStage;
+  /** How this issue cascades to impact subsequent decision stages */
+  frictionCascade?: string;
 }
 
 export interface AuditSection {
@@ -33,6 +43,12 @@ export interface FirstScreenAnalysis {
   dominantEmotion: string;
   exitReason: string;
   clarityConfidence: number;
+  /** What visitors THINK the page is about in the first 5 seconds */
+  visitorMentalModel?: string;
+  /** The primary question blocking the visitor from engaging further */
+  decisionBarrier?: string;
+  /** Ordered attention sequence: what visitors look at first → second → third */
+  attentionSequence?: string[];
 }
 
 export interface ConfusionMap {
@@ -40,11 +56,21 @@ export interface ConfusionMap {
   densityScore: number;
   frictionWords: number;
   decisionParalysis: number;
+  /** What the jargon level means for user comprehension behavior */
+  jargonImpact?: string;
+  /** How information density affects scanning vs. reading behavior */
+  densityImpact?: string;
+  /** What friction language signals to the visitor psychologically */
+  frictionImpact?: string;
+  /** What choice overload does to decision-making speed */
+  paralysisImpact?: string;
 }
 
 export interface TrustMatrixItem {
   label: string;
   score: number;
+  /** What this trust score means for visitor confidence at the decision stage */
+  behavioralNote?: string;
 }
 
 /* ── Heuristic Evaluation (Nielsen's 10 Usability Heuristics) ── */
@@ -90,13 +116,38 @@ export interface StructureRewrite {
 
 export type SectionRewrite = TextRewrite | StructureRewrite;
 
+/** Structured conversion killer with behavioral context */
+export interface ConversionKillerItem {
+  title: string;
+  description: string;
+  /** Which visitors this blocker primarily affects */
+  affectedVisitors?: string;
+  /** How this issue cascades through the decision journey */
+  behavioralCascade?: string;
+  /** Expected conversion lift if this is fixed */
+  expectedLift?: string;
+}
+
+/** Backward-compatible: old audits have string[], new audits have object[] */
+export type ConversionKiller = string | ConversionKillerItem;
+
+/** Quick win or strategic fix with behavioral impact context */
+export interface ActionItem {
+  text: string;
+  /** Expected behavioral change if implemented */
+  expectedImpact?: string;
+}
+
+/** Backward-compatible: old audits have string[], new audits have object[] */
+export type ActionableItem = string | ActionItem;
+
 export interface UXAuditResult {
   overallScore: number;
   grade: string;
   executiveSummary: string;
-  conversionKillers: string[];
-  quickWins: string[];
-  strategicFixes: string[];
+  conversionKillers: ConversionKiller[];
+  quickWins: ActionableItem[];
+  strategicFixes: ActionableItem[];
   flags: string[];
   categories: {
     messageClarity: CategoryScore;

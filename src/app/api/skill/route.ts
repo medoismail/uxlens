@@ -158,15 +158,15 @@ function createSkillServer(userId: string, keyId: string) {
 
       if (audit.conversionKillers?.length) {
         text += `\n## 🚨 Conversion Killers\n\n`;
-        audit.conversionKillers.forEach((k: string, i: number) => { text += `${i + 1}. ${k}\n`; });
+        audit.conversionKillers.forEach((k, i) => { text += `${i + 1}. ${typeof k === "string" ? k : k.title}\n`; });
       }
       if (audit.quickWins?.length) {
         text += `\n## ⚡ Quick Wins\n\n`;
-        audit.quickWins.forEach((w: string, i: number) => { text += `${i + 1}. ${w}\n`; });
+        audit.quickWins.forEach((w, i) => { text += `${i + 1}. ${typeof w === "string" ? w : w.text}\n`; });
       }
       if (audit.strategicFixes?.length) {
         text += `\n## 🎯 Strategic Fixes\n\n`;
-        audit.strategicFixes.forEach((f: string, i: number) => { text += `${i + 1}. ${f}\n`; });
+        audit.strategicFixes.forEach((f, i) => { text += `${i + 1}. ${typeof f === "string" ? f : f.text}\n`; });
       }
 
       // Top findings with severity
@@ -379,11 +379,11 @@ function createSkillServer(userId: string, keyId: string) {
 
       if (audit.conversionKillers?.length) {
         text += `\n### Conversion Killers\n`;
-        audit.conversionKillers.forEach((k: string, i: number) => { text += `${i + 1}. ${k}\n`; });
+        audit.conversionKillers.forEach((k, i) => { text += `${i + 1}. ${typeof k === "string" ? k : k.title}\n`; });
       }
       if (audit.quickWins?.length) {
         text += `\n### Quick Wins\n`;
-        audit.quickWins.forEach((w: string, i: number) => { text += `${i + 1}. ${w}\n`; });
+        audit.quickWins.forEach((w, i) => { text += `${i + 1}. ${typeof w === "string" ? w : w.text}\n`; });
       }
 
       // Top findings with severity
