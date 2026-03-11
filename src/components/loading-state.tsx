@@ -16,42 +16,38 @@ const PIPELINE_STEPS = [
   { num: "10", name: "Heuristic Evaluation", desc: "Scoring 10 Nielsen usability heuristics with issues & passes" },
 ];
 
-const STEP_DURATION = 2200; // ms per step total
-const PROGRESS_DURATION = 1600; // ms for the progress bar fill
+const TOTAL_STEPS = PIPELINE_STEPS.length;
+const STEP_DURATION = 2000; // 2s per step → ~20s total for 10 steps
+const PROGRESS_FILL_TIME = 1400; // time for progress bar to fill within each step
 
 export function LoadingState() {
   const [activeStep, setActiveStep] = useState(0);
   const [phase, setPhase] = useState<"enter" | "loading" | "done" | "exit">("enter");
+  const isLastStep = activeStep === TOTAL_STEPS - 1;
 
   useEffect(() => {
-    // Phase timeline per step:
-    // 0ms: enter (slide in)
-    // 300ms: loading (progress bar fills)
-    // 1900ms: done (checkmark)
-    // 2000ms: exit (slide out)
-    // 2200ms: next step
-
     const timers: ReturnType<typeof setTimeout>[] = [];
 
     function runStep(step: number) {
-      if (step >= PIPELINE_STEPS.length) return;
+      if (step >= TOTAL_STEPS) return;
+      const last = step === TOTAL_STEPS - 1;
 
       setActiveStep(step);
       setPhase("enter");
 
-      timers.push(setTimeout(() => setPhase("loading"), 300));
-      timers.push(setTimeout(() => setPhase("done"), 300 + PROGRESS_DURATION));
-      timers.push(setTimeout(() => setPhase("exit"), STEP_DURATION - 200));
-      timers.push(
-        setTimeout(() => {
-          if (step < PIPELINE_STEPS.length - 1) {
-            runStep(step + 1);
-          } else {
-            // Stay on last step in "done" state
-            setPhase("done");
-          }
-        }, STEP_DURATION)
-      );
+      // Enter → Loading (progress bar starts filling)
+      timers.push(setTimeout(() => setPhase("loading"), 250));
+
+      if (last) {
+        // Last step: never complete, stays in "loading" forever
+        // The component will be unmounted when the audit is ready
+        return;
+      }
+
+      // Steps 1-9: complete and transition to next
+      timers.push(setTimeout(() => setPhase("done"), 250 + PROGRESS_FILL_TIME));
+      timers.push(setTimeout(() => setPhase("exit"), STEP_DURATION - 250));
+      timers.push(setTimeout(() => runStep(step + 1), STEP_DURATION));
     }
 
     runStep(0);
@@ -59,7 +55,6 @@ export function LoadingState() {
   }, []);
 
   const step = PIPELINE_STEPS[activeStep];
-  const progress = ((activeStep + (phase === "done" || phase === "exit" ? 1 : 0.5)) / PIPELINE_STEPS.length) * 100;
 
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 animate-fade-in relative z-[1]">
@@ -79,30 +74,8 @@ export function LoadingState() {
         10-layer structured audit — usually takes 15-25 seconds
       </p>
 
-      {/* Overall progress bar */}
-      <div className="w-full max-w-sm mb-6">
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="text-[11px] font-mono text-foreground/40">
-            Step {activeStep + 1} of {PIPELINE_STEPS.length}
-          </span>
-          <span className="text-[11px] font-mono text-foreground/40 tabular-nums">
-            {Math.round(progress)}%
-          </span>
-        </div>
-        <div className="h-1 rounded-full overflow-hidden" style={{ background: "var(--border)" }}>
-          <div
-            className="h-full rounded-full"
-            style={{
-              width: `${progress}%`,
-              background: "var(--brand)",
-              transition: "width 0.6s cubic-bezier(0.22, 1, 0.36, 1)",
-            }}
-          />
-        </div>
-      </div>
-
       {/* Step card — single card that animates in/out */}
-      <div className="w-full max-w-sm relative" style={{ height: 120 }}>
+      <div className="w-full max-w-sm relative" style={{ height: 110 }}>
         <div
           key={activeStep}
           className={`absolute inset-0 step-card step-card--${phase}`}
@@ -111,11 +84,10 @@ export function LoadingState() {
             className="rounded-xl border p-4 h-full flex flex-col justify-between"
             style={{
               background: "var(--s1)",
-              borderColor: phase === "done" ? "oklch(0.52 0.14 155 / 25%)" : "var(--brand-glow)",
-              boxShadow:
-                phase === "done"
-                  ? "0 0 20px oklch(0.52 0.14 155 / 8%)"
-                  : "0 0 20px var(--brand-glow)",
+              borderColor: phase === "done"
+                ? "var(--brand-glow)"
+                : "var(--brand-glow)",
+              boxShadow: "0 0 20px var(--brand-glow)",
               transition: "border-color 0.3s, box-shadow 0.3s",
             }}
           >
@@ -124,13 +96,13 @@ export function LoadingState() {
               <div
                 className="w-8 h-8 rounded-full border grid place-items-center text-[11px] font-mono font-bold shrink-0 transition-all duration-300"
                 style={{
-                  borderColor: phase === "done" ? "var(--score-high)" : "var(--brand)",
-                  color: phase === "done" ? "var(--score-high)" : "var(--brand)",
-                  background: phase === "done" ? "oklch(0.52 0.14 155 / 10%)" : "var(--brand-dim)",
+                  borderColor: phase === "done" ? "var(--brand)" : "var(--brand)",
+                  color: "var(--brand)",
+                  background: "var(--brand-dim)",
                 }}
               >
-                {phase === "done" ? (
-                  <Check className="h-3.5 w-3.5" style={{ color: "var(--score-high)" }} />
+                {phase === "done" && !isLastStep ? (
+                  <Check className="h-3.5 w-3.5" style={{ color: "var(--brand)" }} />
                 ) : (
                   step.num
                 )}
@@ -141,21 +113,45 @@ export function LoadingState() {
                   {step.desc}
                 </div>
               </div>
+              {/* Loading dots for active step */}
+              {(phase === "loading" || (isLastStep && phase !== "enter")) && (
+                <span className="inline-flex gap-[3px] items-center shrink-0">
+                  {[0, 1, 2].map((d) => (
+                    <span
+                      key={d}
+                      className="w-1 h-1 rounded-full"
+                      style={{
+                        background: "var(--brand)",
+                        animation: "pdot 1.2s ease-in-out infinite",
+                        animationDelay: `${d * 150}ms`,
+                      }}
+                    />
+                  ))}
+                </span>
+              )}
             </div>
 
-            {/* Progress bar inside card */}
+            {/* Progress bar */}
             <div className="mt-3">
               <div className="h-[3px] rounded-full overflow-hidden" style={{ background: "var(--border)" }}>
                 <div
                   className="h-full rounded-full"
                   style={{
-                    width: phase === "enter" ? "0%" : phase === "loading" ? "100%" : "100%",
-                    background:
-                      phase === "done" ? "var(--score-high)" : "var(--brand)",
+                    width:
+                      phase === "enter"
+                        ? "0%"
+                        : isLastStep && phase === "loading"
+                        ? "85%"
+                        : phase === "loading"
+                        ? "100%"
+                        : "100%",
+                    background: "var(--brand)",
                     transition:
-                      phase === "loading"
-                        ? `width ${PROGRESS_DURATION}ms cubic-bezier(0.22, 1, 0.36, 1)`
-                        : "width 0.2s ease, background 0.3s ease",
+                      isLastStep && phase === "loading"
+                        ? `width 12s cubic-bezier(0.1, 0.5, 0.2, 1)`
+                        : phase === "loading"
+                        ? `width ${PROGRESS_FILL_TIME}ms cubic-bezier(0.22, 1, 0.36, 1)`
+                        : "width 0.2s ease",
                   }}
                 />
               </div>
@@ -164,8 +160,8 @@ export function LoadingState() {
         </div>
       </div>
 
-      {/* Completed steps dots */}
-      <div className="flex items-center gap-1.5 mt-6">
+      {/* Step dots indicator */}
+      <div className="flex items-center gap-1.5 mt-5">
         {PIPELINE_STEPS.map((_, i) => (
           <div
             key={i}
@@ -173,10 +169,11 @@ export function LoadingState() {
             style={{
               background:
                 i < activeStep
-                  ? "var(--score-high)"
+                  ? "var(--brand)"
                   : i === activeStep
                   ? "var(--brand)"
                   : "var(--border)",
+              opacity: i < activeStep ? 0.5 : i === activeStep ? 1 : 0.4,
               transform: i === activeStep ? "scale(1.4)" : "scale(1)",
             }}
           />
