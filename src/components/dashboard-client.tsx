@@ -278,47 +278,40 @@ function ApiKeysSection() {
         </div>
       </div>
 
-      {/* Install command */}
-      <div className="mb-4">
+      {/* Install command + key — single unified box */}
+      <div>
         <p className="text-[10px] uppercase tracking-wider text-foreground/30 mb-1.5 font-medium">Install Command</p>
         <div
-          className="flex items-center gap-2 rounded-lg border px-3 py-2"
+          className="rounded-lg border overflow-hidden"
           style={{ borderColor: "var(--border)", background: "var(--s2)" }}
         >
-          <Terminal className="w-3.5 h-3.5 text-foreground/30 shrink-0" />
-          <code className="text-[11px] text-foreground/60 flex-1 font-mono truncate">
-            {installCmd}
-          </code>
-          <button
-            onClick={() => copyToClipboard(installCmd, "cmd")}
-            className="shrink-0 p-1 rounded hover:bg-foreground/5 transition-colors"
-            title="Copy command"
-          >
-            {copiedCmd ? (
-              <Check className="w-3.5 h-3.5 text-green-600" />
-            ) : (
-              <Copy className="w-3.5 h-3.5 text-foreground/30" />
-            )}
-          </button>
-        </div>
-        <p className="text-[10px] text-foreground/25 mt-1">
-          {activeKey
-            ? "Reveal your API key, then copy the command with the key included"
-            : "Generate an API key below, then the command will include it automatically"}
-        </p>
-      </div>
+          {/* Command row */}
+          <div className="flex items-center gap-2 px-3 py-2">
+            <Terminal className="w-3.5 h-3.5 text-foreground/30 shrink-0" />
+            <code className="text-[11px] text-foreground/60 flex-1 font-mono truncate">
+              {installCmd}
+            </code>
+            <button
+              onClick={() => copyToClipboard(installCmd, "cmd")}
+              className="shrink-0 p-1 rounded hover:bg-foreground/5 transition-colors"
+              title="Copy command"
+            >
+              {copiedCmd ? (
+                <Check className="w-3.5 h-3.5 text-green-600" />
+              ) : (
+                <Copy className="w-3.5 h-3.5 text-foreground/30" />
+              )}
+            </button>
+          </div>
 
-      {/* Active key display */}
-      {!loading && activeKey && (
-        <div className="mb-4">
-          <p className="text-[10px] uppercase tracking-wider text-foreground/30 mb-1.5 font-medium">Your API Key</p>
-          <div
-            className="rounded-lg border px-3 py-2.5"
-            style={{ borderColor: "var(--border)", background: "var(--s2)" }}
-          >
-            {/* Key value row */}
-            <div className="flex items-center gap-2">
-              <code className="text-[12px] font-mono text-foreground/60 flex-1 truncate select-all">
+          {/* Key row — inside the same box */}
+          {!loading && activeKey && (
+            <div
+              className="flex items-center gap-2 px-3 py-2 border-t"
+              style={{ borderColor: "var(--border)" }}
+            >
+              <Key className="w-3.5 h-3.5 text-foreground/20 shrink-0" />
+              <code className="text-[11px] font-mono text-foreground/50 flex-1 truncate select-all">
                 {displayKey}
               </code>
 
@@ -326,7 +319,7 @@ function ApiKeysSection() {
               <button
                 onClick={() => toggleVisibility(activeKey.id)}
                 disabled={revealing}
-                className="shrink-0 p-1.5 rounded-md hover:bg-foreground/5 transition-colors disabled:opacity-40"
+                className="shrink-0 p-1 rounded hover:bg-foreground/5 transition-colors disabled:opacity-40"
                 title={visible ? "Hide key" : "Reveal key"}
               >
                 {revealing ? (
@@ -342,7 +335,7 @@ function ApiKeysSection() {
               {visible && revealedKey && (
                 <button
                   onClick={() => copyToClipboard(revealedKey, "key")}
-                  className="shrink-0 p-1.5 rounded-md hover:bg-foreground/5 transition-colors"
+                  className="shrink-0 p-1 rounded hover:bg-foreground/5 transition-colors"
                   title="Copy key"
                 >
                   {copied ? (
@@ -353,37 +346,38 @@ function ApiKeysSection() {
                 </button>
               )}
 
-              {/* Revoke / delete key */}
+              {/* Revoke */}
               <button
                 onClick={() => revoke(activeKey.id)}
-                className="shrink-0 p-1.5 rounded-md hover:bg-red-50 transition-colors group"
+                className="shrink-0 p-1 rounded hover:bg-red-50 transition-colors group"
                 title="Revoke key"
               >
                 <Trash2 className="w-3.5 h-3.5 text-foreground/20 group-hover:text-red-500 transition-colors" />
               </button>
-            </div>
 
-            {/* Meta info */}
-            <div className="flex items-center gap-3 mt-2 pt-2 border-t" style={{ borderColor: "var(--border)" }}>
-              <span className="text-[10px] text-foreground/25">
-                Created {new Date(activeKey.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              {/* Meta */}
+              <span className="shrink-0 text-[10px] text-foreground/20 hidden sm:inline">
+                {activeKey.lastUsedAt
+                  ? `Used ${new Date(activeKey.lastUsedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+                  : `Created ${new Date(activeKey.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`}
               </span>
-              {activeKey.lastUsedAt && (
-                <span className="text-[10px] text-foreground/25">
-                  Last used {new Date(activeKey.lastUsedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                </span>
-              )}
             </div>
-          </div>
+          )}
         </div>
-      )}
+
+        {!activeKey && !loading && (
+          <p className="text-[10px] text-foreground/25 mt-1">
+            Generate an API key below, then the command will include it automatically
+          </p>
+        )}
+      </div>
 
       {/* Generate button — only visible when no active key */}
       {!loading && !activeKey && (
         <button
           onClick={generate}
           disabled={generating}
-          className="inline-flex items-center gap-2 text-[12px] font-medium px-4 py-2 rounded-lg border transition-all duration-150 hover:opacity-80 disabled:opacity-40"
+          className="inline-flex items-center gap-2 text-[12px] font-medium px-4 py-2 mt-3 rounded-lg border transition-all duration-150 hover:opacity-80 disabled:opacity-40"
           style={{
             borderColor: "#bbf7d0",
             color: "#16a34a",
