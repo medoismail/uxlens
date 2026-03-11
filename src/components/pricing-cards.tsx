@@ -3,9 +3,13 @@
 import { Check } from "lucide-react";
 import type { PlanTier } from "@/lib/types";
 
-/* Single Gumroad membership product with 3 tiers (Starter/Pro/Agency).
-   The tier is selected via ?tier= query param on the checkout URL. */
-const GUMROAD_PRODUCT_URL = process.env.NEXT_PUBLIC_GUMROAD_PRODUCT || "";
+/* Each Gumroad plan is a separate product with its own checkout URL.
+   Next.js inlines NEXT_PUBLIC_ vars at build time — must be literal. */
+const CHECKOUT_URLS: Record<string, string> = {
+  starter: process.env.NEXT_PUBLIC_GUMROAD_STARTER || "",
+  pro: process.env.NEXT_PUBLIC_GUMROAD_PRO || "",
+  agency: process.env.NEXT_PUBLIC_GUMROAD_AGENCY || "",
+};
 
 const PLANS = [
   {
@@ -60,10 +64,10 @@ interface PricingCardsProps {
 }
 
 export function PricingCards({ email, currentPlan }: PricingCardsProps) {
-  function handleSelect(tierName: string) {
-    if (!GUMROAD_PRODUCT_URL) return;
-    const url = new URL(GUMROAD_PRODUCT_URL);
-    url.searchParams.set("tier", tierName);
+  function handleSelect(tier: string) {
+    const baseUrl = CHECKOUT_URLS[tier];
+    if (!baseUrl) return;
+    const url = new URL(baseUrl);
     if (email) url.searchParams.set("email", email);
     window.open(url.toString(), "_blank");
   }
@@ -129,7 +133,7 @@ export function PricingCards({ email, currentPlan }: PricingCardsProps) {
               </div>
             ) : (
               <button
-                onClick={() => handleSelect(plan.name)}
+                onClick={() => handleSelect(plan.tier)}
                 className={`w-full mt-5 rounded-lg py-2 text-[14px] font-medium transition-all duration-150 active:scale-[0.98] ${
                   isHigher
                     ? "bg-foreground text-background hover:opacity-90"

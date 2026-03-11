@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   Target, Zap, Shield, Eye, Search, Layers, Pen,
   ChevronDown, ChevronRight, RotateCcw, ArrowRight, User, Lock,
-  Flame, Brain, HelpCircle, Heart, LogOut,
+  Flame, Brain, HelpCircle, Heart, LogOut, Loader2,
   X, AlertTriangle, Check, ListChecks, Sparkles,
   TrendingUp, Lightbulb, BarChart3, Activity,
 } from "lucide-react";
@@ -1350,18 +1350,25 @@ function ReportDivider({ label }: { label: string }) {
 function HumanAuditCTA({ url, onRequested }: { url: string; onRequested: (url: string, email: string) => void }) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [sending, setSending] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("Please enter a valid email"); return; }
-    const baseUrl = process.env.NEXT_PUBLIC_GUMROAD_HUMAN_AUDIT || "#";
-    if (baseUrl !== "#") {
-      const checkoutUrl = new URL(baseUrl);
-      checkoutUrl.searchParams.set("email", email);
-      window.open(checkoutUrl.toString(), "_blank");
+    setSending(true);
+    try {
+      await fetch("/api/human-audit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url, email: email.trim() }),
+      });
+      onRequested(url, email.trim());
+    } catch {
+      setError("Failed to send request. Please try again.");
+    } finally {
+      setSending(false);
     }
-    onRequested(url, email.trim());
   }
 
   return (
@@ -1382,8 +1389,8 @@ function HumanAuditCTA({ url, onRequested }: { url: string; onRequested: (url: s
             <input type="email" placeholder="you@example.com" value={email} onChange={(e) => { setEmail(e.target.value); if (error) setError(""); }} className="h-10 w-full rounded-lg bg-transparent px-4 text-[14px] text-foreground placeholder:text-foreground/50 focus:outline-none" />
           </div>
           {error && <p className="text-[12px] text-destructive animate-fade-in pl-1">{error}</p>}
-          <button type="submit" disabled={!email.trim()} className="inline-flex w-full h-10 items-center justify-center gap-2 rounded-lg px-5 text-[14px] font-bold transition-all duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none" style={{ background: "var(--brand)", color: "var(--brand-fg)" }}>
-            Request Human Audit <ArrowRight className="h-3.5 w-3.5" />
+          <button type="submit" disabled={!email.trim() || sending} className="inline-flex w-full h-10 items-center justify-center gap-2 rounded-lg px-5 text-[14px] font-bold transition-all duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none" style={{ background: "var(--brand)", color: "var(--brand-fg)" }}>
+            {sending ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Sending...</> : <>Request Human Audit <ArrowRight className="h-3.5 w-3.5" /></>}
           </button>
         </form>
       </div>

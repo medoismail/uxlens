@@ -55,7 +55,7 @@ export function LimitReached({
     }
   }
 
-  function handleRequestHumanAudit(e: React.FormEvent) {
+  async function handleRequestHumanAudit(e: React.FormEvent) {
     e.preventDefault();
     setAuditError("");
     if (!emailRegex.test(email)) {
@@ -67,11 +67,14 @@ export function LimitReached({
       return;
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_GUMROAD_HUMAN_AUDIT || "#";
-    if (baseUrl !== "#") {
-      const checkoutUrl = new URL(baseUrl);
-      checkoutUrl.searchParams.set("email", email);
-      window.open(checkoutUrl.toString(), "_blank");
+    try {
+      await fetch("/api/human-audit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: auditUrl.trim(), email: email.trim() }),
+      });
+    } catch {
+      // Still proceed to confirmation
     }
 
     onHumanAuditRequested(auditUrl.trim(), email.trim());

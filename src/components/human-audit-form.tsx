@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, User } from "lucide-react";
+import { ArrowRight, Loader2, User } from "lucide-react";
 import { urlSchema } from "@/lib/schemas";
 
 interface HumanAuditFormProps {
@@ -12,8 +12,9 @@ export function HumanAuditForm({ onRequested }: HumanAuditFormProps) {
   const [url, setUrl] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [sending, setSending] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
 
@@ -29,16 +30,19 @@ export function HumanAuditForm({ onRequested }: HumanAuditFormProps) {
       return;
     }
 
-    // Open Gumroad checkout
-    const baseUrl = process.env.NEXT_PUBLIC_GUMROAD_HUMAN_AUDIT || "#";
-    if (baseUrl !== "#") {
-      const checkoutUrl = new URL(baseUrl);
-      checkoutUrl.searchParams.set("email", email);
-      window.open(checkoutUrl.toString(), "_blank");
+    setSending(true);
+    try {
+      await fetch("/api/human-audit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: url.trim(), email: email.trim() }),
+      });
+      onRequested(url.trim(), email.trim());
+    } catch {
+      setError("Failed to send request. Please try again.");
+    } finally {
+      setSending(false);
     }
-
-    // Trigger confirmation regardless (user completes payment externally)
-    onRequested(url.trim(), email.trim());
   }
 
   return (
@@ -66,12 +70,14 @@ export function HumanAuditForm({ onRequested }: HumanAuditFormProps) {
 
       <button
         type="submit"
-        disabled={!url.trim() || !email.trim()}
+        disabled={!url.trim() || !email.trim() || sending}
         className="inline-flex w-full h-11 items-center justify-center gap-2 rounded-xl bg-foreground px-5 text-[14px] font-medium text-background transition-all duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none"
       >
-        <User className="h-3.5 w-3.5" />
-        Request Human Audit
-        <ArrowRight className="h-3.5 w-3.5" />
+        {sending ? (
+          <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Sending...</>
+        ) : (
+          <><User className="h-3.5 w-3.5" /> Request Human Audit <ArrowRight className="h-3.5 w-3.5" /></>
+        )}
       </button>
     </form>
   );

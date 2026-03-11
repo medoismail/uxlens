@@ -528,7 +528,7 @@ export function ChatMock() {
           {["Explain my trust score", "Rewrite my headline"].map((q) => (
             <span
               key={q}
-              className="text-[10px] px-2.5 py-1 rounded-full border text-foreground/55"
+              className="text-[10px] px-2.5 py-1 rounded-full border text-foreground/55 cursor-pointer hover:text-foreground/70 hover:border-foreground/20 transition-colors"
               style={{ borderColor: "var(--border)" }}
             >
               {q}
@@ -542,13 +542,13 @@ export function ChatMock() {
           style={{ borderColor: "var(--border)" }}
         >
           <div
-            className="flex-1 h-8 rounded-lg px-3 flex items-center text-[12px] text-foreground/40"
+            className="flex-1 h-8 rounded-lg px-3 flex items-center text-[12px] text-foreground/40 cursor-text"
             style={{ background: "var(--s2)" }}
           >
             Ask about your audit...
           </div>
           <div
-            className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
+            className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
             style={{ background: "var(--brand)" }}
           >
             <svg
@@ -669,7 +669,7 @@ export function RewriteMock() {
             <p className="text-[12px] text-foreground/40 line-through leading-relaxed mb-3">
               We help teams create amazing experiences with our platform.
             </p>
-            <span className="inline-block text-[12px] px-3 py-1.5 rounded-md border text-foreground/40 line-through border-foreground/10">
+            <span className="inline-block text-[12px] px-3 py-1.5 rounded-md border text-foreground/40 line-through border-foreground/10 cursor-pointer">
               Learn More
             </span>
           </div>
@@ -693,7 +693,7 @@ export function RewriteMock() {
               audits, no waiting.
             </p>
             <span
-              className="inline-block text-[12px] font-bold px-3 py-1.5 rounded-md"
+              className="inline-block text-[12px] font-bold px-3 py-1.5 rounded-md cursor-pointer hover:opacity-90 transition-opacity"
               style={{
                 background: "var(--brand)",
                 color: "var(--brand-fg)",

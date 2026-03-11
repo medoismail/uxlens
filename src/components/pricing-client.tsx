@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, Sparkles, User, Crown } from "lucide-react";
+import { ArrowRight, Check, Sparkles, User, Crown, Loader2, CheckCircle2 } from "lucide-react";
 import { Show, useAuth } from "@clerk/nextjs";
 import { Header } from "@/components/header";
 import { PricingCards } from "@/components/pricing-cards";
@@ -25,10 +26,30 @@ export function PricingClient({
   const usagePercent = monthlyLimit > 0 ? Math.min(100, Math.round((auditsUsed / monthlyLimit) * 100)) : 0;
   const auditsRemaining = Math.max(0, monthlyLimit - auditsUsed);
 
-  function handleHumanAudit() {
-    const baseUrl = process.env.NEXT_PUBLIC_GUMROAD_HUMAN_AUDIT || "#";
-    if (baseUrl === "#") return;
-    window.open(baseUrl, "_blank");
+  const [haUrl, setHaUrl] = useState("");
+  const [haEmail, setHaEmail] = useState("");
+  const [haError, setHaError] = useState("");
+  const [haSending, setHaSending] = useState(false);
+  const [haSent, setHaSent] = useState(false);
+
+  async function handleHumanAudit(e: React.FormEvent) {
+    e.preventDefault();
+    setHaError("");
+    if (!haUrl.trim()) { setHaError("Please enter a URL"); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(haEmail)) { setHaError("Please enter a valid email"); return; }
+    setHaSending(true);
+    try {
+      await fetch("/api/human-audit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: haUrl.trim(), email: haEmail.trim() }),
+      });
+      setHaSent(true);
+    } catch {
+      setHaError("Failed to send. Please try again.");
+    } finally {
+      setHaSending(false);
+    }
   }
 
   return (
@@ -186,14 +207,31 @@ export function PricingClient({
           <p className="text-[12px] text-foreground/40 leading-relaxed mb-4">
             A real UX professional analyzes your page in depth — not just what&apos;s wrong, but exactly how to fix it with annotated screenshots, priority matrix, and rewrite recommendations.
           </p>
-          <button
-            onClick={handleHumanAudit}
-            className="inline-flex w-full h-10 items-center justify-center gap-2 rounded-lg px-5 text-[14px] font-bold transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
-            style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
-          >
-            Request Human Audit
-            <ArrowRight className="h-3.5 w-3.5" />
-          </button>
+          {haSent ? (
+            <div className="flex items-center gap-2 justify-center py-3 text-[14px] font-medium animate-fade-in" style={{ color: "var(--score-high)" }}>
+              <CheckCircle2 className="h-4 w-4" /> Request sent! We&apos;ll be in touch within 2–3 days.
+            </div>
+          ) : (
+            <form onSubmit={handleHumanAudit} className="space-y-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="focus-glow rounded-lg border transition-all duration-200" style={{ borderColor: "var(--border2)", background: "var(--background)" }}>
+                  <input type="text" placeholder="https://your-page.com" value={haUrl} onChange={(e) => { setHaUrl(e.target.value); if (haError) setHaError(""); }} className="h-10 w-full rounded-lg bg-transparent px-3.5 text-[12px] font-mono text-foreground placeholder:text-foreground/45 focus:outline-none" />
+                </div>
+                <div className="focus-glow rounded-lg border transition-all duration-200" style={{ borderColor: "var(--border2)", background: "var(--background)" }}>
+                  <input type="email" placeholder="you@example.com" value={haEmail} onChange={(e) => { setHaEmail(e.target.value); if (haError) setHaError(""); }} className="h-10 w-full rounded-lg bg-transparent px-3.5 text-[14px] text-foreground placeholder:text-foreground/45 focus:outline-none" />
+                </div>
+              </div>
+              {haError && <p className="text-[12px] text-destructive animate-fade-in pl-1">{haError}</p>}
+              <button
+                type="submit"
+                disabled={!haUrl.trim() || !haEmail.trim() || haSending}
+                className="inline-flex w-full h-10 items-center justify-center gap-2 rounded-lg px-5 text-[14px] font-bold transition-all duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none"
+                style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
+              >
+                {haSending ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Sending...</> : <>Request Human Audit <ArrowRight className="h-3.5 w-3.5" /></>}
+              </button>
+            </form>
+          )}
         </div>
 
         {/* Sign-in CTA for anonymous users */}
