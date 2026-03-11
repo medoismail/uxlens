@@ -1,8 +1,8 @@
 export function HeroIcons() {
   return (
     <svg
-      width="280"
-      height="160"
+      width="210"
+      height="120"
       viewBox="0 0 1929 1100"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
