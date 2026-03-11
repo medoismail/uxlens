@@ -4,6 +4,18 @@ import { useState } from "react";
 import { Download, Loader2 } from "lucide-react";
 import type { UXAuditResult, CompetitorAnalysis, HeatmapZone, VisualAnalysis } from "@/lib/types";
 
+/** Quick check for Arabic/Hebrew/Urdu script in the audit data */
+const RTL_REGEX = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\u0590-\u05FF]/;
+function hasNonLatinContent(data: UXAuditResult): boolean {
+  const sample = [
+    data.executiveSummary,
+    data.sections?.[0]?.subtitle,
+    data.sections?.[0]?.findings?.[0]?.title,
+    data.rewrite?.beforeHeadline,
+  ].filter(Boolean).join(" ");
+  return RTL_REGEX.test(sample);
+}
+
 interface PdfExportButtonProps {
   data: UXAuditResult;
   url: string;
@@ -20,13 +32,36 @@ export function PdfExportButton({
   screenshotUrl, heatmapZones, pageHeight, viewportWidth, visualAnalysis,
 }: PdfExportButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [statusText, setStatusText] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   async function handleExport() {
     setIsGenerating(true);
     setError(null);
+    setStatusText("Generating PDF...");
 
     try {
+      // If audit has Arabic/RTL content, translate to English first
+      let pdfData = data;
+      if (hasNonLatinContent(data)) {
+        setStatusText("Translating to English...");
+        try {
+          const res = await fetch("/api/pdf-translate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ data }),
+          });
+          if (res.ok) {
+            const { data: translated } = await res.json();
+            if (translated) pdfData = translated;
+          }
+        } catch (e) {
+          console.warn("Translation failed, using original data:", e);
+          // Fall through with original data
+        }
+        setStatusText("Generating PDF...");
+      }
+
       // Generate heatmap composite image if we have screenshot + zones
       let heatmapImage: string | undefined;
       if (screenshotUrl && heatmapZones && heatmapZones.length > 0) {
@@ -49,7 +84,7 @@ export function PdfExportButton({
 
       const blob = await pdf(
         <AuditPDF
-          data={data}
+          data={pdfData}
           url={url}
           competitorAnalysis={competitorAnalysis}
           heatmapImage={heatmapImage}
@@ -76,6 +111,7 @@ export function PdfExportButton({
       setError(`Failed to generate PDF: ${msg}`);
     } finally {
       setIsGenerating(false);
+      setStatusText("");
     }
   }
 
@@ -94,7 +130,7 @@ export function PdfExportButton({
       {isGenerating ? (
         <>
           <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          Generating PDF...
+          {statusText || "Generating PDF..."}
         </>
       ) : (
         <>

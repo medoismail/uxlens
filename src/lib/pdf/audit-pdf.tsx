@@ -124,9 +124,9 @@ interface AuditPDFProps {
 }
 
 export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAnalysis }: AuditPDFProps) {
-  // Auto-detect script — use Arabic font + RTL layout when RTL content is detected
-  const isRTL = auditHasRTL(data);
-  const font = isRTL ? "NotoSansArabic" : "NotoSans";
+  // Always use LTR English layout — Arabic content is auto-translated before PDF export
+  const isRTL = false;
+  const font = "NotoSans";
   const styles = buildStyles(font, isRTL);
 
   let domain = url;
