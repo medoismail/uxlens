@@ -512,7 +512,7 @@ export function ResultsReport({
         <DashSection icon={<Activity className="h-4 w-4" style={{ color: "var(--accent-blue)" }} />} title="Visual Analytics" subtitle="UX quality breakdown and issue distribution">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             {/* Radar Chart */}
-            <div className="rounded-xl shadow-elevation-1 p-4 flex flex-col items-center" style={{ background: "var(--s1)" }}>
+            <div className="rounded-xl border p-4 flex flex-col items-center" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
               <p className="text-[12px] uppercase tracking-[2px] text-foreground/50 mb-3 self-start">UX Score Radar</p>
               <RadarChart categories={data.categories} />
             </div>
@@ -520,14 +520,14 @@ export function ResultsReport({
             {/* Severity Distribution + Visual Health */}
             <div className="flex flex-col gap-3">
               {/* Severity Distribution */}
-              <div className="rounded-xl shadow-elevation-1 p-4" style={{ background: "var(--s1)" }}>
+              <div className="rounded-xl border p-4" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
                 <p className="text-[12px] uppercase tracking-[2px] text-foreground/50 mb-2.5">Issue Severity</p>
                 <SeverityDistribution counts={severityCounts} />
               </div>
 
               {/* Visual Health (if available) */}
               {visualAnalysis && visualAnalysisStatus === "done" && (
-                <div className="rounded-xl shadow-elevation-1 p-4" style={{ background: "var(--s1)" }}>
+                <div className="rounded-xl border p-4" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
                   <p className="text-[12px] uppercase tracking-[2px] text-foreground/50 mb-2.5">Visual Health</p>
                   <div className="flex flex-col gap-2">
                     {[
@@ -550,7 +550,7 @@ export function ResultsReport({
               )}
 
               {visualAnalysisStatus === "loading" && (
-                <div className="rounded-xl shadow-elevation-1 p-5" style={{ background: "var(--s1)" }}>
+                <div className="rounded-xl border p-5" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
                   <p className="text-[12px] uppercase tracking-[2px] text-foreground/45 mb-3">Visual Health</p>
                   <div className="flex items-center gap-2 justify-center py-4">
                     <div className="h-3.5 w-3.5 border-2 border-foreground/15 border-t-foreground/40 rounded-full animate-spin" />
@@ -711,7 +711,7 @@ export function ResultsReport({
         <ScrollReveal>
           <DashSection icon={<ListChecks className="h-4 w-4" style={{ color: "var(--accent-purple)" }} />} title="Heuristic Insights" subtitle={`Nielsen's 10 heuristics — Overall: ${data.heuristicEvaluation.overallHeuristicScore.toFixed(1)}/10`}>
             {/* Overall score */}
-            <div className="flex items-center gap-3 mb-4 p-2.5 rounded-lg shadow-elevation-1" style={{ background: "var(--s2)" }}>
+            <div className="flex items-center gap-3 mb-4 p-2.5 rounded-lg border" style={{ background: "var(--s2)", borderColor: "var(--border)" }}>
               <span className="text-[22px] font-bold font-mono" style={{ color: heuristicColor(data.heuristicEvaluation.overallHeuristicScore) }}>{data.heuristicEvaluation.overallHeuristicScore.toFixed(1)}</span>
               <div>
                 <div className="text-[12px] font-semibold">Overall Heuristic Score</div>
@@ -1133,7 +1133,7 @@ function MiniInsight({ icon, label, value, color, hint }: { icon: React.ReactNod
 function HeuristicCard({ heuristic }: { heuristic: HeuristicScore }) {
   const color = heuristicColor(heuristic.score);
   return (
-    <div className="rounded-lg shadow-elevation-1 p-3" style={{ background: "var(--s1)" }}>
+    <div className="rounded-lg border p-3" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
       <div className="flex items-start justify-between gap-2 mb-1.5">
         <div className="text-[12px] font-semibold leading-snug flex-1">{heuristic.name}</div>
         <span className="text-[12px] font-bold font-mono px-1.5 py-0.5 rounded-[5px] shrink-0" style={{ color, background: heuristicBg(heuristic.score) }}>{heuristic.score}/10</span>
