@@ -8,7 +8,7 @@ import { updateCompetitorAnalysis } from "@/lib/db/audits";
 import { PLAN_FEATURES } from "@/lib/types";
 import type { PlanTier, CompetitorAnalysis } from "@/lib/types";
 
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 function err(message: string, status = 400) {
   return NextResponse.json({ success: false, error: message }, { status });

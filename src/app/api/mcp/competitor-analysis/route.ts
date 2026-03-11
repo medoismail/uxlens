@@ -6,7 +6,7 @@ import { updateCompetitorAnalysis } from "@/lib/db/audits";
 import { authenticateMcpRequest, checkMcpRateLimit } from "@/lib/mcp-auth";
 import type { CompetitorAnalysis } from "@/lib/types";
 
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 /**
  * POST /api/mcp/competitor-analysis
