@@ -304,12 +304,12 @@ The JSON structure must be exactly:
   "strategicFixes": [<string>, <string>],
   "flags": [<string: short flag label, max 4>],
   "categories": {
-    "messageClarity":    { "score": <0-100>, "note": <string: 1-sentence insight> },
-    "cognitiveLoad":     { "score": <0-100>, "note": <string> },
-    "conversionArch":    { "score": <0-100>, "note": <string> },
-    "trustSignals":      { "score": <0-100>, "note": <string> },
-    "contradictions":    { "score": <0-100>, "note": <string> },
-    "firstScreen":       { "score": <0-100>, "note": <string> }
+    "messageClarity":    { "score": <0-100>, "note": <string: 2-3 sentences — explain the score, the key behavioral pattern observed, and what this means for visitor conversion> },
+    "cognitiveLoad":     { "score": <0-100>, "note": <string: 2-3 sentences — describe the cognitive friction level, specific overload patterns, and the behavioral consequence> },
+    "conversionArch":    { "score": <0-100>, "note": <string: 2-3 sentences — assess the conversion pathway strength, specific blockers, and how this affects action probability> },
+    "trustSignals":      { "score": <0-100>, "note": <string: 2-3 sentences — evaluate the trust foundation, what signals are present or missing, and how this impacts hesitation> },
+    "contradictions":    { "score": <0-100>, "note": <string: 2-3 sentences — describe any consistency issues, specific contradictions found, and how they erode credibility> },
+    "firstScreen":       { "score": <0-100>, "note": <string: 2-3 sentences — assess above-fold effectiveness, what cold-traffic visitors experience, and the impact on bounce rate> }
   },
   "sections": [
     {

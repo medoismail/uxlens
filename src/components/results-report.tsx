@@ -86,13 +86,21 @@ const SECTION_ICONS: Record<string, React.ReactNode> = {
 };
 
 const CATEGORY_DEFS = [
-  { key: "messageClarity", label: "Message Clarity", color: "oklch(0.62 0.18 275)", icon: <Target className="h-3.5 w-3.5" /> },
-  { key: "cognitiveLoad", label: "Cognitive Load", color: "oklch(0.62 0.14 245)", icon: <Brain className="h-3.5 w-3.5" /> },
-  { key: "conversionArch", label: "Conversion Arch.", color: "oklch(0.65 0.16 55)", icon: <Zap className="h-3.5 w-3.5" /> },
-  { key: "trustSignals", label: "Trust Signals", color: "oklch(0.62 0.15 160)", icon: <Shield className="h-3.5 w-3.5" /> },
-  { key: "contradictions", label: "Contradictions", color: "oklch(0.62 0.16 15)", icon: <Search className="h-3.5 w-3.5" /> },
-  { key: "firstScreen", label: "First Screen", color: "oklch(0.62 0.14 200)", icon: <Eye className="h-3.5 w-3.5" /> },
+  { key: "messageClarity", label: "Message Clarity", desc: "How quickly visitors understand your offer", color: "oklch(0.62 0.18 275)", icon: <Target className="h-3.5 w-3.5" /> },
+  { key: "cognitiveLoad", label: "Cognitive Load", desc: "Mental effort needed to process the page", color: "oklch(0.62 0.14 245)", icon: <Brain className="h-3.5 w-3.5" /> },
+  { key: "conversionArch", label: "Conversion Arch.", desc: "Strength of the path from interest to action", color: "oklch(0.65 0.16 55)", icon: <Zap className="h-3.5 w-3.5" /> },
+  { key: "trustSignals", label: "Trust Signals", desc: "Credibility cues that reduce visitor hesitation", color: "oklch(0.62 0.15 160)", icon: <Shield className="h-3.5 w-3.5" /> },
+  { key: "contradictions", label: "Contradictions", desc: "Consistency between claims and evidence", color: "oklch(0.62 0.16 15)", icon: <Search className="h-3.5 w-3.5" /> },
+  { key: "firstScreen", label: "First Screen", desc: "Above-the-fold clarity for cold traffic", color: "oklch(0.62 0.14 200)", icon: <Eye className="h-3.5 w-3.5" /> },
 ] as const;
+
+function scoreInterpretation(score: number): string {
+  if (score >= 80) return "Strong";
+  if (score >= 60) return "Adequate";
+  if (score >= 40) return "Needs work";
+  if (score >= 20) return "Weak";
+  return "Critical";
+}
 
 const FLAG_STYLES: React.CSSProperties[] = [
   { color: "var(--score-low)", borderColor: "oklch(0.55 0.17 20 / 20%)", background: "oklch(0.55 0.17 20 / 7%)" },
@@ -331,7 +339,7 @@ export function ResultsReport({
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {CATEGORY_DEFS.map((cat, idx) => {
               const catData = data.categories[cat.key as keyof typeof data.categories];
-              return <MetricGridCard key={cat.key} label={cat.label} score={catData.score} color={cat.color} icon={cat.icon} sparkData={generateSparkData(catData.score, idx)} />;
+              return <MetricGridCard key={cat.key} label={cat.label} score={catData.score} color={cat.color} icon={cat.icon} sparkData={generateSparkData(catData.score, idx)} note={catData.note} desc={cat.desc} />;
             })}
           </div>
         </DashSection>
@@ -485,6 +493,54 @@ export function ResultsReport({
       </ScrollReveal>
 
       {/* ═══════════════════════════════════════════════════════
+         6b. TRUST MATRIX
+         ═══════════════════════════════════════════════════════ */}
+      {data.trustMatrix && data.trustMatrix.length > 0 && (
+        <ScrollReveal>
+          <DashSection icon={<Shield className="h-4 w-4" style={{ color: "var(--accent-blue)" }} />} title="Trust Matrix" subtitle="Five trust dimensions evaluated by the AI auditor">
+            <div className="flex flex-col gap-3">
+              {[...data.trustMatrix].sort((a, b) => a.score - b.score).map((item) => (
+                <div key={item.label} className="flex items-center gap-3">
+                  <span className="text-[11px] text-foreground/45 w-[130px] sm:w-[155px] shrink-0 truncate">{item.label}</span>
+                  <div className="flex-1 h-[8px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
+                    <div className="h-full rounded-full animate-bar-width" style={{ background: scoreColor(item.score), width: `${item.score}%`, "--bar-width": `${item.score}%` } as React.CSSProperties} />
+                  </div>
+                  <span className="text-[13px] font-bold font-mono w-8 text-right" style={{ color: scoreColor(item.score) }}>{item.score}</span>
+                </div>
+              ))}
+            </div>
+          </DashSection>
+        </ScrollReveal>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════
+         6c. CONFUSION MAP
+         ═══════════════════════════════════════════════════════ */}
+      {data.confusionMap && (
+        <ScrollReveal>
+          <DashSection icon={<Brain className="h-4 w-4" style={{ color: "var(--accent-purple)" }} />} title="Confusion Map" subtitle="Cognitive friction breakdown across four dimensions">
+            <div className="flex flex-col gap-3">
+              {[
+                { label: "Jargon Level", score: data.confusionMap.jargonScore },
+                { label: "Information Density", score: data.confusionMap.densityScore },
+                { label: "Friction Language", score: data.confusionMap.frictionWords },
+                { label: "Decision Paralysis", score: data.confusionMap.decisionParalysis },
+              ].sort((a, b) => b.score - a.score).map((item) => (
+                <div key={item.label} className="flex items-center gap-3">
+                  <span className="text-[11px] text-foreground/45 w-[130px] sm:w-[155px] shrink-0 truncate">{item.label}</span>
+                  <div className="flex-1 h-[8px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
+                    <div className="h-full rounded-full animate-bar-width" style={{ background: scoreColor(100 - item.score), width: `${item.score}%`, "--bar-width": `${item.score}%` } as React.CSSProperties} />
+                  </div>
+                  <span className="text-[13px] font-bold font-mono w-8 text-right" style={{ color: scoreColor(100 - item.score) }}>{item.score}</span>
+                </div>
+              ))}
+            </div>
+            <p className="text-[10px] text-foreground/25 mt-3">Higher scores indicate greater cognitive friction.</p>
+          </DashSection>
+        </ScrollReveal>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════
          7. HEATMAP + ATTENTION INSIGHT
          ═══════════════════════════════════════════════════════ */}
       <ScrollReveal>
@@ -492,10 +548,25 @@ export function ResultsReport({
           {/* First screen interpretation */}
           {data.firstScreenAnalysis.immediateUnderstanding && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-4">
-              <MiniInsight icon={<Eye className="h-3.5 w-3.5" />} label="First impression" value={data.firstScreenAnalysis.immediateUnderstanding} color="var(--brand)" />
-              <MiniInsight icon={<HelpCircle className="h-3.5 w-3.5" />} label="Unanswered" value={data.firstScreenAnalysis.unansweredQuestion} color="var(--score-mid)" />
-              <MiniInsight icon={<Heart className="h-3.5 w-3.5" />} label="Dominant emotion" value={data.firstScreenAnalysis.dominantEmotion} color="var(--accent-purple)" />
-              <MiniInsight icon={<LogOut className="h-3.5 w-3.5" />} label="#1 exit reason" value={data.firstScreenAnalysis.exitReason} color="var(--score-low)" />
+              <MiniInsight icon={<Eye className="h-3.5 w-3.5" />} label="First impression" value={data.firstScreenAnalysis.immediateUnderstanding} color="var(--brand)" hint="What visitors understand within 5 seconds" />
+              <MiniInsight icon={<HelpCircle className="h-3.5 w-3.5" />} label="Unanswered" value={data.firstScreenAnalysis.unansweredQuestion} color="var(--score-mid)" hint="The question most likely to cause bounce" />
+              <MiniInsight icon={<Heart className="h-3.5 w-3.5" />} label="Dominant emotion" value={data.firstScreenAnalysis.dominantEmotion} color="var(--accent-purple)" hint="The emotional response triggered by the first screen" />
+              <MiniInsight icon={<LogOut className="h-3.5 w-3.5" />} label="#1 exit reason" value={data.firstScreenAnalysis.exitReason} color="var(--score-low)" hint="The primary reason a visitor would leave within 8 seconds" />
+              {/* Clarity confidence score */}
+              <div className="flex gap-2.5 p-3 rounded-lg text-[12px] leading-relaxed sm:col-span-2" style={{ background: "var(--s2)" }}>
+                <span className="shrink-0 mt-0.5" style={{ color: scoreColor(data.firstScreenAnalysis.clarityConfidence) }}>
+                  <Target className="h-3.5 w-3.5" />
+                </span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-medium text-foreground/55">Clarity confidence: </span>
+                  <span className="text-[16px] font-bold font-mono" style={{ color: scoreColor(data.firstScreenAnalysis.clarityConfidence) }}>
+                    {data.firstScreenAnalysis.clarityConfidence}%
+                  </span>
+                  <span className="text-[10px] text-foreground/30">
+                    {data.firstScreenAnalysis.clarityConfidence >= 70 ? "Visitors likely understand the offer" : data.firstScreenAnalysis.clarityConfidence >= 40 ? "Some visitors may struggle to understand" : "Most visitors will leave confused"}
+                  </span>
+                </div>
+              </div>
             </div>
           )}
 
@@ -703,22 +774,27 @@ function BarChartRow({ label, score, color, note }: { label: string; score: numb
 }
 
 /* ── Metric Grid Card with Sparkline ── */
-function MetricGridCard({ label, score, color, icon, sparkData }: { label: string; score: number; color: string; icon: React.ReactNode; sparkData: number[] }) {
+function MetricGridCard({ label, score, color, icon, sparkData, note, desc }: { label: string; score: number; color: string; icon: React.ReactNode; sparkData: number[]; note?: string; desc?: string }) {
   return (
     <div className="dash-card rounded-xl border p-4" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-1.5 text-[11px] text-foreground/40">
           <span style={{ color }}>{icon}</span>
           <span className="truncate">{label}</span>
         </div>
-        <span className="text-[18px] font-bold font-mono" style={{ color }}>{score}</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-[18px] font-bold font-mono" style={{ color }}>{score}</span>
+          <span className="text-[9px] text-foreground/25 leading-none">{scoreInterpretation(score)}</span>
+        </div>
       </div>
+      {desc && <p className="text-[9px] text-foreground/25 mb-1.5 leading-snug">{desc}</p>}
       {/* Mini sparkline */}
       <div className="flex items-end gap-[3px] h-[20px]">
         {sparkData.map((v, i) => (
           <div key={i} className="flex-1 rounded-sm transition-all duration-500" style={{ background: color, height: `${v * 100}%`, opacity: 0.4 + v * 0.6 }} />
         ))}
       </div>
+      {note && <p className="text-[10px] text-foreground/30 leading-snug mt-2 line-clamp-2">{note}</p>}
     </div>
   );
 }
@@ -749,6 +825,7 @@ function InsightDashCard({ finding, defaultOpen = false }: { finding: Finding; d
         <div className="flex items-center gap-1.5 shrink-0">
           {finding.severity && <span className="text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider border" style={SEVERITY_STYLES[finding.severity] || {}}>{finding.severity}</span>}
           {finding.impact && <span className="text-[10px] px-2 py-0.5 rounded font-medium" style={impactBadge[finding.impact]}>{finding.impact}</span>}
+          {finding.category && <span className="text-[10px] px-1.5 py-0.5 rounded border text-foreground/30 hidden sm:inline" style={{ borderColor: "var(--border)", background: "var(--s2)" }}>{finding.category}</span>}
         </div>
         <ChevronDown className={`h-3 w-3 text-foreground/30 transition-transform duration-200 shrink-0 ${open ? "rotate-180" : ""}`} />
       </div>
@@ -878,13 +955,14 @@ function SeverityDistribution({ counts }: { counts: Record<string, number> }) {
 }
 
 /* ── Mini Insight (for first-screen analysis) ── */
-function MiniInsight({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string; color: string }) {
+function MiniInsight({ icon, label, value, color, hint }: { icon: React.ReactNode; label: string; value: string; color: string; hint?: string }) {
   return (
     <div className="flex gap-2.5 p-3 rounded-lg text-[12px] leading-relaxed" style={{ background: "var(--s2)" }}>
       <span className="shrink-0 mt-0.5" style={{ color }}>{icon}</span>
       <div>
         <span className="font-medium text-foreground/55">{label}: </span>
         <span className="text-foreground/40">{value}</span>
+        {hint && <p className="text-[10px] text-foreground/25 mt-1">{hint}</p>}
       </div>
     </div>
   );
@@ -941,8 +1019,21 @@ function FindingCard({ finding }: { finding: Finding }) {
         <div className="font-medium mb-0.5" style={{ color: s.titleColor }}>
           {finding.title}
           {finding.severity && <span className="text-[10px] px-[5px] py-[1px] rounded ml-1.5 uppercase tracking-wider border" style={SEVERITY_STYLES[finding.severity] || {}}>{finding.severity}</span>}
+          {finding.category && <span className="text-[10px] px-1.5 py-[1px] rounded ml-1.5 border text-foreground/30" style={{ borderColor: "var(--border)", background: "var(--s2)" }}>{finding.category}</span>}
         </div>
         <div className="text-foreground/45">{finding.desc}</div>
+        {finding.whyItMatters && (
+          <div className="mt-2 p-2 rounded-md text-[11px]" style={{ background: "oklch(0.58 0.16 75 / 4%)" }}>
+            <span className="font-semibold" style={{ color: "var(--score-mid)" }}>Why it matters: </span>
+            <span className="text-foreground/40">{finding.whyItMatters}</span>
+          </div>
+        )}
+        {finding.recommendedFix && (
+          <div className="mt-1.5 p-2 rounded-md text-[11px]" style={{ background: "oklch(0.52 0.14 155 / 4%)" }}>
+            <span className="font-semibold" style={{ color: "var(--score-high)" }}>Fix: </span>
+            <span className="text-foreground/40">{finding.recommendedFix}</span>
+          </div>
+        )}
       </div>
     </div>
   );
