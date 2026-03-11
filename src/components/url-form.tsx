@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, Loader2, Globe } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { urlSchema } from "@/lib/schemas";
 
 interface UrlFormProps {
@@ -29,15 +29,10 @@ export function UrlForm({ onSubmit, isLoading }: UrlFormProps) {
     <form onSubmit={handleSubmit} className="w-full">
       <div className="focus-glow relative overflow-hidden rounded-[14px] border transition-all duration-300" style={{ background: "var(--s1)", borderColor: "rgba(0,0,0,0.06)" }}>
         {/* Browser dots */}
-        <div className="flex items-center gap-2.5 px-5 py-3" style={{ borderColor: "rgba(0,0,0,0.05)" }}>
-          <div className="w-[10px] h-[10px] rounded-full shrink-0" style={{ background: "#ff5f57" }} />
-          <div className="w-[10px] h-[10px] rounded-full shrink-0" style={{ background: "#ffbd2e" }} />
-          <div className="w-[10px] h-[10px] rounded-full shrink-0" style={{ background: "#28c840" }} />
-        </div>
-
-        {/* URL input area */}
-        <div className="mx-4 mb-3 flex items-center gap-2.5 rounded-lg border px-4 py-3 transition-colors" style={{ background: "oklch(0 0 0 / 3%)", borderColor: "rgba(0,0,0,0.07)" }}>
-          <Globe className="h-4 w-4 shrink-0 text-foreground/25" />
+        <div className="flex items-center gap-2.5 px-5 py-3.5 border-b" style={{ borderColor: "rgba(0,0,0,0.05)" }}>
+          <div className="w-[10px] h-[10px] rounded-full" style={{ background: "#ff5f57" }} />
+          <div className="w-[10px] h-[10px] rounded-full" style={{ background: "#ffbd2e" }} />
+          <div className="w-[10px] h-[10px] rounded-full" style={{ background: "#28c840" }} />
           <input
             type="text"
             placeholder="https://your-landing-page.com"
@@ -47,12 +42,12 @@ export function UrlForm({ onSubmit, isLoading }: UrlFormProps) {
               if (error) setError("");
             }}
             disabled={isLoading}
-            className="flex-1 bg-transparent text-[14px] font-mono text-foreground/60 placeholder:text-foreground/30 focus:outline-none disabled:opacity-50"
+            className="flex-1 bg-transparent text-[12px] font-mono text-foreground/40 placeholder:text-foreground/20 focus:outline-none disabled:opacity-50 ml-2"
           />
         </div>
 
         {/* Action bar */}
-        <div className="flex items-center justify-between px-5 py-3 gap-4 border-t" style={{ background: "oklch(0 0 0 / 3%)", borderColor: "rgba(0,0,0,0.05)" }}>
+        <div className="flex items-center justify-between px-5 py-3 gap-4" style={{ background: "oklch(0 0 0 / 4%)" }}>
           <p className="text-[10px] font-mono text-foreground/25 tracking-wide hidden sm:block">
             Paste your URL and run the full 10-layer audit
           </p>
