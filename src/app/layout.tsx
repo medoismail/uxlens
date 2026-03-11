@@ -80,10 +80,10 @@ export const metadata: Metadata = {
       "AI UX audit platform with screenshot heatmaps, 10-layer diagnostic, heuristic evaluation, and actionable fixes. Save audits, export PDFs, and chat with AI about your findings.",
     images: [
       {
-        url: "/opengraph-image",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "UXLens — AI-Powered UX Audit Tool",
+        alt: "UXLens — Find What's Killing Your Conversions",
       },
     ],
   },
@@ -92,7 +92,7 @@ export const metadata: Metadata = {
     title: "UXLens — AI UX Audit Platform",
     description:
       "AI UX audit platform with screenshot heatmaps, 10-layer diagnostic, heuristic evaluation, dashboard, PDF export, and AI chat.",
-    images: ["/opengraph-image"],
+    images: ["/og-image.png"],
   },
   category: "technology",
   manifest: "/manifest.webmanifest",
