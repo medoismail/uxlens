@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import { UrlForm } from "@/components/url-form";
+import { HeroIcons } from "@/components/hero-icons";
 
 const HeroBackground = lazy(() =>
   import("@/components/hero-background").then((m) => ({ default: m.HeroBackground }))
@@ -59,24 +60,15 @@ interface HeroProps {
 
 export function Hero({ onSubmit, isLoading }: HeroProps) {
   return (
-    <section className="relative flex flex-col items-center text-center px-6 pt-20 pb-20">
+    <section className="relative flex flex-col items-center text-center px-6 pt-10 pb-20">
       {/* Three.js animated background */}
       <Suspense fallback={null}>
         <HeroBackground />
       </Suspense>
 
-      {/* Badge */}
+      {/* Icons illustration */}
       <div className="animate-fade-in mb-7 relative z-[1]">
-        <span
-          className="inline-flex items-center rounded-full border px-3.5 py-1.5 text-[12px] font-medium tracking-wide uppercase"
-          style={{
-            borderColor: "rgba(0,0,0,0.06)",
-            background: "var(--brand-dim)",
-            color: "var(--brand)",
-          }}
-        >
-          AI-Powered UX Audit Platform
-        </span>
+        <HeroIcons />
       </div>
 
       {/* Headline — 2 lines + rotating word on line 3 */}
