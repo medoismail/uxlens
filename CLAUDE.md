@@ -42,7 +42,7 @@ After updating, always run these greps to catch stragglers:
 | Engine Version | v5 |
 | Layer Count | 10 |
 | AI Model | GPT-4o |
-| Max Tokens | 12,288 |
+| Max Tokens | 16,384 |
 | Pricing | Free $0 (5/mo), Starter $12 (50/mo), Pro $29 (200/mo), Agency $79 (1000/mo) |
 
 ### 10 Diagnostic Layers:

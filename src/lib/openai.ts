@@ -578,7 +578,7 @@ export async function generateUXAudit(
       model: "gpt-4o",
       response_format: { type: "json_object" },
       temperature: 0.4,
-      max_tokens: 12288,
+      max_tokens: 16384,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: buildUserPrompt(content) },
@@ -587,11 +587,25 @@ export async function generateUXAudit(
   );
 
   const raw = response.choices[0]?.message?.content;
+  const finishReason = response.choices[0]?.finish_reason;
+
   if (!raw) {
     throw new Error("No response from OpenAI");
   }
 
-  const parsed = JSON.parse(raw);
+  if (finishReason === "length") {
+    console.error("[UXAudit] Output truncated — finish_reason=length. Response length:", raw.length);
+    throw new Error("AI output was truncated due to token limit. The audit response was too long.");
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (jsonErr) {
+    console.error("[UXAudit] JSON parse failed. finish_reason:", finishReason, "raw length:", raw.length, "last 200 chars:", raw.slice(-200));
+    throw new Error(`Failed to parse AI response as JSON (finish_reason: ${finishReason})`);
+  }
+
   const validated = uxAuditSchema.parse(parsed);
   return validated;
 }
