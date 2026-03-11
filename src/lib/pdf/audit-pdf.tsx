@@ -10,16 +10,16 @@ import {
 } from "@react-pdf/renderer";
 import type { UXAuditResult, CompetitorAnalysis, VisualAnalysis } from "@/lib/types";
 
-/* ── Register Noto Sans for Unicode support ── */
+/* ── Register Noto Sans — self-hosted for reliability (no CDN fetch) ── */
 Font.register({
   family: "NotoSans",
   fonts: [
     {
-      src: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans@latest/latin-400-normal.ttf",
+      src: "/fonts/noto-sans-400.ttf",
       fontWeight: 400,
     },
     {
-      src: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans@latest/latin-700-normal.ttf",
+      src: "/fonts/noto-sans-700.ttf",
       fontWeight: 700,
     },
   ],
