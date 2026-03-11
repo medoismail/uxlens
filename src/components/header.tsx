@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Show, UserButton, SignInButton } from "@clerk/nextjs";
 import { useSubscription } from "@/hooks/use-subscription";
@@ -61,6 +62,15 @@ function Logo({ height = 26 }: { height?: number }) {
 }
 
 export function Header() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <>
       <header className="w-full border-b sticky top-0 z-50 backdrop-blur-md" style={{ borderColor: "rgba(0,0,0,0.05)", background: "oklch(1 0 0 / 88%)" }}>
@@ -116,26 +126,39 @@ export function Header() {
           </div>
         </nav>
 
-        {/* Beta development banner */}
+        {/* Beta development banner — hides on scroll (grid-row + opacity for GPU-composited smoothness) */}
         <div
-          className="w-full border-t text-center py-2.5 px-4"
+          className="grid overflow-hidden"
           style={{
-            borderColor: "rgba(0,0,0,0.04)",
-            background: "linear-gradient(90deg, var(--brand-dim), oklch(0.98 0.005 276), var(--brand-dim))",
+            gridTemplateRows: scrolled ? "0fr" : "1fr",
+            transition: "grid-template-rows 500ms cubic-bezier(0.16, 1, 0.3, 1)",
           }}
         >
-          <p className="text-[11px] text-foreground/50 leading-relaxed max-w-[700px] mx-auto">
-            <span className="font-semibold" style={{ color: "var(--brand)" }}>Beta</span>
-            {" — "}This product is under active development. Plans are not active yet, but you can test it for free with the free plan limitations.
-            {" "}Need Pro access?{" "}
-            <a
-              href="mailto:hi@medoismail.design"
-              className="font-medium underline underline-offset-2 transition-colors hover:opacity-70"
-              style={{ color: "var(--brand)" }}
+          <div className="overflow-hidden min-h-0">
+            <div
+              className="w-full border-t text-center py-2.5 px-4"
+              style={{
+                borderColor: "rgba(0,0,0,0.04)",
+                background: "linear-gradient(90deg, var(--brand-dim), oklch(0.98 0.005 276), var(--brand-dim))",
+                opacity: scrolled ? 0 : 1,
+                transition: "opacity 400ms cubic-bezier(0.16, 1, 0.3, 1)",
+                willChange: "opacity",
+              }}
             >
-              hi@medoismail.design
-            </a>
-          </p>
+              <p className="text-[11px] text-foreground/50 leading-relaxed max-w-[700px] mx-auto">
+                <span className="font-semibold" style={{ color: "var(--brand)" }}>Beta</span>
+                {" — "}This product is under active development. Plans are not active yet, but you can test it for free with the free plan limitations.
+                {" "}Need Pro access?{" "}
+                <a
+                  href="mailto:hi@medoismail.design"
+                  className="font-medium underline underline-offset-2 transition-colors hover:opacity-70"
+                  style={{ color: "var(--brand)" }}
+                >
+                  hi@medoismail.design
+                </a>
+              </p>
+            </div>
+          </div>
         </div>
       </header>
     </>
