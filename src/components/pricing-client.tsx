@@ -120,10 +120,10 @@ export function PricingClient({
         )}
 
         {/* Free tier + Paid plans */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 w-full">
           {/* Free Card */}
           <div
-            className={`relative rounded-xl border p-5 transition-all duration-200 ${
+            className={`relative rounded-2xl border p-6 transition-all duration-250 ${
               isSignedIn && currentPlan === "free"
                 ? "border-foreground/20 shadow-elevation-1 bg-card"
                 : "border-border/40 bg-card/50 hover:border-border/60"
@@ -140,13 +140,13 @@ export function PricingClient({
               </div>
             )}
             <p className="text-[14px] font-semibold text-foreground">Free</p>
-            <div className="mt-2 flex items-baseline gap-0.5">
-              <span className="text-2xl font-bold tracking-tight text-foreground">$0</span>
+            <div className="mt-3 flex items-baseline gap-0.5">
+              <span className="text-3xl font-bold tracking-tight text-foreground">$0</span>
               <span className="text-[12px] text-muted-foreground/60">/mo</span>
             </div>
-            <p className="text-[12px] text-muted-foreground/60 mt-1">5 audits/month</p>
+            <p className="text-[12px] text-muted-foreground/50 mt-1.5">5 audits/month</p>
 
-            <ul className="mt-4 space-y-2">
+            <ul className="mt-5 space-y-2.5">
               {[
                 "Full scores & 6 categories",
                 "Heuristic evaluation (10 heuristics)",
@@ -164,7 +164,7 @@ export function PricingClient({
 
             {isSignedIn && currentPlan === "free" ? (
               <div
-                className="flex items-center justify-center w-full mt-5 rounded-lg py-2 text-[14px] font-medium border"
+                className="flex items-center justify-center w-full mt-6 rounded-xl py-2.5 text-[14px] font-medium border"
                 style={{ borderColor: "var(--brand-glow)", color: "var(--brand)", background: "var(--brand-dim)" }}
               >
                 Your Current Plan
@@ -172,7 +172,7 @@ export function PricingClient({
             ) : (
               <Link
                 href="/"
-                className="flex items-center justify-center w-full mt-5 rounded-lg py-2 text-[14px] font-medium border border-border/50 bg-background text-foreground hover:border-border hover:shadow-elevation-1 transition-all duration-150 active:scale-[0.98]"
+                className="flex items-center justify-center w-full mt-6 rounded-xl py-2.5 text-[14px] font-medium border border-border/50 bg-background text-foreground hover:border-border hover:shadow-elevation-1 transition-all duration-150 active:scale-[0.98]"
               >
                 Get Started Free
               </Link>
@@ -193,7 +193,7 @@ export function PricingClient({
         </div>
 
         {/* Human Audit */}
-        <div className="max-w-xl mx-auto rounded-xl border p-6" style={{ background: "var(--s1)", borderColor: "var(--border2)" }}>
+        <div className="max-w-xl mx-auto rounded-2xl border p-7" style={{ background: "var(--s1)", borderColor: "var(--border2)" }}>
           <div className="flex items-center gap-3 mb-4">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg shrink-0" style={{ background: "var(--brand)" }}>
               <User className="h-4 w-4" style={{ color: "var(--brand-fg)" }} />

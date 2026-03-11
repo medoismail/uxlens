@@ -317,9 +317,9 @@ export function ResultsReport({
          1. EXECUTIVE SUMMARY ROW
          ═══════════════════════════════════════════════════════ */}
       <ScrollReveal>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 mb-5">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
           {/* UX Score — large gauge card */}
-          <div className="col-span-2 sm:col-span-1 dash-card rounded-xl border p-3.5 flex flex-col items-center justify-center" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+          <div className="col-span-2 sm:col-span-1 dash-card rounded-2xl border p-4 flex flex-col items-center justify-center" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
             <div className="relative w-[64px] h-[64px] mb-1.5">
               <svg className="-rotate-90 w-full h-full" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="44" fill="none" strokeWidth="7" style={{ stroke: "var(--s3)" }} />
@@ -343,7 +343,7 @@ export function ResultsReport({
           <MetricCard label="Trust" value={trustScore} suffix="/100" color={scoreColor(trustScore)} />
 
           {/* UX Complexity */}
-          <div className="dash-card rounded-xl border p-3 flex flex-col items-center justify-center text-center" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+          <div className="dash-card rounded-2xl border p-4 flex flex-col items-center justify-center text-center" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
             <span className="text-[18px] font-bold animate-count-up mb-0.5" style={{ color: complexity.color }}>{complexity.label}</span>
             <span className="text-[10px] text-foreground/60 font-medium">Complexity</span>
           </div>
@@ -352,8 +352,8 @@ export function ResultsReport({
 
       {/* Executive summary + flags */}
       <ScrollReveal>
-        <div className="rounded-xl border p-4 mb-5" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-          <p className="text-[12px] text-foreground/70 leading-relaxed mb-3">{data.executiveSummary}</p>
+        <div className="rounded-2xl border p-5 mb-6" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+          <p className="text-[13px] text-foreground/65 leading-relaxed mb-3">{data.executiveSummary}</p>
           <div className="flex flex-wrap gap-1.5">
             {data.flags.map((flag, i) => (
               <span key={i} className="text-[12px] px-2.5 py-0.5 rounded-[5px] border" style={FLAG_STYLES[i % FLAG_STYLES.length]}>{flag}</span>
@@ -380,7 +380,7 @@ export function ResultsReport({
          ═══════════════════════════════════════════════════════ */}
       <ScrollReveal>
         <DashSection icon={<BarChart3 className="h-4 w-4" style={{ color: "var(--brand)" }} />} title="UX Metrics" subtitle="Six diagnostic categories">
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {CATEGORY_DEFS.map((cat, idx) => {
               const catData = data.categories[cat.key as keyof typeof data.categories];
               return <MetricGridCard key={cat.key} label={cat.label} score={catData.score} color={cat.color} icon={cat.icon} sparkData={generateSparkData(catData.score, idx)} note={catData.note} desc={cat.desc} />;
@@ -451,7 +451,7 @@ export function ResultsReport({
          ═══════════════════════════════════════════════════════ */}
       <ScrollReveal>
         <DashSection icon={<Layers className="h-4 w-4" style={{ color: "var(--brand)" }} />} title="Section Analysis" subtitle="Per-section scores and issue breakdown">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {data.sections.map((sec) => (
               <SectionCard
                 key={sec.id}
@@ -854,12 +854,12 @@ export function ResultsReport({
 /* ── Dashboard Section Wrapper ── */
 function DashSection({ icon, title, subtitle, children }: { icon: React.ReactNode; title: string; subtitle: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl border p-4 pb-5 mb-5" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-      <div className="flex items-center gap-2.5 pb-3 mb-3.5 border-b" style={{ borderColor: "var(--border)" }}>
-        <div className="w-7 h-7 rounded-md grid place-items-center shrink-0" style={{ background: "var(--s2)" }}>{icon}</div>
+    <section className="rounded-2xl border p-5 pb-6 mb-6" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+      <div className="flex items-center gap-3 pb-4 mb-4 border-b" style={{ borderColor: "var(--border)" }}>
+        <div className="w-8 h-8 rounded-xl grid place-items-center shrink-0" style={{ background: "var(--s2)" }}>{icon}</div>
         <div>
-          <h3 className="text-[14px] font-semibold">{title}</h3>
-          <p className="text-[12px] text-foreground/55">{subtitle}</p>
+          <h3 className="text-[15px] font-semibold">{title}</h3>
+          <p className="text-[12px] text-foreground/45">{subtitle}</p>
         </div>
       </div>
       {children}
@@ -870,12 +870,12 @@ function DashSection({ icon, title, subtitle, children }: { icon: React.ReactNod
 /* ── Metric Card ── */
 function MetricCard({ label, value, suffix = "", color }: { label: string; value: number; suffix?: string; color: string }) {
   return (
-    <div className="dash-card rounded-xl border p-3 flex flex-col items-center justify-center text-center" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-      <div className="flex items-baseline gap-0.5 mb-0.5">
-        <span className="text-[20px] font-bold tabular-nums animate-count-up" style={{ color }}>{value}</span>
-        {suffix && <span className="text-[10px] text-foreground/50">{suffix}</span>}
+    <div className="dash-card rounded-2xl border p-4 flex flex-col items-center justify-center text-center" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+      <div className="flex items-baseline gap-0.5 mb-1">
+        <span className="text-[24px] font-bold tabular-nums animate-count-up" style={{ color }}>{value}</span>
+        {suffix && <span className="text-[11px] text-foreground/40">{suffix}</span>}
       </div>
-      <span className="text-[10px] text-foreground/60 font-medium leading-tight">{label}</span>
+      <span className="text-[11px] text-foreground/50 font-medium leading-tight">{label}</span>
     </div>
   );
 }
@@ -906,25 +906,25 @@ function BarChartRow({ label, score, color, note }: { label: string; score: numb
 /* ── Metric Grid Card with Sparkline ── */
 function MetricGridCard({ label, score, color, icon, sparkData, note, desc }: { label: string; score: number; color: string; icon: React.ReactNode; sparkData: number[]; note?: string; desc?: string }) {
   return (
-    <div className="dash-card rounded-xl border p-3.5" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-      <div className="flex items-center justify-between mb-0.5">
-        <div className="flex items-center gap-1.5 text-[12px] text-foreground/60">
+    <div className="dash-card rounded-2xl border p-4" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
+      <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center gap-2 text-[12px] text-foreground/50">
           <span style={{ color }}>{icon}</span>
           <span className="truncate">{label}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-[17px] font-bold font-mono" style={{ color }}>{score}</span>
-          <span className="text-[10px] text-foreground/50 leading-none">{scoreInterpretation(score)}</span>
+          <span className="text-[20px] font-bold font-mono" style={{ color }}>{score}</span>
+          <span className="text-[10px] text-foreground/40 leading-none">{scoreInterpretation(score)}</span>
         </div>
       </div>
-      {desc && <p className="text-[10px] text-foreground/45 mb-1.5 leading-snug">{desc}</p>}
+      {desc && <p className="text-[10px] text-foreground/40 mb-2 leading-snug">{desc}</p>}
       {/* Mini sparkline */}
-      <div className="flex items-end gap-[3px] h-[20px]">
+      <div className="flex items-end gap-[3px] h-[22px]">
         {sparkData.map((v, i) => (
-          <div key={i} className="flex-1 rounded-sm transition-all duration-500" style={{ background: color, height: `${v * 100}%`, opacity: 0.4 + v * 0.6 }} />
+          <div key={i} className="flex-1 rounded-sm transition-all duration-500" style={{ background: color, height: `${v * 100}%`, opacity: 0.35 + v * 0.55 }} />
         ))}
       </div>
-      {note && <p className="text-[10px] text-foreground/50 leading-snug mt-2">{note}</p>}
+      {note && <p className="text-[10px] text-foreground/45 leading-snug mt-2.5">{note}</p>}
     </div>
   );
 }
@@ -945,8 +945,8 @@ function InsightDashCard({ finding, defaultOpen = false }: { finding: Finding; d
   };
 
   return (
-    <div className="rounded-lg cursor-pointer transition-all duration-200" style={{ background: s.bg, border: `1px solid ${s.border}` }} onClick={() => setOpen(!open)}>
-      <div className="flex items-center gap-3 p-3.5">
+    <div className="rounded-xl cursor-pointer transition-all duration-200" style={{ background: s.bg, border: `1px solid ${s.border}` }} onClick={() => setOpen(!open)}>
+      <div className="flex items-center gap-3 p-4">
         <span className="shrink-0" style={{ color: s.color }}>{s.icon}</span>
         <div className="flex-1 min-w-0">
           <span className="text-[12px] font-medium block" style={{ color: s.color }}>{finding.title}</span>
@@ -1017,22 +1017,22 @@ function InsightDashCard({ finding, defaultOpen = false }: { finding: Finding; d
 function SectionCard({ section, isExpanded, onClick }: { section: AuditSection; isExpanded: boolean; onClick: () => void }) {
   const issueCount = section.findings.filter(f => f.type === "issue").length;
   return (
-    <button onClick={onClick} className={`dash-card rounded-xl border p-3 text-left transition-all duration-200 w-full ${isExpanded ? "ring-2" : ""}`} style={{ background: "var(--s1)", borderColor: isExpanded ? "var(--brand-glow)" : "var(--border)", "--tw-ring-color": "var(--brand-glow)" } as React.CSSProperties}>
-      <div className="flex items-center gap-2 mb-1.5">
-        <div className="w-5.5 h-5.5 rounded-md grid place-items-center shrink-0" style={{ background: "var(--s2)" }}>
-          {SECTION_ICONS[section.id] || <Layers className="h-3 w-3" />}
+    <button onClick={onClick} className={`dash-card rounded-2xl border p-4 text-left transition-all duration-250 w-full ${isExpanded ? "ring-2" : ""}`} style={{ background: "var(--s1)", borderColor: isExpanded ? "var(--brand-glow)" : "var(--border)", "--tw-ring-color": "var(--brand-glow)" } as React.CSSProperties}>
+      <div className="flex items-center gap-2 mb-2">
+        <div className="w-7 h-7 rounded-lg grid place-items-center shrink-0" style={{ background: "var(--s2)" }}>
+          {SECTION_ICONS[section.id] || <Layers className="h-3.5 w-3.5" />}
         </div>
-        <ChevronRight className={`h-3 w-3 text-foreground/40 ml-auto transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`} />
+        <ChevronRight className={`h-3 w-3 text-foreground/30 ml-auto transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`} />
       </div>
-      <p className="text-[12px] font-semibold text-foreground/70 mb-0.5 truncate">{section.name}</p>
+      <p className="text-[12px] font-semibold text-foreground/65 mb-1 truncate">{section.name}</p>
       <div className="flex items-center gap-2">
         <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: scoreColor(section.score) }} />
-        <span className="text-[14px] font-bold font-mono" style={{ color: scoreColor(section.score) }}>{section.score}</span>
+        <span className="text-[18px] font-bold font-mono" style={{ color: scoreColor(section.score) }}>{section.score}</span>
         {issueCount > 0 && (
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: "oklch(0.55 0.17 20 / 8%)", color: "var(--score-low)" }}>{issueCount} issues</span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: "oklch(0.55 0.17 20 / 8%)", color: "var(--score-low)" }}>{issueCount}</span>
         )}
       </div>
-      <span className="text-[10px] text-foreground/40 mt-1.5 flex items-center gap-0.5">View details <ChevronRight className="h-2.5 w-2.5" /></span>
+      <span className="text-[10px] text-foreground/35 mt-2 flex items-center gap-0.5">View details <ChevronRight className="h-2.5 w-2.5" /></span>
     </button>
   );
 }

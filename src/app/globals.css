@@ -71,8 +71,8 @@
   /* ── Safe area for notched devices (iPhone home indicator) ── */
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 
-  /* ── Backgrounds — pure white / neutral ── */
-  --background: #ffffff;
+  /* ── Backgrounds — very faint brand-tinted off-white ── */
+  --background: oklch(0.99 0.004 290);
   --foreground: oklch(0.145 0.004 285);
 
   --card: #ffffff;
@@ -108,7 +108,7 @@
   --chart-4: oklch(0.60 0.14 245);
   --chart-5: oklch(0.55 0.17 20);
 
-  --radius: 0.625rem;
+  --radius: 0.875rem;
 
   /* ── Sidebar — neutral ── */
   --sidebar: oklch(0.985 0.002 264);
@@ -386,23 +386,23 @@
   50% { opacity: 0; }
 }
 
-/* Soft elevation system */
+/* Soft elevation system — barely-visible, warm shadows */
 .shadow-elevation-1 {
   box-shadow:
-    0 1px 2px oklch(0 0 0 / 6%),
-    0 1px 3px oklch(0 0 0 / 4%);
+    0 1px 2px oklch(0 0 0 / 3%),
+    0 1px 4px oklch(0 0 0 / 2%);
 }
 
 .shadow-elevation-2 {
   box-shadow:
-    0 2px 4px oklch(0 0 0 / 6%),
-    0 4px 12px oklch(0 0 0 / 4%);
+    0 2px 4px oklch(0 0 0 / 3%),
+    0 4px 16px oklch(0 0 0 / 3%);
 }
 
 .shadow-elevation-3 {
   box-shadow:
-    0 4px 8px oklch(0 0 0 / 8%),
-    0 8px 24px oklch(0 0 0 / 6%);
+    0 4px 8px oklch(0 0 0 / 4%),
+    0 8px 32px oklch(0 0 0 / 3%);
 }
 
 /* Score color utilities */
@@ -460,11 +460,11 @@
 
 /* ── Dashboard card hover effect ──────────────────────── */
 .dash-card {
-  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+  transition: transform 250ms ease, box-shadow 250ms ease, border-color 250ms ease;
 }
 .dash-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px oklch(0 0 0 / 6%), 0 1px 3px oklch(0 0 0 / 4%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px oklch(0 0 0 / 4%), 0 1px 3px oklch(0 0 0 / 2%);
 }
 
 /* ── Loading step card animations ─────────────────────── */

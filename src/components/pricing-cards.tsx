@@ -73,7 +73,7 @@ export function PricingCards({ email, currentPlan }: PricingCardsProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
       {PLANS.map((plan) => {
         const isCurrent = currentPlan === plan.tier;
         const isHigher = currentPlan && getPlanRank(plan.tier) > getPlanRank(currentPlan);
@@ -82,7 +82,7 @@ export function PricingCards({ email, currentPlan }: PricingCardsProps) {
         return (
           <div
             key={plan.name}
-            className={`relative rounded-xl border p-5 transition-all duration-200 hover:shadow-elevation-2 ${
+            className={`relative rounded-2xl border p-6 transition-all duration-250 hover:shadow-elevation-2 ${
               isCurrent
                 ? "border-foreground/20 shadow-elevation-1 bg-card"
                 : plan.popular && !currentPlan
@@ -109,13 +109,13 @@ export function PricingCards({ email, currentPlan }: PricingCardsProps) {
             ) : null}
 
             <p className="text-[14px] font-semibold text-foreground">{plan.name}</p>
-            <div className="mt-2 flex items-baseline gap-0.5">
-              <span className="text-2xl font-bold tracking-tight text-foreground">{plan.price}</span>
+            <div className="mt-3 flex items-baseline gap-0.5">
+              <span className="text-3xl font-bold tracking-tight text-foreground">{plan.price}</span>
               <span className="text-[12px] text-muted-foreground/60">{plan.period}</span>
             </div>
-            <p className="text-[12px] text-muted-foreground/60 mt-1">{plan.audits}</p>
+            <p className="text-[12px] text-muted-foreground/50 mt-1.5">{plan.audits}</p>
 
-            <ul className="mt-4 space-y-2">
+            <ul className="mt-5 space-y-2.5">
               {plan.features.map((f) => (
                 <li key={f} className="flex items-start gap-2 text-[12px] text-muted-foreground">
                   <Check className="h-3 w-3 text-foreground/50 mt-0.5 shrink-0" />
@@ -126,7 +126,7 @@ export function PricingCards({ email, currentPlan }: PricingCardsProps) {
 
             {isCurrent ? (
               <div
-                className="flex items-center justify-center w-full mt-5 rounded-lg py-2 text-[14px] font-medium border"
+                className="flex items-center justify-center w-full mt-6 rounded-xl py-2.5 text-[14px] font-medium border"
                 style={{ borderColor: "var(--brand-glow)", color: "var(--brand)", background: "var(--brand-dim)" }}
               >
                 Your Current Plan
@@ -134,7 +134,7 @@ export function PricingCards({ email, currentPlan }: PricingCardsProps) {
             ) : (
               <button
                 onClick={() => handleSelect(plan.tier)}
-                className={`w-full mt-5 rounded-lg py-2 text-[14px] font-medium transition-all duration-150 active:scale-[0.98] ${
+                className={`w-full mt-6 rounded-xl py-2.5 text-[14px] font-medium transition-all duration-150 active:scale-[0.98] ${
                   isHigher
                     ? "bg-foreground text-background hover:opacity-90"
                     : isLower

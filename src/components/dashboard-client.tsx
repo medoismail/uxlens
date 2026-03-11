@@ -59,17 +59,17 @@ function PlanCard({ planInfo, totalAudits }: { planInfo: PlanInfo; totalAudits: 
 
   return (
     <div
-      className="rounded-xl border p-4 mb-6"
+      className="rounded-2xl border p-5 mb-8"
       style={{ borderColor: config.border, background: config.bg }}
     >
       <div className="flex items-center justify-between gap-4 flex-wrap">
         {/* Plan info */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3.5">
           <div
-            className="w-9 h-9 rounded-lg grid place-items-center"
+            className="w-10 h-10 rounded-xl grid place-items-center"
             style={{ background: config.color + "18" }}
           >
-            <Crown className="w-4 h-4" style={{ color: config.color }} />
+            <Crown className="w-4.5 h-4.5" style={{ color: config.color }} />
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -262,13 +262,13 @@ function ApiKeysSection() {
 
   return (
     <div
-      className="rounded-xl border p-5 mb-6"
+      className="rounded-2xl border p-6 mb-8"
       style={{ borderColor: "var(--border)", background: "var(--s1)" }}
     >
-      <div className="flex items-center gap-2.5 mb-3">
+      <div className="flex items-center gap-3 mb-4">
         <div
-          className="w-8 h-8 rounded-lg grid place-items-center"
-          style={{ background: "#16a34a18" }}
+          className="w-10 h-10 rounded-xl grid place-items-center"
+          style={{ background: "#16a34a12" }}
         >
           <Key className="w-4 h-4" style={{ color: "#16a34a" }} />
         </div>
@@ -464,19 +464,19 @@ export function DashboardClient() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
-      <main className="flex-1 w-full max-w-[960px] mx-auto px-7 py-10">
-        <div className="flex items-center justify-between mb-6">
+      <main className="flex-1 w-full max-w-[960px] mx-auto px-7 py-12">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-foreground">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
               Your Audits
             </h1>
-            <p className="text-[12px] text-foreground/40 mt-1">
+            <p className="text-[13px] text-foreground/40 mt-1.5">
               {total} audit{total !== 1 ? "s" : ""} total
             </p>
           </div>
           <Link
             href="/"
-            className="text-[12px] font-medium px-4 py-2 rounded-lg transition-all duration-150 hover:opacity-80"
+            className="text-[13px] font-medium px-5 py-2.5 rounded-xl transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
             style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
           >
             New Audit
@@ -492,16 +492,16 @@ export function DashboardClient() {
         )}
 
         {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
-                className="rounded-xl border p-4 animate-pulse"
+                className="rounded-2xl border p-5 animate-pulse"
                 style={{ borderColor: "var(--border)", background: "var(--s1)" }}
               >
-                <div className="h-4 w-3/4 rounded" style={{ background: "var(--s3)" }} />
-                <div className="h-3 w-1/2 rounded mt-3" style={{ background: "var(--s3)" }} />
-                <div className="h-8 w-16 rounded mt-4" style={{ background: "var(--s3)" }} />
+                <div className="h-4 w-3/4 rounded-lg" style={{ background: "var(--s3)" }} />
+                <div className="h-3 w-1/2 rounded-lg mt-3" style={{ background: "var(--s3)" }} />
+                <div className="h-8 w-16 rounded-lg mt-4" style={{ background: "var(--s3)" }} />
               </div>
             ))}
           </div>
@@ -529,7 +529,7 @@ export function DashboardClient() {
 
         {!loading && audits.length > 0 && (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {audits.map((audit) => {
                 let domain = audit.url;
                 try { domain = new URL(audit.url).hostname.replace("www.", ""); } catch {}
@@ -542,13 +542,13 @@ export function DashboardClient() {
                 return (
                   <div
                     key={audit.id}
-                    className="group relative rounded-xl border p-4 transition-all duration-200 hover:shadow-elevation-1 hover:border-foreground/15"
+                    className="group relative rounded-2xl border p-5 transition-all duration-250 hover:shadow-elevation-2 hover:border-foreground/10"
                     style={{ borderColor: "var(--border)", background: "var(--s1)" }}
                   >
                     {/* Delete button (top-right, visible on hover) */}
                     <button
                       onClick={(e) => { e.stopPropagation(); setDeleteTarget(audit); }}
-                      className="absolute top-3 right-3 z-10 p-1.5 rounded-lg border opacity-0 group-hover:opacity-100 transition-all duration-150 hover:border-red-200 hover:bg-red-50"
+                      className="absolute top-4 right-4 z-10 p-1.5 rounded-xl border opacity-0 group-hover:opacity-100 transition-all duration-150 hover:border-red-200 hover:bg-red-50"
                       style={{ borderColor: "var(--border)", background: "var(--s1)" }}
                       title="Delete audit"
                     >
@@ -558,7 +558,7 @@ export function DashboardClient() {
                     <Link href={`/audit/${audit.id}`} className="block">
                       {/* Thumbnail */}
                       {audit.screenshotPath && (
-                        <div className="relative rounded-lg overflow-hidden mb-3 border h-28" style={{ borderColor: "var(--border)" }}>
+                        <div className="relative rounded-xl overflow-hidden mb-4 border h-32" style={{ borderColor: "var(--border)" }}>
                           <Image
                             src={audit.screenshotPath}
                             alt={`Screenshot of ${domain}`}
@@ -570,25 +570,25 @@ export function DashboardClient() {
                         </div>
                       )}
 
-                      <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0 flex-1">
-                          <p className="text-[14px] font-medium text-foreground truncate group-hover:text-foreground/80 transition-colors">
+                          <p className="text-[14px] font-semibold text-foreground truncate group-hover:text-foreground/80 transition-colors">
                             {domain}
                           </p>
-                          <p className="text-[12px] text-foreground/50 mt-0.5">{date}</p>
+                          <p className="text-[12px] text-foreground/40 mt-1">{date}</p>
                         </div>
 
-                        <div className="flex items-center gap-1.5 shrink-0">
+                        <div className="flex items-center gap-2 shrink-0">
                           <span
-                            className="text-[18px] font-bold tabular-nums"
+                            className="text-[22px] font-bold tabular-nums"
                             style={{ color: scoreColor(audit.score) }}
                           >
                             {audit.score}
                           </span>
                           <span
-                            className="text-[12px] font-mono px-1.5 py-0.5 rounded"
+                            className="text-[11px] font-mono font-medium px-2 py-0.5 rounded-lg"
                             style={{
-                              background: `${scoreColor(audit.score)}15`,
+                              background: `${scoreColor(audit.score)}12`,
                               color: scoreColor(audit.score),
                             }}
                           >
@@ -597,7 +597,7 @@ export function DashboardClient() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1 mt-3 text-[12px] text-foreground/45 group-hover:text-foreground/40 transition-colors">
+                      <div className="flex items-center gap-1.5 mt-4 text-[12px] text-foreground/35 group-hover:text-foreground/50 transition-colors">
                         <ExternalLink className="h-3 w-3" />
                         <span>View full report</span>
                       </div>
