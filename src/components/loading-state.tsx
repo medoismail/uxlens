@@ -76,7 +76,7 @@ export function LoadingState() {
                   background: isActive
                     ? "var(--brand-dim)"
                     : isDone
-                    ? "oklch(0.623 0.178 145 / 8%)"
+                    ? "oklch(0.52 0.14 155 / 8%)"
                     : "transparent",
                   boxShadow: isActive ? "0 0 12px var(--brand-glow)" : "none",
                 }}

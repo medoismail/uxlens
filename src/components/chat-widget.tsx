@@ -305,7 +305,7 @@ export function ChatWidget({ auditId, plan }: ChatWidgetProps) {
 
           {/* Error */}
           {error && (
-            <div className="px-4 py-2 text-[12px] text-center border-t" style={{ borderColor: "var(--border)", color: "var(--score-low)", background: "oklch(0.647 0.176 17 / 5%)" }}>
+            <div className="px-4 py-2 text-[12px] text-center border-t" style={{ borderColor: "var(--border)", color: "var(--score-low)", background: "oklch(0.55 0.17 20 / 5%)" }}>
               {error}
               {error.includes("Pro") && (
                 <Link href="/pricing" className="ml-1 underline font-medium" style={{ color: "var(--brand)" }}>

@@ -39,130 +39,115 @@ function scoreColor(s: number) {
   return "var(--score-low)";
 }
 
-/* ── Score Banner Mock ── */
+/* ════════════════════════════════════════════════════════════
+   Executive Summary Mock (replaces ScoreBannerMock)
+   — 5-card metric row matching new dashboard layout
+   ════════════════════════════════════════════════════════════ */
 
 const MOCK_SCORE = 82;
 const MOCK_GRADE = "B+";
-const MOCK_SUMMARY =
-  "Strong value proposition with room to improve trust signals and reduce cognitive friction above the fold.";
-const MOCK_FLAGS = [
-  { text: "Weak social proof", style: { color: "var(--score-low)", borderColor: "oklch(0.647 0.176 17 / 20%)", background: "oklch(0.647 0.176 17 / 7%)" } },
-  { text: "CTA below fold", style: { color: "var(--score-mid)", borderColor: "oklch(0.725 0.187 91 / 20%)", background: "oklch(0.725 0.187 91 / 7%)" } },
-  { text: "Strong headline", style: { color: "var(--score-high)", borderColor: "oklch(0.623 0.178 145 / 20%)", background: "oklch(0.623 0.178 145 / 7%)" } },
-];
 
-export function ScoreBannerMock() {
+export function ExecutiveSummaryMock() {
   const circumference = 2 * Math.PI * 44;
   const dashOffset = circumference - (MOCK_SCORE / 100) * circumference;
   const dialColor = scoreColor(MOCK_SCORE);
 
   return (
-    <div
-      className="relative overflow-hidden rounded-[14px] border p-6 flex flex-col sm:flex-row gap-5 items-center"
-      style={{ background: "var(--s1)", borderColor: "var(--border2)" }}
-    >
+    <div className="grid grid-cols-5 gap-2">
+      {/* UX Score — large gauge card */}
       <div
-        className="absolute -top-20 -right-20 w-[180px] h-[180px] rounded-full pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(circle, var(--brand-glow) 0%, transparent 65%)",
-        }}
-      />
-
-      {/* Score dial */}
-      <div className="relative w-20 h-20 shrink-0">
-        <svg className="-rotate-90 w-full h-full" viewBox="0 0 100 100">
-          <circle
-            cx="50" cy="50" r="44" fill="none" strokeWidth="7"
-            style={{ stroke: "var(--s3)" }}
-          />
-          <circle
-            cx="50" cy="50" r="44" fill="none"
-            strokeWidth="7" strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={dashOffset}
-            className="animate-ring-fill"
-            style={{
-              stroke: dialColor,
-              "--ring-circumference": circumference,
-              "--ring-offset": dashOffset,
-            } as React.CSSProperties}
-          />
-        </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span
-            className="text-[22px] font-bold tabular-nums leading-none"
-            style={{ color: dialColor }}
-          >
-            {MOCK_SCORE}
-          </span>
-          <span className="text-[10px] uppercase tracking-[1px] text-foreground/35 mt-0.5">
-            / 100
-          </span>
+        className="col-span-2 sm:col-span-1 dash-card rounded-xl border p-3 flex flex-col items-center justify-center"
+        style={{ background: "var(--s1)", borderColor: "var(--border)" }}
+      >
+        <div className="relative w-[52px] h-[52px] mb-1.5">
+          <svg className="-rotate-90 w-full h-full" viewBox="0 0 100 100">
+            <circle
+              cx="50" cy="50" r="44" fill="none" strokeWidth="8"
+              style={{ stroke: "var(--s3)" }}
+            />
+            <circle
+              cx="50" cy="50" r="44" fill="none"
+              strokeWidth="8" strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={dashOffset}
+              className="animate-ring-fill"
+              style={{
+                stroke: dialColor,
+                "--ring-circumference": circumference,
+                "--ring-offset": dashOffset,
+              } as React.CSSProperties}
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span
+              className="text-[16px] font-bold tabular-nums leading-none"
+              style={{ color: dialColor }}
+            >
+              {MOCK_SCORE}
+            </span>
+          </div>
         </div>
+        <span className="text-[9px] text-foreground/40 font-medium">UX Score</span>
+        <span className="text-[8px] text-foreground/25">{MOCK_GRADE}</span>
       </div>
 
-      {/* Info */}
-      <div className="flex-1 min-w-0 text-center sm:text-left">
-        <h3 className="text-xl font-light tracking-tight mb-1">
-          {MOCK_GRADE}
-        </h3>
-        <p className="text-[11px] text-foreground/50 leading-relaxed mb-2.5 max-w-[420px]">
-          {MOCK_SUMMARY}
-        </p>
-        <div className="flex flex-wrap gap-1.5 justify-center sm:justify-start">
-          {MOCK_FLAGS.map((flag) => (
-            <span
-              key={flag.text}
-              className="text-[10px] px-2 py-0.5 rounded-[5px] border"
-              style={flag.style}
-            >
-              {flag.text}
-            </span>
-          ))}
-        </div>
+      {/* Conv. Risk */}
+      <MiniMetricCard label="Conv. Risk" value={22} suffix="%" color={scoreColor(78)} />
+      {/* Readability */}
+      <MiniMetricCard label="Readability" value={72} suffix="%" color={scoreColor(72)} />
+      {/* Trust */}
+      <MiniMetricCard label="Trust" value={70} suffix="/100" color={scoreColor(70)} />
+      {/* Complexity */}
+      <div
+        className="dash-card rounded-xl border p-2.5 flex flex-col items-center justify-center text-center"
+        style={{ background: "var(--s1)", borderColor: "var(--border)" }}
+      >
+        <span className="text-[14px] font-bold mb-0.5" style={{ color: "var(--score-mid)" }}>Medium</span>
+        <span className="text-[9px] text-foreground/40 font-medium">Complexity</span>
       </div>
     </div>
   );
 }
 
-/* ── Category Grid Mock ── */
+function MiniMetricCard({ label, value, suffix = "", color }: { label: string; value: number; suffix?: string; color: string }) {
+  return (
+    <div
+      className="dash-card rounded-xl border p-2.5 flex flex-col items-center justify-center text-center"
+      style={{ background: "var(--s1)", borderColor: "var(--border)" }}
+    >
+      <div className="flex items-baseline gap-0.5 mb-0.5">
+        <span className="text-[16px] font-bold tabular-nums" style={{ color }}>{value}</span>
+        {suffix && <span className="text-[9px] text-foreground/30">{suffix}</span>}
+      </div>
+      <span className="text-[9px] text-foreground/40 font-medium">{label}</span>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   Bar Chart Mock (replaces CategoryGridMock)
+   — Horizontal bars sorted by score ascending (worst first)
+   ════════════════════════════════════════════════════════════ */
 
 const MOCK_CATEGORIES = [
-  { label: "Message Clarity", score: 88, color: "var(--brand)", note: "Clear value prop with strong headline" },
-  { label: "Cognitive Load", score: 72, color: "var(--accent-blue)", note: "Moderate density, simplify above fold" },
-  { label: "Conversion Arch.", score: 79, color: "var(--accent-purple)", note: "Good CTA placement, add urgency" },
-  { label: "Trust Signals", score: 70, color: "var(--score-high)", note: "Add testimonials and security badges" },
-  { label: "Contradictions", score: 85, color: "var(--score-low)", note: "Messaging is mostly consistent" },
-  { label: "First Screen", score: 76, color: "var(--brand-strong)", note: "Headline works, CTA needs visibility" },
+  { label: "Trust Signals", score: 70, color: "oklch(0.62 0.15 160)" },
+  { label: "Cognitive Load", score: 72, color: "oklch(0.62 0.14 245)" },
+  { label: "First Screen", score: 76, color: "oklch(0.62 0.14 200)" },
+  { label: "Conversion Arch.", score: 79, color: "oklch(0.65 0.16 55)" },
+  { label: "Contradictions", score: 85, color: "oklch(0.62 0.16 15)" },
+  { label: "Message Clarity", score: 88, color: "oklch(0.62 0.18 275)" },
 ];
 
-export function CategoryGridMock() {
+export function BarChartMock() {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+    <div className="flex flex-col gap-2">
       {MOCK_CATEGORIES.map((cat) => (
-        <div
-          key={cat.label}
-          className="rounded-[10px] border p-3"
-          style={{ background: "var(--s1)", borderColor: "var(--border)" }}
-        >
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-1.5 text-[10px] text-foreground/40 tracking-wide">
-              <span
-                className="w-1.5 h-1.5 rounded-full shrink-0"
-                style={{ background: cat.color }}
-              />
-              {cat.label}
-            </div>
-            <span
-              className="text-[15px] font-bold font-mono"
-              style={{ color: cat.color }}
-            >
-              {cat.score}
-            </span>
-          </div>
+        <div key={cat.label} className="flex items-center gap-2">
+          <span className="text-[10px] text-foreground/40 w-[90px] sm:w-[110px] shrink-0 truncate">
+            {cat.label}
+          </span>
           <div
-            className="h-[3px] rounded-full overflow-hidden"
+            className="flex-1 h-[6px] rounded-full overflow-hidden"
             style={{ background: "var(--s3)" }}
           >
             <div
@@ -174,12 +159,206 @@ export function CategoryGridMock() {
               } as React.CSSProperties}
             />
           </div>
-          <p className="text-[10px] text-foreground/30 mt-1.5 leading-snug line-clamp-1">
-            {cat.note}
-          </p>
+          <span
+            className="text-[11px] font-bold font-mono w-6 text-right"
+            style={{ color: cat.color }}
+          >
+            {cat.score}
+          </span>
         </div>
       ))}
     </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   Metric Grid Mock (2×3 compact cards with sparklines)
+   ════════════════════════════════════════════════════════════ */
+
+const MOCK_METRIC_GRID = [
+  { label: "Clarity", score: 88, color: "oklch(0.62 0.18 275)" },
+  { label: "Cog. Load", score: 72, color: "oklch(0.62 0.14 245)" },
+  { label: "Conv.", score: 79, color: "oklch(0.65 0.16 55)" },
+  { label: "Trust", score: 70, color: "oklch(0.62 0.15 160)" },
+  { label: "Contra.", score: 85, color: "oklch(0.62 0.16 15)" },
+  { label: "1st Screen", score: 76, color: "oklch(0.62 0.14 200)" },
+];
+
+const SPARK_PATTERNS = [
+  [0.25, 0.50, 1.00, 0.60, 0.80],
+  [0.80, 0.55, 0.30, 0.65, 1.00],
+  [0.40, 1.00, 0.70, 0.35, 0.55],
+  [0.60, 0.40, 0.75, 1.00, 0.50],
+  [1.00, 0.65, 0.40, 0.55, 0.30],
+  [0.35, 0.70, 0.55, 1.00, 0.75],
+];
+function generateSparkData(score: number, index: number = 0): number[] {
+  const s = score / 100;
+  const pattern = SPARK_PATTERNS[index % SPARK_PATTERNS.length];
+  return pattern.map(m => Math.min(1, Math.max(0.08, s * m)));
+}
+
+export function MetricGridMock() {
+  return (
+    <div className="grid grid-cols-3 gap-1.5">
+      {MOCK_METRIC_GRID.map((cat, idx) => {
+        const sparkData = generateSparkData(cat.score, idx);
+        return (
+          <div
+            key={cat.label}
+            className="dash-card rounded-lg border p-2.5"
+            style={{ background: "var(--s1)", borderColor: "var(--border)" }}
+          >
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[9px] text-foreground/35 truncate">{cat.label}</span>
+              <span
+                className="text-[13px] font-bold font-mono"
+                style={{ color: cat.color }}
+              >
+                {cat.score}
+              </span>
+            </div>
+            {/* Mini sparkline */}
+            <div className="flex items-end gap-[2px] h-[14px]">
+              {sparkData.map((v, i) => (
+                <div
+                  key={i}
+                  className="flex-1 rounded-sm"
+                  style={{
+                    background: cat.color,
+                    height: `${v * 100}%`,
+                    opacity: 0.4 + v * 0.6,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   Radar Chart Mock (static SVG for Feature 2 section)
+   — 6-axis spider chart matching the dashboard RadarChart
+   ════════════════════════════════════════════════════════════ */
+
+export function RadarChartMock() {
+  const size = 200;
+  const cx = size / 2;
+  const cy = size / 2;
+  const maxR = 80;
+  const labels = ["Clarity", "Cog. Load", "Conv.", "Trust", "Contra.", "1st Screen"];
+  const scores = [88, 72, 79, 70, 85, 76];
+
+  const getPoint = (index: number, value: number) => {
+    const angle = (Math.PI * 2 * index) / 6 - Math.PI / 2;
+    const r = (value / 100) * maxR;
+    return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+  };
+
+  const gridLevels = [25, 50, 75, 100];
+
+  return (
+    <MockContainer glow>
+      <div className="p-4 flex flex-col items-center">
+        <div className="flex items-center justify-between w-full mb-3">
+          <h4 className="text-[12px] font-semibold text-foreground">
+            UX Score Radar
+          </h4>
+          <span
+            className="text-[10px] font-mono px-2 py-0.5 rounded"
+            style={{ background: "var(--brand-dim)", color: "var(--brand)" }}
+          >
+            6 DIMENSIONS
+          </span>
+        </div>
+
+        <svg
+          width={size}
+          height={size}
+          viewBox={`0 0 ${size} ${size}`}
+          className="animate-radar"
+        >
+          {/* Grid polygons */}
+          {gridLevels.map((level) => {
+            const pts = Array.from({ length: 6 }, (_, i) => getPoint(i, level));
+            return (
+              <polygon
+                key={level}
+                points={pts.map((p) => `${p.x},${p.y}`).join(" ")}
+                fill="none"
+                stroke="var(--s3)"
+                strokeWidth="1"
+              />
+            );
+          })}
+          {/* Axis lines */}
+          {Array.from({ length: 6 }, (_, i) => {
+            const p = getPoint(i, 100);
+            return (
+              <line
+                key={i}
+                x1={cx}
+                y1={cy}
+                x2={p.x}
+                y2={p.y}
+                stroke="var(--s3)"
+                strokeWidth="1"
+              />
+            );
+          })}
+          {/* Data polygon */}
+          <polygon
+            points={scores
+              .map((s, i) => {
+                const p = getPoint(i, s);
+                return `${p.x},${p.y}`;
+              })
+              .join(" ")}
+            fill="oklch(0.504 0.282 276.1 / 12%)"
+            stroke="var(--brand)"
+            strokeWidth="2"
+          />
+          {/* Data dots */}
+          {scores.map((s, i) => {
+            const p = getPoint(i, s);
+            return <circle key={i} cx={p.x} cy={p.y} r="3" fill="var(--brand)" />;
+          })}
+          {/* Labels */}
+          {labels.map((label, i) => {
+            const p = getPoint(i, 118);
+            return (
+              <text
+                key={i}
+                x={p.x}
+                y={p.y}
+                textAnchor="middle"
+                dominantBaseline="central"
+                className="text-[9px] fill-foreground/35"
+              >
+                {label}
+              </text>
+            );
+          })}
+        </svg>
+
+        {/* Bottom score summary */}
+        <div className="flex items-center gap-4 mt-3">
+          <div className="flex items-center gap-1.5 text-[10px] text-foreground/35">
+            <span
+              className="w-2 h-2 rounded-full"
+              style={{ background: "var(--brand)" }}
+            />
+            Your score
+          </div>
+          <span className="text-[12px] font-mono font-bold" style={{ color: scoreColor(82) }}>
+            82 / 100
+          </span>
+        </div>
+      </div>
+    </MockContainer>
   );
 }
 
@@ -529,7 +708,10 @@ export function RewriteMock() {
   );
 }
 
-/* ── Product Preview Mock (Composite Hero Visual) ── */
+/* ════════════════════════════════════════════════════════════
+   Product Preview Mock (Composite Hero Visual)
+   — Updated to show new analytics dashboard layout
+   ════════════════════════════════════════════════════════════ */
 
 export function ProductPreviewMock() {
   return (
@@ -570,20 +752,43 @@ export function ProductPreviewMock() {
             </span>
           </div>
 
-          {/* Content */}
-          <div className="p-4 sm:p-5 space-y-4">
+          {/* Dashboard Content */}
+          <div className="p-4 sm:p-5 space-y-3">
             {/* Report header */}
-            <div className="text-center mb-2">
+            <div className="text-center mb-1">
               <p className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/25 mb-1">
-                10-Layer UX Audit Report
+                Diagnostic Engine v5 — UX Dashboard
               </p>
               <p className="text-[14px] font-semibold text-foreground">
                 demo-landing-page.com
               </p>
             </div>
 
-            <ScoreBannerMock />
-            <CategoryGridMock />
+            {/* Executive Summary Row */}
+            <ExecutiveSummaryMock />
+
+            {/* Conversion Killers Bar Chart */}
+            <div
+              className="rounded-xl border p-3.5"
+              style={{ background: "var(--s1)", borderColor: "var(--border)" }}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <div
+                  className="w-5 h-5 rounded-md grid place-items-center shrink-0"
+                  style={{ background: "var(--s2)" }}
+                >
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-foreground/40">
+                    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-2-3.78-2-5.5a5 5 0 0 1 10 0c0 1.72-.93 3.36-2 5.5-.5 1-1 1.62-1 3a2.5 2.5 0 0 0 2.5 2.5" />
+                    <path d="M8 15h8" /><path d="M8 18h8" /><path d="M10 21h4" />
+                  </svg>
+                </div>
+                <span className="text-[11px] font-semibold text-foreground/70">Conversion Killers</span>
+              </div>
+              <BarChartMock />
+            </div>
+
+            {/* UX Metrics Grid */}
+            <MetricGridMock />
           </div>
         </div>
       </div>
@@ -665,3 +870,13 @@ export function FeatureSection({
     </section>
   );
 }
+
+/* ════════════════════════════════════════════════════════════
+   Legacy exports (backward-compatible aliases)
+   ════════════════════════════════════════════════════════════ */
+
+/** @deprecated Use ExecutiveSummaryMock instead */
+export const ScoreBannerMock = ExecutiveSummaryMock;
+
+/** @deprecated Use BarChartMock instead */
+export const CategoryGridMock = BarChartMock;

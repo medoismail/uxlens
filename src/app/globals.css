@@ -101,12 +101,12 @@
   --input: oklch(0.902 0.004 264);
   --ring: oklch(0.504 0.282 276 / 25%);
 
-  /* ── Charts ── */
+  /* ── Charts — aligned with score + category palette ── */
   --chart-1: oklch(0.504 0.282 276.1);
-  --chart-2: oklch(0.484 0.164 145);
-  --chart-3: oklch(0.498 0.161 91);
-  --chart-4: oklch(0.637 0.15 245);
-  --chart-5: oklch(0.513 0.168 17);
+  --chart-2: oklch(0.52 0.14 155);
+  --chart-3: oklch(0.58 0.16 75);
+  --chart-4: oklch(0.60 0.14 245);
+  --chart-5: oklch(0.55 0.17 20);
 
   --radius: 0.625rem;
 
@@ -146,12 +146,12 @@
   --brand-fg: #ffffff;
   --brand-strong: var(--brand-800);
 
-  /* ── Score / semantic colors (dark enough for white bg) ── */
-  --score-high: oklch(0.417 0.145 145);
-  --score-mid: oklch(0.498 0.161 91);
-  --score-low: oklch(0.513 0.168 17);
+  /* ── Score / semantic colors — lightened to L≈0.55 for cohesion with category palette ── */
+  --score-high: oklch(0.52 0.14 155);
+  --score-mid: oklch(0.58 0.16 75);
+  --score-low: oklch(0.55 0.17 20);
   --accent-purple: var(--brand-800);
-  --accent-blue: oklch(0.637 0.15 245);
+  --accent-blue: oklch(0.60 0.14 245);
 }
 
 @layer base {
@@ -438,6 +438,48 @@
     filter: none;
     transition: none;
   }
+}
+
+/* ── Dashboard card hover effect ──────────────────────── */
+.dash-card {
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+.dash-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px oklch(0 0 0 / 6%), 0 1px 3px oklch(0 0 0 / 4%);
+}
+
+/* ── Radar chart reveal animation ─────────────────────── */
+@keyframes radarReveal {
+  from { opacity: 0; transform: scale(0.3); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-radar {
+  animation: radarReveal 800ms cubic-bezier(0.22, 1, 0.36, 1) 200ms both;
+  transform-origin: center;
+}
+
+/* ── Insight card expand/collapse ─────────────────────── */
+.insight-expand {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 300ms ease;
+}
+.insight-expand.open {
+  grid-template-rows: 1fr;
+}
+.insight-expand > div {
+  overflow: hidden;
+}
+
+/* ── Tooltip on hover ─────────────────────────────────── */
+.bar-tooltip {
+  opacity: 0;
+  transition: opacity 150ms ease;
+  pointer-events: none;
+}
+.group:hover .bar-tooltip {
+  opacity: 1;
 }
 
 /* Landing page mock utilities */

@@ -156,7 +156,7 @@ function ComparisonRow({ comp, comp1Name, comp2Name }: { comp: CategoryCompariso
       <div className="flex items-center justify-between mb-2">
         <span className="text-[12px] font-medium text-foreground">{normalizeCategory(comp.category)}</span>
         <span className="text-[10px] font-mono px-2 py-0.5 rounded" style={{
-          background: comp.winner === "user" ? "oklch(0.623 0.178 145 / 8%)" : "oklch(0.647 0.176 17 / 8%)",
+          background: comp.winner === "user" ? "oklch(0.52 0.14 155 / 8%)" : "oklch(0.55 0.17 20 / 8%)",
           color: comp.winner === "user" ? "var(--score-high)" : "var(--score-low)",
         }}>
           {winner} wins
@@ -427,7 +427,7 @@ export function CompetitorSection({
       {data.competitiveAdvantages.length > 0 && (
         <div className="rounded-xl border p-5" style={{ borderColor: "var(--border)", background: "var(--s1)" }}>
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-9 h-9 rounded-lg grid place-items-center" style={{ background: "oklch(0.623 0.178 145 / 8%)" }}>
+            <div className="w-9 h-9 rounded-lg grid place-items-center" style={{ background: "oklch(0.52 0.14 155 / 8%)" }}>
               <ArrowUpRight className="h-4 w-4" style={{ color: "var(--score-high)" }} />
             </div>
             <div>

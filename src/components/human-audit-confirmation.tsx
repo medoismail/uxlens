@@ -14,7 +14,7 @@ export function HumanAuditConfirmation({ url, email, onReset }: HumanAuditConfir
 
   return (
     <div className="flex flex-col items-center justify-center py-32 px-6 text-center animate-fade-in relative z-[1]">
-      <div className="flex h-12 w-12 items-center justify-center rounded-full mb-6" style={{ background: "oklch(0.623 0.178 145 / 10%)" }}>
+      <div className="flex h-12 w-12 items-center justify-center rounded-full mb-6" style={{ background: "oklch(0.52 0.14 155 / 10%)" }}>
         <CheckCircle2 className="h-6 w-6" style={{ color: "var(--score-high)" }} />
       </div>
 

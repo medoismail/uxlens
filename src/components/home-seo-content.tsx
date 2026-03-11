@@ -18,6 +18,7 @@ import {
   ChatMock,
   CompetitorMock,
   RewriteMock,
+  RadarChartMock,
   FeatureSection,
 } from "@/components/landing-mocks";
 import { ScrollReveal } from "@/components/scroll-reveal";
@@ -265,95 +266,7 @@ export function HomeSEOContent() {
         ]}
         reversed
       >
-        <div className="space-y-4">
-          {/* Mini score ring */}
-          <div
-            className="flex items-center gap-4 rounded-xl border p-4"
-            style={{
-              background: "var(--s1)",
-              borderColor: "var(--border2)",
-            }}
-          >
-            <div className="relative w-14 h-14 shrink-0">
-              <svg
-                className="-rotate-90 w-full h-full"
-                viewBox="0 0 100 100"
-              >
-                <circle
-                  cx="50" cy="50" r="44" fill="none" strokeWidth="8"
-                  style={{ stroke: "var(--s3)" }}
-                />
-                <circle
-                  cx="50" cy="50" r="44" fill="none"
-                  strokeWidth="8" strokeLinecap="round"
-                  strokeDasharray={2 * Math.PI * 44}
-                  strokeDashoffset={
-                    2 * Math.PI * 44 - (82 / 100) * 2 * Math.PI * 44
-                  }
-                  className="animate-ring-fill"
-                  style={{
-                    stroke: "var(--score-high)",
-                    "--ring-circumference": 2 * Math.PI * 44,
-                    "--ring-offset":
-                      2 * Math.PI * 44 - (82 / 100) * 2 * Math.PI * 44,
-                  } as React.CSSProperties}
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span
-                  className="text-[18px] font-bold tabular-nums"
-                  style={{ color: "var(--score-high)" }}
-                >
-                  82
-                </span>
-              </div>
-            </div>
-            <div>
-              <p className="text-[13px] font-semibold text-foreground">
-                Overall UX Score
-              </p>
-              <p className="text-[11px] text-foreground/40">
-                Across 6 diagnostic categories
-              </p>
-            </div>
-          </div>
-          {/* Category bars */}
-          <div className="space-y-2.5">
-            {[
-              { label: "Message Clarity", score: 88, color: "var(--brand)" },
-              { label: "Cognitive Load", score: 72, color: "var(--accent-blue)" },
-              { label: "Conversion Arch.", score: 79, color: "var(--accent-purple)" },
-              { label: "Trust Signals", score: 70, color: "var(--score-high)" },
-              { label: "Contradictions", score: 85, color: "var(--score-low)" },
-              { label: "First Screen", score: 76, color: "var(--brand-strong)" },
-            ].map((cat) => (
-              <div key={cat.label} className="flex items-center gap-3">
-                <span className="text-[11px] text-foreground/40 w-28 shrink-0">
-                  {cat.label}
-                </span>
-                <div
-                  className="flex-1 h-[5px] rounded-full overflow-hidden"
-                  style={{ background: "var(--s3)" }}
-                >
-                  <div
-                    className="h-full rounded-full animate-bar-width"
-                    style={{
-                      background: cat.color,
-                      width: `${cat.score}%`,
-                      "--bar-width": `${cat.score}%`,
-                    } as React.CSSProperties}
-                  />
-                </div>
-                <span
-                  className="text-[12px] font-mono font-bold w-7 text-right"
-                  style={{ color: cat.color }}
-                >
-                  {cat.score}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <RadarChartMock />
       </FeatureSection>
 
       {/* Feature 3: AI Chat */}
