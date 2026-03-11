@@ -72,7 +72,7 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
       </div>
 
       {/* Headline — 2 lines + rotating word on line 3 */}
-      <h1 className="animate-slide-up text-[clamp(34px,5.5vw,56px)] font-bold tracking-[-1.5px] leading-[1.15] max-w-[780px] text-foreground relative z-[1]">
+      <h1 className="animate-slide-up text-[clamp(28px,4.5vw,46px)] font-bold tracking-[-1.5px] leading-[1.15] max-w-[780px] text-foreground relative z-[1]">
         Find What&apos;s Killing
         <br />
         Your Conversions
