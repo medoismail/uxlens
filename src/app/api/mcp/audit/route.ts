@@ -7,7 +7,7 @@ import { fetchPageHTML } from "@/lib/fetch-html";
 import { saveAudit } from "@/lib/db/audits";
 import { authenticateMcpRequest, checkMcpRateLimit } from "@/lib/mcp-auth";
 
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 /**
  * POST /api/mcp/audit

@@ -10,8 +10,8 @@ import { getUserByClerkId, upsertUser } from "@/lib/db/users";
 import { saveAudit } from "@/lib/db/audits";
 import type { AnalysisError } from "@/lib/types";
 
-// Vercel Pro = 60s; Hobby = 10s max regardless
-export const maxDuration = 60;
+// Vercel Pro allows up to 300s; behavioral analysis needs ~45-70s from GPT-4o
+export const maxDuration = 120;
 
 function errorResponse(error: string, code: AnalysisError["code"], status = 400) {
   return NextResponse.json({ success: false, error, code } satisfies AnalysisError, { status });
