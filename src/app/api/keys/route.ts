@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { getUserByClerkId, getUserPlan } from "@/lib/db/users";
-import { generateApiKey, listApiKeys, revokeApiKey } from "@/lib/api-keys";
+import { generateApiKey, listApiKeys, revokeApiKey, revealApiKey } from "@/lib/api-keys";
 
 /**
  * GET /api/keys — List the authenticated user's API keys.
@@ -36,8 +36,8 @@ export async function GET() {
 
 /**
  * POST /api/keys — Generate a new API key.
+ * Only 1 active key allowed per user.
  * Body: { name?: string }
- * Returns the raw key (shown once).
  */
 export async function POST(request: Request) {
   try {
@@ -74,9 +74,44 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Failed to generate key";
-    const status = msg.includes("Maximum") ? 400 : 500;
+    const status = msg.includes("already have") ? 400 : 500;
     console.error("[API Keys] Generate error:", error);
     return NextResponse.json({ error: msg }, { status });
+  }
+}
+
+/**
+ * PATCH /api/keys — Reveal the full API key (decrypted).
+ * Body: { keyId: string }
+ */
+export async function PATCH(request: Request) {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const dbUser = await getUserByClerkId(userId);
+    if (!dbUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const body = await request.json();
+    const { keyId } = body;
+
+    if (!keyId || typeof keyId !== "string") {
+      return NextResponse.json({ error: "Missing keyId" }, { status: 400 });
+    }
+
+    const rawKey = await revealApiKey(dbUser.id, keyId);
+    if (!rawKey) {
+      return NextResponse.json({ error: "Unable to reveal key" }, { status: 404 });
+    }
+
+    return NextResponse.json({ key: rawKey });
+  } catch (error) {
+    console.error("[API Keys] Reveal error:", error);
+    return NextResponse.json({ error: "Failed to reveal key" }, { status: 500 });
   }
 }
 

@@ -1,9 +1,15 @@
-import { randomBytes, createHash } from "crypto";
+import { randomBytes, createHash, createCipheriv, createDecipheriv } from "crypto";
 import { getSupabase } from "@/lib/supabase";
 import type { DbUser } from "@/lib/db/users";
 
 const KEY_PREFIX = "uxl_";
-const MAX_KEYS_PER_USER = 3;
+const MAX_KEYS_PER_USER = 1;
+
+/** AES-256-GCM encryption secret — falls back to a deterministic key derived from SUPABASE_URL */
+function getEncryptionKey(): Buffer {
+  const secret = process.env.API_KEY_ENCRYPTION_SECRET || process.env.SUPABASE_URL || "uxlens-default-key";
+  return createHash("sha256").update(secret).digest(); // 32 bytes
+}
 
 export interface ApiKeyInfo {
   id: string;
@@ -18,9 +24,36 @@ function hashKey(rawKey: string): string {
   return createHash("sha256").update(rawKey).digest("hex");
 }
 
+/** Encrypt a raw API key using AES-256-GCM */
+function encryptKey(rawKey: string): string {
+  const key = getEncryptionKey();
+  const iv = randomBytes(12); // 96-bit IV for GCM
+  const cipher = createCipheriv("aes-256-gcm", key, iv);
+  const encrypted = Buffer.concat([cipher.update(rawKey, "utf8"), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  // Store as: iv:tag:encrypted (all hex)
+  return `${iv.toString("hex")}:${tag.toString("hex")}:${encrypted.toString("hex")}`;
+}
+
+/** Decrypt an encrypted API key */
+function decryptKey(encrypted: string): string | null {
+  try {
+    const [ivHex, tagHex, dataHex] = encrypted.split(":");
+    if (!ivHex || !tagHex || !dataHex) return null;
+    const key = getEncryptionKey();
+    const decipher = createDecipheriv("aes-256-gcm", key, Buffer.from(ivHex, "hex"));
+    decipher.setAuthTag(Buffer.from(tagHex, "hex"));
+    const decrypted = Buffer.concat([decipher.update(Buffer.from(dataHex, "hex")), decipher.final()]);
+    return decrypted.toString("utf8");
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Generate a new API key for a user.
- * Returns the raw key (shown once to user) + metadata.
+ * Only 1 active key allowed per user.
+ * Returns the raw key + metadata.
  */
 export async function generateApiKey(
   userId: string,
@@ -29,7 +62,7 @@ export async function generateApiKey(
   const sb = getSupabase();
   if (!sb) return null;
 
-  // Check key count limit
+  // Check key count limit — only 1 active key
   const { count } = await sb
     .from("api_keys")
     .select("*", { count: "exact", head: true })
@@ -37,7 +70,7 @@ export async function generateApiKey(
     .eq("revoked", false);
 
   if ((count ?? 0) >= MAX_KEYS_PER_USER) {
-    throw new Error(`Maximum ${MAX_KEYS_PER_USER} active API keys allowed`);
+    throw new Error("You already have an active API key. Revoke it first to generate a new one.");
   }
 
   // Generate key: uxl_ + 32 hex chars
@@ -45,6 +78,7 @@ export async function generateApiKey(
   const rawKey = `${KEY_PREFIX}${rawSecret}`;
   const keyPrefix = rawKey.slice(0, 8);
   const keyHash = hashKey(rawKey);
+  const keyEncrypted = encryptKey(rawKey);
 
   const { data, error } = await sb
     .from("api_keys")
@@ -53,6 +87,7 @@ export async function generateApiKey(
       name,
       key_prefix: keyPrefix,
       key_hash: keyHash,
+      key_encrypted: keyEncrypted,
     })
     .select("id")
     .single();
@@ -130,6 +165,30 @@ export async function listApiKeys(userId: string): Promise<ApiKeyInfo[]> {
     lastUsedAt: row.last_used_at,
     revoked: row.revoked,
   }));
+}
+
+/**
+ * Reveal a user's API key by decrypting the stored encrypted version.
+ * Returns the full raw key, or null if not found / decryption fails.
+ */
+export async function revealApiKey(
+  userId: string,
+  keyId: string
+): Promise<string | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+
+  const { data, error } = await sb
+    .from("api_keys")
+    .select("key_encrypted")
+    .eq("id", keyId)
+    .eq("user_id", userId)
+    .eq("revoked", false)
+    .single();
+
+  if (error || !data?.key_encrypted) return null;
+
+  return decryptKey(data.key_encrypted);
 }
 
 /**
