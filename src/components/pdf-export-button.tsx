@@ -72,7 +72,8 @@ export function PdfExportButton({
       URL.revokeObjectURL(downloadUrl);
     } catch (err) {
       console.error("PDF export failed:", err);
-      setError("Failed to generate PDF. Please try again.");
+      const msg = err instanceof Error ? err.message : "Unknown error";
+      setError(`Failed to generate PDF: ${msg}`);
     } finally {
       setIsGenerating(false);
     }

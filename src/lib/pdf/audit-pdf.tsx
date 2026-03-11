@@ -10,7 +10,7 @@ import {
 } from "@react-pdf/renderer";
 import type { UXAuditResult, CompetitorAnalysis, VisualAnalysis } from "@/lib/types";
 
-/* ── Register Noto Sans for Unicode support (Arabic, CJK, Cyrillic, etc.) ── */
+/* ── Register Noto Sans for Unicode support ── */
 Font.register({
   family: "NotoSans",
   fonts: [
@@ -22,16 +22,11 @@ Font.register({
       src: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans@latest/latin-700-normal.ttf",
       fontWeight: 700,
     },
-    {
-      src: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-arabic@latest/arabic-400-normal.ttf",
-      fontWeight: 400,
-    },
-    {
-      src: "https://cdn.jsdelivr.net/fontsource/fonts/noto-sans-arabic@latest/arabic-700-normal.ttf",
-      fontWeight: 700,
-    },
   ],
 });
+
+/* Disable hyphenation — avoids crashes on exotic word boundaries */
+Font.registerHyphenationCallback((word) => [word]);
 
 const BRAND = "#4C2CFF";
 const BRAND_LIGHT = "#EDEAFF";
@@ -243,7 +238,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
               ))}
 
               {/* Visual findings */}
-              {visualAnalysis.findings.length > 0 && (
+              {visualAnalysis.findings && visualAnalysis.findings.length > 0 && (
                 <View style={{ marginTop: 12 }}>
                   <Text style={styles.sectionSubtitle}>Visual Findings</Text>
                   {visualAnalysis.findings.slice(0, 5).map((finding, fi) => (
@@ -311,7 +306,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
             )}
 
             {/* Per-section rewrite */}
-            {section.rewrite && section.rewrite.type === "text" && (
+            {section.rewrite && section.rewrite.type === "text" && section.rewrite.items?.length > 0 && (
               <View style={{ marginTop: 4, marginBottom: 8 }}>
                 <Text style={[styles.rewriteLabel, { fontSize: 9, marginBottom: 4 }]}>AI REWRITE</Text>
                 {section.rewrite.items.slice(0, 3).map((item, ii) => (
@@ -331,7 +326,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
             {section.rewrite && section.rewrite.type === "structure" && (
               <View style={{ marginTop: 4, marginBottom: 8 }}>
                 <Text style={[styles.rewriteLabel, { fontSize: 9, marginBottom: 4 }]}>STRUCTURE REWRITE</Text>
-                {section.rewrite.suggestedOrder.length > 0 && (
+                {section.rewrite.suggestedOrder?.length > 0 && (
                   <View style={{ marginBottom: 4 }}>
                     <Text style={{ fontSize: 8, fontFamily: "NotoSans", fontWeight: 700, color: "#555", marginBottom: 2 }}>Suggested Order</Text>
                     {section.rewrite.suggestedOrder.map((s, si) => (
@@ -342,7 +337,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
                     ))}
                   </View>
                 )}
-                {section.rewrite.additions.length > 0 && (
+                {section.rewrite.additions?.length > 0 && (
                   <View style={{ marginBottom: 4 }}>
                     <Text style={{ fontSize: 8, fontFamily: "NotoSans", fontWeight: 700, color: "#22c55e", marginBottom: 2 }}>Add</Text>
                     {section.rewrite.additions.map((a, ai) => (
@@ -353,7 +348,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
                     ))}
                   </View>
                 )}
-                {section.rewrite.removals.length > 0 && (
+                {section.rewrite.removals?.length > 0 && (
                   <View style={{ marginBottom: 4 }}>
                     <Text style={{ fontSize: 8, fontFamily: "NotoSans", fontWeight: 700, color: "#ef4444", marginBottom: 2 }}>Remove / Reword</Text>
                     {section.rewrite.removals.map((r, ri) => (
@@ -390,7 +385,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
       </Page>
 
       {/* Heuristic Evaluation Page */}
-      {data.heuristicEvaluation && data.heuristicEvaluation.heuristics.length > 0 && (
+      {data.heuristicEvaluation && (data.heuristicEvaluation.heuristics?.length ?? 0) > 0 && (
         <Page size="A4" style={styles.page} wrap>
           <View style={styles.header} fixed>
             <Text style={styles.logo}>UXLens</Text>
@@ -398,7 +393,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
           </View>
 
           <Text style={styles.sectionTitle}>
-            Nielsen&apos;s Heuristic Evaluation — {data.heuristicEvaluation.overallHeuristicScore.toFixed(1)}/10
+            Nielsen&apos;s Heuristic Evaluation — {(data.heuristicEvaluation.overallHeuristicScore ?? 0).toFixed(1)}/10
           </Text>
           <Text style={[styles.text, { marginBottom: 12 }]}>
             Each of Nielsen&apos;s 10 usability heuristics scored 0-10, with detected issues and positive observations.
@@ -428,7 +423,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
       )}
 
       {/* Competitor Analysis Page (Pro+) */}
-      {competitorAnalysis && competitorAnalysis.competitors.length > 0 && (
+      {competitorAnalysis && competitorAnalysis.competitors?.length > 0 && (
         <Page size="A4" style={styles.page} wrap>
           <View style={styles.header} fixed>
             <Text style={styles.logo}>UXLens</Text>
