@@ -1,0 +1,1185 @@
+{
+  "$schema": "https://design-tokens.org/schema.json",
+  "name": "UXLens Design System",
+  "version": "5.0.0",
+  "description": "Complete design system extracted from UXLens — AI-powered UX audit SaaS platform. Includes all tokens, components, patterns, screens, and audit findings for Figma Design System Extractor.",
+  "meta": {
+    "framework": "Next.js 16 (App Router) + React 19 + TypeScript",
+    "styling": "Tailwind CSS 4 + CSS variables + oklch color space",
+    "componentLibrary": "shadcn/ui (base-ui primitives)",
+    "uiLibraries": ["@base-ui-components/react", "class-variance-authority", "@react-pdf/renderer"],
+    "iconLibraries": ["lucide-react"],
+    "fonts": {
+      "sans": { "family": "Inter Tight", "cssVariable": "--font-inter-tight", "source": "next/font/google" },
+      "mono": { "family": "JetBrains Mono", "cssVariable": "--font-mono", "source": "next/font/google" }
+    },
+    "colorSpace": "oklch (converted to hex for Figma)",
+    "componentCount": 22,
+    "patternCount": 13,
+    "screenCount": 6,
+    "tokenSource": "src/app/globals.css (:root block)"
+  },
+
+  "colors": {
+    "primitives": {
+      "brand": {
+        "brand-900": { "value": "#4C2CFF", "oklch": "oklch(0.504 0.282 276.1)", "source": "globals.css", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+        "brand-800": { "value": "#5D41FF", "oklch": "oklch(0.543 0.262 277.1)", "source": "globals.css", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+        "brand-700": { "value": "#6F56FF", "oklch": "oklch(0.582 0.238 278.4)", "source": "globals.css", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+        "brand-600": { "value": "#816BFF", "oklch": "oklch(0.621 0.209 279.6)", "source": "globals.css", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+        "brand-500": { "value": "#9380FF", "oklch": "oklch(0.66 0.177 280.6)", "source": "globals.css", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+        "brand-400": { "value": "#A595FF", "oklch": "oklch(0.699 0.143 281.4)", "source": "globals.css", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+        "brand-300": { "value": "#B7ABFF", "oklch": "oklch(0.738 0.109 282.0)", "source": "globals.css", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+        "brand-200": { "value": "#C9C0FF", "oklch": "oklch(0.816 0.073 283.0)", "source": "globals.css", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+        "brand-100": { "value": "#DBD5FF", "oklch": "oklch(0.893 0.044 284.0)", "source": "globals.css", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+        "brand-50": { "value": "#EDEAFF", "oklch": "oklch(0.941 0.024 284.5)", "source": "globals.css", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+        "brand-25": { "value": "#F6F4FF", "oklch": "oklch(0.97 0.012 285.0)", "source": "globals.css", "isReferenced": false, "usageCount": 0, "usedIn": [] }
+      }
+    },
+
+    "semantic": {
+      "primary": { "value": "#4C2CFF", "source": "globals.css --primary", "isReferenced": true, "usageCount": 6, "usedIn": ["button.tsx", "badge.tsx", "input.tsx"] },
+      "primary-foreground": { "value": "#FFFFFF", "source": "globals.css --primary-foreground", "isReferenced": true, "usageCount": 4, "usedIn": ["button.tsx", "badge.tsx"] },
+      "secondary": { "value": "#F3F4F6", "source": "globals.css --secondary", "isReferenced": true, "usageCount": 3, "usedIn": ["button.tsx"] },
+      "secondary-foreground": { "value": "#303338", "source": "globals.css --secondary-foreground", "isReferenced": true, "usageCount": 2, "usedIn": ["button.tsx"] },
+      "accent": { "value": "#F3F4F6", "source": "globals.css --accent", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+      "accent-foreground": { "value": "#303338", "source": "globals.css --accent-foreground", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+      "muted": { "value": "#F3F4F6", "source": "globals.css --muted", "isReferenced": true, "usageCount": 3, "usedIn": ["button.tsx", "badge.tsx"] },
+      "muted-foreground": { "value": "#707379", "source": "globals.css --muted-foreground", "isReferenced": true, "usageCount": 5, "usedIn": ["input.tsx", "card.tsx", "pricing-cards.tsx"] },
+      "brand": { "value": "#4C2CFF", "source": "globals.css --brand", "isReferenced": true, "usageCount": 14, "usedIn": ["header.tsx", "hero.tsx", "url-form.tsx", "loading-state.tsx", "results-report.tsx", "chat-widget.tsx", "competitor-section.tsx", "landing-mocks.tsx", "pdf-export-button.tsx", "install-banner.tsx"] },
+      "brand-strong": { "value": "#5D41FF", "source": "globals.css --brand-strong", "isReferenced": true, "usageCount": 2, "usedIn": ["globals.css hover states"] },
+      "brand-fg": { "value": "#FFFFFF", "source": "globals.css --brand-fg", "isReferenced": true, "usageCount": 13, "usedIn": ["header.tsx", "url-form.tsx", "loading-state.tsx", "results-report.tsx", "chat-widget.tsx", "competitor-section.tsx", "install-banner.tsx", "landing-mocks.tsx", "pricing-cards.tsx"] },
+      "brand-dim": { "value": "rgba(76,44,255,0.06)", "source": "globals.css --brand-dim", "isReferenced": true, "usageCount": 10, "usedIn": ["header.tsx", "loading-state.tsx", "results-report.tsx", "chat-widget.tsx", "competitor-section.tsx", "landing-mocks.tsx", "limit-reached.tsx"] },
+      "brand-glow": { "value": "rgba(76,44,255,0.12)", "source": "globals.css --brand-glow", "isReferenced": true, "usageCount": 8, "usedIn": ["url-form.tsx", "loading-state.tsx", "results-report.tsx", "chat-widget.tsx", "competitor-section.tsx", "landing-mocks.tsx"] },
+      "accent-blue": { "value": "#1F86CD", "source": "globals.css --accent-blue", "isReferenced": true, "usageCount": 2, "usedIn": ["results-report.tsx"] },
+      "accent-purple": { "value": "#5D41FF", "source": "globals.css --accent-purple", "isReferenced": true, "usageCount": 2, "usedIn": ["results-report.tsx"] }
+    },
+
+    "backgrounds": {
+      "background": { "value": "#FFFFFF", "source": "globals.css --background", "isReferenced": true, "usageCount": 4, "usedIn": ["layout.tsx body", "human-audit-form.tsx"] },
+      "s1": { "value": "#FFFFFF", "source": "globals.css --s1", "isReferenced": true, "usageCount": 14, "usedIn": ["error-state.tsx", "results-report.tsx", "chat-widget.tsx", "competitor-section.tsx", "landing-mocks.tsx", "limit-reached.tsx", "human-audit-confirmation.tsx", "header.tsx", "url-form.tsx"] },
+      "s2": { "value": "#F4F5F7", "source": "globals.css --s2", "isReferenced": true, "usageCount": 7, "usedIn": ["results-report.tsx", "chat-widget.tsx", "competitor-section.tsx", "landing-mocks.tsx"] },
+      "s3": { "value": "#E0E1E4", "source": "globals.css --s3", "isReferenced": true, "usageCount": 9, "usedIn": ["results-report.tsx", "competitor-section.tsx", "landing-mocks.tsx", "limit-reached.tsx"] }
+    },
+
+    "surfaces": {
+      "card": { "value": "#FFFFFF", "source": "globals.css --card", "isReferenced": true, "usageCount": 3, "usedIn": ["card.tsx"] },
+      "card-foreground": { "value": "#0A0A0C", "source": "globals.css --card-foreground", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+      "popover": { "value": "#FFFFFF", "source": "globals.css --popover", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+      "popover-foreground": { "value": "#0A0A0C", "source": "globals.css --popover-foreground", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+      "sidebar": { "value": "#F9FAFB", "source": "globals.css --sidebar", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+      "sidebar-foreground": { "value": "#0A0A0C", "source": "globals.css --sidebar-foreground", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+      "sidebar-accent": { "value": "#F3F4F6", "source": "globals.css --sidebar-accent", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+      "sidebar-accent-foreground": { "value": "#303338", "source": "globals.css --sidebar-accent-foreground", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+      "sidebar-primary": { "value": "#4C2CFF", "source": "globals.css --sidebar-primary", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+      "sidebar-primary-foreground": { "value": "#FFFFFF", "source": "globals.css --sidebar-primary-foreground", "isReferenced": false, "usageCount": 0, "usedIn": [] }
+    },
+
+    "text": {
+      "foreground": { "value": "#0A0A0C", "source": "globals.css --foreground", "isReferenced": true, "usageCount": 18, "usedIn": ["header.tsx", "footer.tsx", "url-form.tsx", "loading-state.tsx", "error-state.tsx", "results-report.tsx", "chat-widget.tsx", "competitor-section.tsx", "pricing-cards.tsx", "limit-reached.tsx", "landing-mocks.tsx", "human-audit-form.tsx", "human-audit-confirmation.tsx"] }
+    },
+
+    "borders": {
+      "border": { "value": "#E4E5E8", "source": "globals.css --border", "isReferenced": true, "usageCount": 12, "usedIn": ["header.tsx", "footer.tsx", "url-form.tsx", "loading-state.tsx", "results-report.tsx", "competitor-section.tsx", "install-banner.tsx", "human-audit-form.tsx"] },
+      "border2": { "value": "#D6D7DA", "source": "globals.css --border2", "isReferenced": true, "usageCount": 8, "usedIn": ["error-state.tsx", "results-report.tsx", "chat-widget.tsx", "landing-mocks.tsx", "limit-reached.tsx", "human-audit-confirmation.tsx", "install-banner.tsx"] },
+      "input": { "value": "#DDDFE1", "source": "globals.css --input", "isReferenced": true, "usageCount": 2, "usedIn": ["input.tsx"] },
+      "ring": { "value": "#4B2CFF", "source": "globals.css --ring", "isReferenced": true, "usageCount": 4, "usedIn": ["button.tsx", "badge.tsx", "input.tsx"] },
+      "sidebar-border": { "value": "#E4E5E8", "source": "globals.css --sidebar-border", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+      "sidebar-ring": { "value": "#4B2CFF", "source": "globals.css --sidebar-ring", "isReferenced": false, "usageCount": 0, "usedIn": [] }
+    },
+
+    "feedback": {
+      "destructive": { "value": "#B32E43", "source": "globals.css --destructive", "isReferenced": true, "usageCount": 6, "usedIn": ["button.tsx", "input.tsx", "url-form.tsx", "limit-reached.tsx", "human-audit-form.tsx"] },
+      "score-high": { "value": "#007F43", "source": "globals.css --score-high", "isReferenced": true, "usageCount": 8, "usedIn": ["results-report.tsx", "competitor-section.tsx", "dashboard page", "landing-mocks.tsx", "human-audit-confirmation.tsx"] },
+      "score-mid": { "value": "#B06800", "source": "globals.css --score-mid", "isReferenced": true, "usageCount": 5, "usedIn": ["results-report.tsx", "competitor-section.tsx", "landing-mocks.tsx"] },
+      "score-low": { "value": "#C13A46", "source": "globals.css --score-low", "isReferenced": true, "usageCount": 9, "usedIn": ["error-state.tsx", "results-report.tsx", "chat-widget.tsx", "competitor-section.tsx", "pdf-export-button.tsx", "dashboard page", "landing-mocks.tsx"] }
+    },
+
+    "interactive": {
+      "brand-dim": { "value": "rgba(76,44,255,0.06)", "note": "alias of semantic.brand-dim" },
+      "brand-glow": { "value": "rgba(76,44,255,0.12)", "note": "alias of semantic.brand-glow" },
+      "ring-focus": { "value": "rgba(76,44,255,0.25)", "source": "globals.css", "usedIn": ["button.tsx", "badge.tsx", "input.tsx"] },
+      "focus-glow-border": { "value": "rgba(92,53,205,0.25)", "source": "globals.css .focus-glow", "usedIn": ["url-form.tsx", "limit-reached.tsx"] },
+      "focus-glow-shadow": { "value": "rgba(92,53,205,0.08)", "source": "globals.css .focus-glow", "usedIn": ["url-form.tsx", "limit-reached.tsx"] }
+    },
+
+    "chart": {
+      "chart-1": { "value": "#4C2CFF", "source": "globals.css --chart-1", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+      "chart-2": { "value": "#007F43", "source": "globals.css --chart-2", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+      "chart-3": { "value": "#B06800", "source": "globals.css --chart-3", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+      "chart-4": { "value": "#1F86CD", "source": "globals.css --chart-4", "isReferenced": false, "usageCount": 0, "usedIn": [] },
+      "chart-5": { "value": "#C13A46", "source": "globals.css --chart-5", "isReferenced": false, "usageCount": 0, "usedIn": [] }
+    },
+
+    "category": {
+      "cat-message-clarity": { "value": "oklch(0.62 0.18 275)", "hex": "#6A4FE0", "usedIn": ["results-report.tsx"] },
+      "cat-cognitive-load": { "value": "oklch(0.62 0.14 245)", "hex": "#4A7DD6", "usedIn": ["results-report.tsx"] },
+      "cat-conversion-arch": { "value": "oklch(0.65 0.16 55)", "hex": "#C08A30", "usedIn": ["results-report.tsx"] },
+      "cat-trust-signals": { "value": "oklch(0.62 0.15 160)", "hex": "#2E9E6E", "usedIn": ["results-report.tsx"] },
+      "cat-contradictions": { "value": "oklch(0.62 0.16 15)", "hex": "#C95A50", "usedIn": ["results-report.tsx"] },
+      "cat-first-screen": { "value": "oklch(0.62 0.14 200)", "hex": "#3A8EA8", "usedIn": ["results-report.tsx"] }
+    },
+
+    "severity": {
+      "severity-critical-bg": { "value": "color-mix(in srgb, #C13A46 15%, transparent)", "usedIn": ["results-report.tsx"] },
+      "severity-critical-border": { "value": "color-mix(in srgb, #C13A46 30%, transparent)", "usedIn": ["results-report.tsx"] },
+      "severity-high-bg": { "value": "color-mix(in srgb, #C13A46 10%, transparent)", "usedIn": ["results-report.tsx"] },
+      "severity-medium-bg": { "value": "color-mix(in srgb, #B06800 10%, transparent)", "usedIn": ["results-report.tsx"] },
+      "severity-low-bg": { "value": "color-mix(in srgb, #007F43 10%, transparent)", "usedIn": ["results-report.tsx"] }
+    },
+
+    "plan": {
+      "plan-starter": { "value": "#2563EB", "usedIn": ["header.tsx"] },
+      "plan-starter-bg": { "value": "#EFF6FF", "usedIn": ["header.tsx"] },
+      "plan-starter-border": { "value": "#BFDBFE", "usedIn": ["header.tsx"] },
+      "plan-pro": { "value": "#7C3AED", "usedIn": ["header.tsx"] },
+      "plan-pro-bg": { "value": "#F5F3FF", "usedIn": ["header.tsx"] },
+      "plan-pro-border": { "value": "#C4B5FD", "usedIn": ["header.tsx"] },
+      "plan-agency": { "value": "#DB2777", "usedIn": ["header.tsx"] },
+      "plan-agency-bg": { "value": "#FDF2F8", "usedIn": ["header.tsx"] },
+      "plan-agency-border": { "value": "#F9A8D4", "usedIn": ["header.tsx"] },
+      "version-green": { "value": "#16A34A", "usedIn": ["header.tsx"] },
+      "version-green-bg": { "value": "#F0FDF4", "usedIn": ["header.tsx"] },
+      "version-green-border": { "value": "#BBF7D0", "usedIn": ["header.tsx"] }
+    },
+
+    "misc": {
+      "browser-dot-red": "#FF5F57",
+      "browser-dot-yellow": "#FFBD2E",
+      "browser-dot-green": "#28C840",
+      "ios-blue": "#007AFF",
+      "theme-color": "#4C2CFF",
+      "icon-bg": "#EAE8F4"
+    }
+  },
+
+  "typography": {
+    "fontFamilies": {
+      "sans": { "value": "Inter Tight", "cssVariable": "--font-inter-tight", "source": "layout.tsx (next/font/google)", "usedIn": ["all components via Tailwind body class"] },
+      "mono": { "value": "JetBrains Mono", "cssVariable": "--font-mono", "source": "layout.tsx (next/font/google)", "usedIn": ["url-form.tsx", "footer.tsx", "results-report.tsx", "loading-state.tsx", "dashboard page"] }
+    },
+    "fontWeights": {
+      "regular": { "value": 400, "usageCount": 30, "usedIn": ["body text", "descriptions", "captions"] },
+      "medium": { "value": 500, "usageCount": 20, "usedIn": ["nav links", "labels", "input text"] },
+      "semibold": { "value": 600, "usageCount": 25, "usedIn": ["headings", "card titles", "button text"] },
+      "bold": { "value": 700, "usageCount": 15, "usedIn": ["hero headline", "section headings", "badges"] }
+    },
+    "scale": {
+      "display-hero": {
+        "fontFamily": "Inter Tight",
+        "fontWeight": 700,
+        "fontSize": "clamp(28px, 4.5vw, 46px)",
+        "lineHeight": 1.15,
+        "letterSpacing": "-1.5px",
+        "source": "hero.tsx",
+        "usedIn": ["hero.tsx h1"]
+      },
+      "heading-section": {
+        "fontFamily": "Inter Tight",
+        "fontWeight": 700,
+        "fontSize": "clamp(22px, 3vw, 32px)",
+        "lineHeight": "tight",
+        "letterSpacing": "-0.5px",
+        "source": "landing-mocks.tsx",
+        "usedIn": ["landing-mocks.tsx FeatureSection h2"]
+      },
+      "heading-xl": {
+        "fontFamily": "Inter Tight",
+        "fontWeight": 600,
+        "fontSize": "20px",
+        "lineHeight": "tight",
+        "letterSpacing": "normal",
+        "usedIn": ["limit-reached.tsx h2"]
+      },
+      "heading-lg": {
+        "fontFamily": "Inter Tight",
+        "fontWeight": 600,
+        "fontSize": "18px",
+        "lineHeight": 1.3,
+        "letterSpacing": "normal",
+        "usedIn": ["loading-state.tsx h2"]
+      },
+      "title-md": {
+        "fontFamily": "Inter Tight",
+        "fontWeight": 600,
+        "fontSize": "16px",
+        "lineHeight": "snug",
+        "letterSpacing": "normal",
+        "usedIn": ["card.tsx CardTitle"]
+      },
+      "title-sm": {
+        "fontFamily": "Inter Tight",
+        "fontWeight": 600,
+        "fontSize": "14px",
+        "lineHeight": "snug",
+        "letterSpacing": "normal",
+        "usedIn": ["results-report.tsx score cards"]
+      },
+      "body-default": {
+        "fontFamily": "Inter Tight",
+        "fontWeight": 400,
+        "fontSize": "14px",
+        "lineHeight": 1.5,
+        "letterSpacing": "normal",
+        "usedIn": ["card.tsx body", "general body text"]
+      },
+      "body-sm": {
+        "fontFamily": "Inter Tight",
+        "fontWeight": 400,
+        "fontSize": "13.5px",
+        "lineHeight": "relaxed",
+        "letterSpacing": "normal",
+        "usedIn": ["hero.tsx subheadline"]
+      },
+      "body-xs": {
+        "fontFamily": "Inter Tight",
+        "fontWeight": 400,
+        "fontSize": "13px",
+        "lineHeight": "relaxed",
+        "letterSpacing": "normal",
+        "usedIn": ["form descriptions", "error messages", "install-banner text"]
+      },
+      "label-md": {
+        "fontFamily": "Inter Tight",
+        "fontWeight": 500,
+        "fontSize": "13px",
+        "lineHeight": 1.4,
+        "letterSpacing": "normal",
+        "usedIn": ["header.tsx nav links", "results-report.tsx section titles"]
+      },
+      "label-sm": {
+        "fontFamily": "Inter Tight",
+        "fontWeight": 500,
+        "fontSize": "12px",
+        "lineHeight": 1.4,
+        "letterSpacing": "normal",
+        "usedIn": ["button labels", "form labels", "install-banner button"]
+      },
+      "label-xs": {
+        "fontFamily": "Inter Tight",
+        "fontWeight": 600,
+        "fontSize": "12px",
+        "lineHeight": 1.4,
+        "letterSpacing": "normal",
+        "usedIn": ["pdf-export-button label", "bold inline labels"]
+      },
+      "caption-md": {
+        "fontFamily": "Inter Tight",
+        "fontWeight": 500,
+        "fontSize": "11px",
+        "lineHeight": 1.4,
+        "letterSpacing": "normal",
+        "usedIn": ["sub labels", "meta text", "install-banner subtitle"]
+      },
+      "caption-sm": {
+        "fontFamily": "Inter Tight",
+        "fontWeight": 400,
+        "fontSize": "10px",
+        "lineHeight": 1.2,
+        "letterSpacing": "normal",
+        "usedIn": ["badge text", "section labels"]
+      },
+      "caption-badge": {
+        "fontFamily": "Inter Tight",
+        "fontWeight": 700,
+        "fontSize": "10px",
+        "lineHeight": 1.2,
+        "letterSpacing": "1.5px",
+        "textTransform": "uppercase",
+        "usedIn": ["header version badge", "hero algo badges"]
+      },
+      "caption-xs": {
+        "fontFamily": "Inter Tight",
+        "fontWeight": 400,
+        "fontSize": "9px",
+        "lineHeight": 1.2,
+        "letterSpacing": "normal",
+        "usedIn": ["metric card labels"]
+      },
+      "code-md": {
+        "fontFamily": "JetBrains Mono",
+        "fontWeight": 400,
+        "fontSize": "12px",
+        "lineHeight": 1.5,
+        "letterSpacing": "normal",
+        "usedIn": ["url-form.tsx input", "footer.tsx links"]
+      },
+      "code-sm": {
+        "fontFamily": "JetBrains Mono",
+        "fontWeight": 400,
+        "fontSize": "11px",
+        "lineHeight": 1.4,
+        "letterSpacing": "normal",
+        "usedIn": ["timestamp", "metadata text"]
+      },
+      "code-xs": {
+        "fontFamily": "JetBrains Mono",
+        "fontWeight": 400,
+        "fontSize": "10px",
+        "lineHeight": 1.2,
+        "letterSpacing": "2px",
+        "textTransform": "uppercase",
+        "usedIn": ["results-report.tsx section labels"]
+      }
+    }
+  },
+
+  "spacing": {
+    "scale": {
+      "0.5": { "value": "2px", "source": "Tailwind default" },
+      "1": { "value": "4px", "source": "Tailwind default" },
+      "1.5": { "value": "6px", "source": "Tailwind default" },
+      "2": { "value": "8px", "source": "Tailwind default" },
+      "2.5": { "value": "10px", "source": "Tailwind default" },
+      "3": { "value": "12px", "source": "Tailwind default" },
+      "3.5": { "value": "14px", "source": "Tailwind default" },
+      "4": { "value": "16px", "source": "Tailwind default" },
+      "5": { "value": "20px", "source": "Tailwind default" },
+      "6": { "value": "24px", "source": "Tailwind default" },
+      "7": { "value": "28px", "source": "Tailwind default" },
+      "8": { "value": "32px", "source": "Tailwind default" },
+      "10": { "value": "40px", "source": "Tailwind default" },
+      "12": { "value": "48px", "source": "Tailwind default" },
+      "16": { "value": "64px", "source": "Tailwind default" },
+      "20": { "value": "80px", "source": "Tailwind default" },
+      "32": { "value": "128px", "source": "Tailwind default" }
+    },
+    "semantic": {
+      "paddings": {
+        "card-padding": { "value": "16px", "tailwind": "p-4", "usedIn": ["card.tsx"] },
+        "card-padding-sm": { "value": "12px", "tailwind": "p-3", "usedIn": ["card.tsx size=sm"] },
+        "section-padding": { "value": "20px", "tailwind": "p-5", "usedIn": ["results-report.tsx DashSection"] },
+        "page-horizontal": { "value": "28px", "tailwind": "px-7", "usedIn": ["layout containers"] },
+        "input-horizontal": { "value": "10px", "tailwind": "px-2.5", "usedIn": ["input.tsx"] },
+        "input-vertical": { "value": "4px", "tailwind": "py-1", "usedIn": ["input.tsx"] },
+        "button-horizontal": { "value": "10px", "tailwind": "px-2.5", "usedIn": ["button.tsx default"] },
+        "button-horizontal-lg": { "value": "24px", "tailwind": "px-6", "usedIn": ["button.tsx lg"] },
+        "badge-horizontal": { "value": "8px", "tailwind": "px-2", "usedIn": ["badge.tsx"] },
+        "url-form-horizontal": { "value": "20px", "tailwind": "px-5", "usedIn": ["url-form.tsx"] },
+        "chat-horizontal": { "value": "14px", "tailwind": "px-3.5", "usedIn": ["chat-widget.tsx"] }
+      },
+      "gaps": {
+        "card-gap": { "value": "16px", "tailwind": "gap-4", "usedIn": ["card grids"] },
+        "card-gap-sm": { "value": "12px", "tailwind": "gap-3", "usedIn": ["compact grids"] },
+        "pricing-grid-gap": { "value": "12px", "tailwind": "gap-3", "usedIn": ["pricing-cards.tsx"] },
+        "button-icon-gap": { "value": "6px", "tailwind": "gap-1.5", "usedIn": ["button.tsx with icon"] },
+        "badge-icon-gap": { "value": "4px", "tailwind": "gap-1", "usedIn": ["badge.tsx with icon"] },
+        "nav-gap": { "value": "24px", "tailwind": "gap-6", "usedIn": ["header.tsx nav"] },
+        "stagger-gap": { "value": "8px", "tailwind": "gap-2", "usedIn": ["stagger containers"] },
+        "chat-messages-gap": { "value": "12px", "tailwind": "space-y-3", "usedIn": ["chat-widget.tsx"] }
+      }
+    }
+  },
+
+  "sizes": {
+    "buttons": {
+      "button-height-xs": 24,
+      "button-height-sm": 28,
+      "button-height-default": 32,
+      "button-height-lg": 36,
+      "button-icon": 32,
+      "button-icon-xs": 24,
+      "button-icon-sm": 28,
+      "button-icon-lg": 36
+    },
+    "inputs": {
+      "input-height": { "value": 32, "tailwind": "h-8" },
+      "input-height-form": { "value": 40, "tailwind": "h-10" },
+      "input-height-compound": { "value": 44, "tailwind": "h-11" }
+    },
+    "badges": {
+      "badge-height": { "value": 20, "tailwind": "h-5" }
+    },
+    "icons": {
+      "icon-xs": 12,
+      "icon-sm": 14,
+      "icon-md": 16,
+      "icon-lg": 20,
+      "icon-xl": 24
+    },
+    "layout": {
+      "avatar-size": 32,
+      "header-height": { "value": 56, "tailwind": "h-14" },
+      "chat-panel-width": 400,
+      "chat-panel-height": 560,
+      "chat-send-button": { "value": 40, "tailwind": "w-10 h-10" },
+      "content-max-width": 960,
+      "form-max-width": { "value": 512, "tailwind": "max-w-lg" },
+      "hero-max-width": 780,
+      "hero-icons-width": 280,
+      "hero-icons-height": 160
+    }
+  },
+
+  "radii": {
+    "cssVariable": "--radius",
+    "base": "10px",
+    "scale": {
+      "radius-sm": { "value": "6px", "calc": "calc(0.625rem * 0.6)" },
+      "radius-md": { "value": "8px", "calc": "calc(0.625rem * 0.8)" },
+      "radius-lg": { "value": "10px", "note": "same as base" },
+      "radius-xl": { "value": "14px" },
+      "radius-2xl": { "value": "18px" },
+      "radius-3xl": { "value": "22px" },
+      "radius-4xl": { "value": "26px" },
+      "radius-full": { "value": "9999px" }
+    },
+    "component-specific": {
+      "url-form": { "value": "14px", "tailwind": "rounded-[14px]" },
+      "competitor-card": { "value": "11px", "tailwind": "rounded-[11px]" },
+      "chat-panel": { "value": "16px", "tailwind": "rounded-2xl" },
+      "chat-bubble": { "value": "16px", "tailwind": "rounded-2xl", "note": "with rounded-br-md/bl-md for directional" }
+    }
+  },
+
+  "strokes": {
+    "border-default": "1px solid",
+    "card-ring": { "value": "1px solid", "tailwind": "ring-1" },
+    "focus-ring": { "value": "3px solid", "tailwind": "ring-3" }
+  },
+
+  "shadows": {
+    "shadow-elevation-1": "0 1px 2px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)",
+    "shadow-elevation-2": "0 2px 4px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04)",
+    "shadow-elevation-3": "0 4px 8px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06)",
+    "focus-glow": "0 0 600px 40px rgba(92,53,205,0.08)",
+    "brand-hover-glow": "0 6px 20px rgba(76,44,255,0.12)",
+    "dash-card-hover": "0 4px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)",
+    "chat-fab-shadow": "0 4px 24px oklch(0.535 0.185 295 / 30%)",
+    "chat-panel-shadow": "shadow-2xl"
+  },
+
+  "opacity": {
+    "disabled": 0.5,
+    "disabled-button": 0.4,
+    "muted-text": 0.4,
+    "subtle-text": 0.25,
+    "ghost-text": 0.2,
+    "loading-done": 0.55,
+    "loading-pending": 0.3,
+    "disabled-pointer": 0.3
+  },
+
+  "animations": {
+    "easing": {
+      "default": "cubic-bezier(0.22, 1, 0.36, 1)",
+      "spring": "cubic-bezier(0.16, 1, 0.3, 1)",
+      "ease-in-out": "cubic-bezier(0.4, 0, 0.6, 1)"
+    },
+    "keyframes": {
+      "fadeIn": { "duration": "400ms", "usedIn": ["hero.tsx", "error-state.tsx", "footer.tsx", "limit-reached.tsx", "human-audit-confirmation.tsx"] },
+      "slideUp": { "duration": "500ms", "usedIn": ["hero.tsx h1, p, form"] },
+      "slideDown": { "duration": "400ms", "usedIn": ["dropdown/popover animations"] },
+      "scaleIn": { "duration": "400ms", "usedIn": ["modal/dialog entry"] },
+      "shimmer": { "duration": "1.8s", "usedIn": ["skeleton loaders"] },
+      "countUp": { "duration": "600ms", "usedIn": ["landing-mocks.tsx score gauges"] },
+      "ringFill": { "duration": "1.2s", "usedIn": ["landing-mocks.tsx gauge rings"] },
+      "barFill": { "duration": "800ms", "usedIn": ["results-report.tsx bar charts"] },
+      "barWidth": { "duration": "1.3s", "usedIn": ["results-report.tsx progress bars"] },
+      "pulse-soft": { "duration": "2s", "usedIn": ["attention indicators"] },
+      "blink-dot": { "duration": "1.8s", "usedIn": ["loading-state.tsx", "header.tsx beta banner"] },
+      "wordSlideIn": { "duration": "500ms", "usedIn": ["hero.tsx RotatingText"] },
+      "wordSlideOut": { "duration": "500ms", "usedIn": ["hero.tsx RotatingText"] },
+      "revealUp": { "duration": "700ms", "usedIn": ["scroll-reveal.tsx (all ScrollReveal instances)"] },
+      "radarReveal": { "duration": "800ms", "usedIn": ["results-report.tsx radar chart"] },
+      "heroFloat": { "duration": "6s", "usedIn": ["hero-icons.tsx floating cards"] },
+      "heroSlideLeft": { "duration": "13s", "usedIn": ["hero-icons.tsx left card"] },
+      "heroSlideRight": { "duration": "13s", "usedIn": ["hero-icons.tsx right card"] },
+      "heroFade": { "duration": "13s", "usedIn": ["hero-icons.tsx left/right card opacity"] },
+      "heroPopSpark": { "duration": "13s", "usedIn": ["hero-icons.tsx sparkle stars"] },
+      "caretBlink": { "duration": "1s", "timingFunction": "step-end", "usedIn": ["url-form.tsx idle caret"] },
+      "install-slide-up": { "duration": "0.4s", "usedIn": ["install-banner.tsx"] }
+    },
+    "stagger": {
+      "childDelay": "60ms",
+      "fuDelay": "50ms",
+      "scrollRevealDelay": "80ms",
+      "maxChildren": 9
+    }
+  },
+
+  "components": {
+    "button": {
+      "source": "src/components/ui/button.tsx",
+      "classification": "primitive",
+      "category": "primitive",
+      "anatomy": ["root", "label", "icon"],
+      "props": {
+        "variant": { "type": "enum", "values": ["default", "outline", "secondary", "ghost", "destructive", "link"], "defaultValue": "default" },
+        "size": { "type": "enum", "values": ["default", "xs", "sm", "lg", "icon", "icon-xs", "icon-sm", "icon-lg"], "defaultValue": "default" }
+      },
+      "states": ["hover", "disabled", "focus-visible", "active", "aria-expanded", "aria-invalid"],
+      "dependencies": ["@base-ui-components/react (ButtonPrimitive)", "class-variance-authority"],
+      "composedFrom": [],
+      "usedIn": ["url-form.tsx", "error-state.tsx", "results-report.tsx", "chat-widget.tsx", "competitor-section.tsx", "pricing-cards.tsx", "limit-reached.tsx", "human-audit-form.tsx"],
+      "hasMotion": false,
+      "accessibilityNotes": "Uses @base-ui ButtonPrimitive for accessible button semantics. Supports focus-visible ring, disabled state, aria-expanded, aria-invalid.",
+      "tokens": ["primary", "primary-foreground", "border", "background", "muted", "foreground", "destructive", "ring", "radius-lg"]
+    },
+
+    "badge": {
+      "source": "src/components/ui/badge.tsx",
+      "classification": "primitive",
+      "category": "primitive",
+      "anatomy": ["root", "label", "icon"],
+      "props": {
+        "variant": { "type": "enum", "values": ["default", "secondary", "destructive", "outline", "ghost", "link"], "defaultValue": "default" }
+      },
+      "states": ["hover", "focus-visible", "aria-invalid"],
+      "dependencies": ["@base-ui-components/react (useRender, mergeProps)", "class-variance-authority"],
+      "composedFrom": [],
+      "usedIn": ["header.tsx", "hero.tsx", "results-report.tsx", "pricing-cards.tsx"],
+      "hasMotion": false,
+      "accessibilityNotes": "Uses @base-ui utilities. Consumer is responsible for semantic meaning (role, aria-label).",
+      "tokens": ["primary", "primary-foreground", "secondary", "destructive", "border", "foreground", "muted", "ring"]
+    },
+
+    "input": {
+      "source": "src/components/ui/input.tsx",
+      "classification": "primitive",
+      "category": "input",
+      "anatomy": ["root"],
+      "props": { "type": { "type": "string" } },
+      "states": ["focus-visible", "disabled", "aria-invalid", "placeholder"],
+      "dependencies": ["@base-ui-components/react (InputPrimitive)"],
+      "composedFrom": [],
+      "usedIn": ["human-audit-form.tsx", "limit-reached.tsx"],
+      "hasMotion": false,
+      "accessibilityNotes": "Uses @base-ui InputPrimitive. Supports focus-visible ring, disabled state, aria-invalid. Consumer responsible for aria-label, aria-describedby.",
+      "tokens": ["input", "foreground", "muted-foreground", "ring", "destructive"]
+    },
+
+    "card": {
+      "source": "src/components/ui/card.tsx",
+      "classification": "primitive",
+      "category": "composite",
+      "anatomy": ["root", "header", "title", "description", "action", "content", "footer"],
+      "props": { "size": { "type": "enum", "values": ["default", "sm"], "defaultValue": "default" } },
+      "slots": ["CardHeader", "CardTitle", "CardDescription", "CardAction", "CardContent", "CardFooter"],
+      "dependencies": [],
+      "composedFrom": [],
+      "usedIn": ["pricing-cards.tsx", "limit-reached.tsx", "dashboard page"],
+      "hasMotion": false,
+      "accessibilityNotes": "Layout-only component with no specific a11y features. Consumer responsible for semantics.",
+      "tokens": ["card", "card-foreground", "foreground", "muted-foreground", "muted", "radius-xl"]
+    },
+
+    "header": {
+      "source": "src/components/header.tsx",
+      "classification": "component",
+      "category": "navigation",
+      "anatomy": ["root", "nav", "logo", "links", "version-badge", "auth-controls", "beta-banner"],
+      "states": ["scrolled", "signed-in", "signed-out"],
+      "subComponents": ["Logo", "PlanBadge"],
+      "dependencies": ["@clerk/nextjs (Show, SignInButton, UserButton)", "useSubscription hook"],
+      "composedFrom": [],
+      "usedIn": ["layout.tsx (auth layout)", "all pages"],
+      "hasMotion": true,
+      "motionDetails": "Grid collapse/expand (500ms cubic-bezier) on beta banner, opacity fade (400ms), blink-dot animation (1.8s infinite)",
+      "accessibilityNotes": "Good: aria-label='Main navigation' on nav, aria-label='UXLens — Home' on logo link. Missing: aria-current on active nav items.",
+      "tokens": ["foreground", "brand", "brand-dim", "brand-glow", "brand-fg", "border", "plan-starter", "plan-pro", "plan-agency", "version-green"]
+    },
+
+    "url-form": {
+      "source": "src/components/url-form.tsx",
+      "classification": "component",
+      "category": "input",
+      "anatomy": ["root", "browser-chrome", "dots", "input", "action-bar", "submit-button", "error-message"],
+      "props": {
+        "onSubmit": { "type": "function" },
+        "isLoading": { "type": "boolean" }
+      },
+      "states": ["idle", "focused", "loading", "error", "disabled"],
+      "dependencies": [],
+      "composedFrom": [],
+      "usedIn": ["hero.tsx"],
+      "hasMotion": true,
+      "motionDetails": "Focus glow (ultra-soft 600px box-shadow), caret blink (1s step-end infinite), button hover translateY(-1px), active scale(0.98), mouse glow on hover",
+      "accessibilityNotes": "Has proper form element with onSubmit. Missing: aria-invalid, aria-describedby for error messaging. Has disabled state on button during loading.",
+      "tokens": ["s1", "foreground", "brand", "brand-fg", "brand-glow", "destructive"]
+    },
+
+    "loading-state": {
+      "source": "src/components/loading-state.tsx",
+      "classification": "component",
+      "category": "feedback",
+      "anatomy": ["root", "blink-dot", "title", "subtitle", "pipeline-steps", "step-number", "step-info", "step-dots"],
+      "states": ["active-step", "done-step", "pending-step"],
+      "dependencies": [],
+      "composedFrom": [],
+      "usedIn": ["page.tsx (HomeClient)"],
+      "hasMotion": true,
+      "motionDetails": "blink-dot (1.8s infinite), pdot animation (1.2s ease-in-out infinite, staggered 0/150/300ms), opacity transitions (300ms)",
+      "accessibilityNotes": "Missing: role='progressbar', aria-live='polite', aria-valuenow/valuemax. No prefers-reduced-motion handling.",
+      "tokens": ["brand", "brand-dim", "brand-glow", "score-high", "border", "foreground"]
+    },
+
+    "error-state": {
+      "source": "src/components/error-state.tsx",
+      "classification": "component",
+      "category": "feedback",
+      "anatomy": ["root", "status-dot", "heading", "message", "retry-button"],
+      "props": {
+        "message": { "type": "string" },
+        "onRetry": { "type": "function" }
+      },
+      "dependencies": [],
+      "composedFrom": [],
+      "usedIn": ["page.tsx (HomeClient)"],
+      "hasMotion": true,
+      "motionDetails": "animate-fade-in (400ms), button transition-all hover/active states",
+      "accessibilityNotes": "Missing: role='alert' on container. Has semantic h2 and descriptive error message.",
+      "tokens": ["score-low", "destructive", "foreground", "border2", "s1"]
+    },
+
+    "pricing-cards": {
+      "source": "src/components/pricing-cards.tsx",
+      "classification": "component",
+      "category": "composite",
+      "anatomy": ["root", "card", "badge", "name", "price", "period", "audits", "feature-list", "action-button"],
+      "props": {
+        "email": { "type": "string" },
+        "currentPlan": { "type": "enum", "values": ["free", "starter", "pro", "agency"] }
+      },
+      "variants": ["default", "popular", "current"],
+      "states": ["hover", "current-plan"],
+      "dependencies": ["LemonSqueezy checkout"],
+      "composedFrom": [],
+      "usedIn": ["pricing page", "limit-reached.tsx"],
+      "hasMotion": false,
+      "accessibilityNotes": "Has clear visual hierarchy with check icons for feature lists.",
+      "tokens": ["foreground", "background", "card", "border", "muted-foreground", "brand", "brand-fg"]
+    },
+
+    "chat-widget": {
+      "source": "src/components/chat-widget.tsx",
+      "classification": "component",
+      "category": "overlay",
+      "anatomy": ["fab-button", "panel", "header", "credits-badge", "messages", "empty-state", "suggestion-chips", "input-area", "textarea", "send-button", "error-bar"],
+      "props": {
+        "auditId": { "type": "string" },
+        "plan": { "type": "string" }
+      },
+      "states": ["closed", "open", "loading", "streaming", "error", "empty", "credits-exhausted"],
+      "dependencies": ["SSE (EventSource) for streaming", "ChatMarkdown sub-component"],
+      "composedFrom": [],
+      "usedIn": ["results-report.tsx (Pro+ plan gate)"],
+      "hasMotion": true,
+      "motionDetails": "FAB hover scale(1.05), active scale(0.95), smooth scrollIntoView for new messages, 200ms transition-all",
+      "accessibilityNotes": "Has Enter/Shift+Enter keyboard handling. Missing: aria-label on FAB, aria-expanded on toggle, aria-live='polite' on message stream, focus trap on panel.",
+      "tokens": ["brand", "brand-fg", "brand-dim", "brand-glow", "s1", "s2", "foreground", "border", "border2", "score-low"]
+    },
+
+    "competitor-section": {
+      "source": "src/components/competitor-section.tsx",
+      "classification": "component",
+      "category": "data-display",
+      "anatomy": ["root", "position-summary", "score-comparison", "category-accordion", "competitor-cards", "advantages-list", "manual-input-form"],
+      "subComponents": ["ScoreBar", "CompetitorCard", "ComparisonRow", "ComparisonAccordion", "CompetitorSkeleton", "CompetitorLockedPreview", "ManualCompetitorInput"],
+      "props": {
+        "data": { "type": "CompetitorAnalysis" },
+        "status": { "type": "enum", "values": ["loading", "done", "failed", "locked"] },
+        "onManualCompetitors": { "type": "function" }
+      },
+      "states": ["loading", "done", "failed", "locked"],
+      "dependencies": [],
+      "composedFrom": [],
+      "usedIn": ["results-report.tsx", "audit/[id] page"],
+      "hasMotion": true,
+      "motionDetails": "Score bar transition-all 500ms, ChevronDown rotation 200ms on expand, hover bg transition",
+      "accessibilityNotes": "Missing: aria-expanded on expandable cards. Has clear text hierarchy.",
+      "tokens": ["score-high", "score-mid", "score-low", "brand", "brand-dim", "brand-fg", "brand-glow", "s1", "s2", "s3", "border", "foreground"]
+    },
+
+    "heatmap-overlay": {
+      "source": "src/components/heatmap-overlay.tsx",
+      "classification": "component",
+      "category": "data-display",
+      "anatomy": ["root", "header", "toggle-button", "screenshot-container", "image", "canvas-overlay", "loading-pill", "gradient-legend"],
+      "props": {
+        "screenshotUrl": { "type": "string" },
+        "heatmapZones": { "type": "HeatmapZone[]" },
+        "pageHeight": { "type": "number" },
+        "viewportWidth": { "type": "number" },
+        "heatmapLoading": { "type": "boolean" }
+      },
+      "states": ["heatmap-visible", "heatmap-hidden", "loading"],
+      "dependencies": ["drawHeatmapOnCanvas (lib/heatmap-composite)"],
+      "composedFrom": [],
+      "usedIn": ["screenshot-section.tsx"],
+      "hasMotion": true,
+      "motionDetails": "Canvas opacity transition 0.3s ease for toggle, animate-spin on loading spinner",
+      "accessibilityNotes": "Has alt='Page screenshot' on image. Canvas is pointer-events-none (correct for overlay). Missing: aria-label on toggle button.",
+      "tokens": ["brand", "brand-dim", "brand-glow", "border", "foreground"]
+    },
+
+    "screenshot-section": {
+      "source": "src/components/screenshot-section.tsx",
+      "classification": "component",
+      "category": "composite",
+      "anatomy": ["root", "heatmap-overlay"],
+      "props": {
+        "screenshotUrl": { "type": "string" },
+        "heatmapZones": { "type": "HeatmapZone[]" },
+        "pageHeight": { "type": "number" },
+        "viewportWidth": { "type": "number" },
+        "heatmapLoading": { "type": "boolean" }
+      },
+      "dependencies": [],
+      "composedFrom": ["heatmap-overlay"],
+      "usedIn": ["results-report.tsx"],
+      "hasMotion": false,
+      "accessibilityNotes": "Wrapper only — delegates to HeatmapOverlay.",
+      "tokens": ["border", "s1"]
+    },
+
+    "pdf-export-button": {
+      "source": "src/components/pdf-export-button.tsx",
+      "classification": "component",
+      "category": "primitive",
+      "anatomy": ["root", "icon", "label"],
+      "states": ["idle", "generating", "error"],
+      "dependencies": ["@react-pdf/renderer (dynamic import)", "AuditPDF component (dynamic import)"],
+      "composedFrom": [],
+      "usedIn": ["results-report.tsx (plan-gated)"],
+      "hasMotion": true,
+      "motionDetails": "animate-spin on loading spinner, hover:opacity-80",
+      "accessibilityNotes": "Missing: aria-label on button, aria-busy during generation.",
+      "tokens": ["brand", "brand-dim", "brand-glow", "score-low"]
+    },
+
+    "scroll-reveal": {
+      "source": "src/components/scroll-reveal.tsx",
+      "classification": "pattern",
+      "category": "layout",
+      "anatomy": ["root"],
+      "props": {
+        "delay": { "type": "number", "range": "0-4" },
+        "threshold": { "type": "number", "defaultValue": 0.15 }
+      },
+      "states": ["hidden", "revealed"],
+      "dependencies": ["IntersectionObserver API"],
+      "composedFrom": [],
+      "usedIn": ["results-report.tsx", "landing-mocks.tsx", "hero.tsx"],
+      "hasMotion": true,
+      "motionDetails": "revealUp keyframes 700ms with blur fade (0-2px), translate3d(0,32px,0) → none, will-change: opacity,transform",
+      "accessibilityNotes": "Excellent: Respects prefers-reduced-motion:reduce — sets opacity:1, transform:none, filter:none, transition:none.",
+      "tokens": []
+    },
+
+    "install-banner": {
+      "source": "src/components/install-banner.tsx",
+      "classification": "component",
+      "category": "feedback",
+      "anatomy": ["root", "icon", "text", "install-button", "dismiss-button", "ios-guide-overlay", "ios-steps"],
+      "variants": ["android", "ios"],
+      "states": ["visible", "exiting", "ios-guide-open"],
+      "dependencies": ["beforeinstallprompt browser API", "localStorage"],
+      "composedFrom": [],
+      "usedIn": ["layout.tsx (root layout, all pages)"],
+      "hasMotion": true,
+      "motionDetails": "install-slide-up keyframe (0.4s ease-out), exit translateY(120%) with 300ms transition, backdrop-blur-sm on iOS guide",
+      "accessibilityNotes": "Has aria-label='Dismiss install banner'. Missing: role='dialog' on iOS guide, aria-modal='true', focus trap on overlay.",
+      "tokens": ["brand", "brand-fg", "border2", "border"]
+    },
+
+    "results-report": {
+      "source": "src/components/results-report.tsx",
+      "classification": "screen-section",
+      "category": "composite",
+      "anatomy": ["header", "score-gauge", "executive-summary", "category-cards", "sparklines", "findings-accordion", "section-rewrites", "heuristic-evaluation", "visual-analysis", "first-screen-analysis", "strengths", "confusion-map", "competitor-section", "screenshot-section"],
+      "subComponents": ["DashSection", "BarChartRow", "InsightDashCard", "SectionCard", "FindingCard", "MiniInsight", "HeuristicCard", "HeroRewrite", "SectionRewriteBlock", "ReportDivider", "LockedHint", "UpgradeCard", "LockedOverlay", "HumanAuditCTA"],
+      "props": {
+        "data": { "type": "UXAuditResult" },
+        "url": { "type": "string" },
+        "onReset": { "type": "function" },
+        "plan": { "type": "string" },
+        "auditId": { "type": "string" },
+        "screenshotUrl": { "type": "string" },
+        "heatmapZones": { "type": "HeatmapZone[]" }
+      },
+      "dependencies": ["ScrollReveal", "ScreenshotSection", "CompetitorSection", "CompetitorLockedPreview", "PdfExportButton", "ChatWidget", "Footer"],
+      "composedFrom": ["screenshot-section", "competitor-section", "chat-widget", "pdf-export-button", "scroll-reveal", "footer"],
+      "usedIn": ["page.tsx (HomeClient)", "audit/[id] page"],
+      "hasMotion": true,
+      "motionDetails": "Uses ScrollReveal wrappers for section entry animations, individual transition-all for hover/state changes on cards",
+      "accessibilityNotes": "Has semantic h1/h2/h3 hierarchy. Missing: role='region' on major sections, aria-expanded on expandable sections, aria-label on icon-only buttons. Large complex component with many sub-sections.",
+      "tokens": ["brand", "brand-dim", "brand-glow", "brand-fg", "s1", "s2", "s3", "border", "border2", "foreground", "muted-foreground", "score-high", "score-mid", "score-low", "accent-purple", "accent-blue", "destructive"]
+    },
+
+    "landing-mocks": {
+      "source": "src/components/landing-mocks.tsx",
+      "classification": "screen-section",
+      "category": "data-display",
+      "subComponents": ["ExecutiveSummaryMock", "BarChartMock", "MetricGridMock", "RadarChartMock", "HeatmapMock", "ChatMock", "CompetitorMock", "RewriteMock", "ProductPreviewMock", "FeatureSection"],
+      "dependencies": ["ScrollReveal"],
+      "composedFrom": ["scroll-reveal"],
+      "usedIn": ["page.tsx (HomeClient, below-fold SEO content)"],
+      "hasMotion": true,
+      "motionDetails": "ScrollReveal wrappers, animate-ring-fill on score gauges (1.2s cubic-bezier, 300ms delay)",
+      "accessibilityNotes": "Missing: role='img'/aria-label on mock cards, aria-hidden on decorative elements.",
+      "tokens": ["brand", "brand-dim", "brand-glow", "brand-fg", "s1", "s2", "s3", "border", "border2", "score-high", "score-mid", "score-low", "foreground"]
+    },
+
+    "limit-reached": {
+      "source": "src/components/limit-reached.tsx",
+      "classification": "screen-section",
+      "category": "feedback",
+      "anatomy": ["root", "icon", "heading", "description", "usage-bar", "pricing-section", "human-audit-form", "verify-access-form", "back-button"],
+      "props": {
+        "usage": { "type": "UsageCheck" },
+        "onReset": { "type": "function" },
+        "onHumanAuditRequested": { "type": "function" },
+        "onSubscriptionVerified": { "type": "function" }
+      },
+      "dependencies": ["PricingCards"],
+      "composedFrom": ["pricing-cards"],
+      "usedIn": ["page.tsx (HomeClient)"],
+      "hasMotion": true,
+      "motionDetails": "animate-fade-in (400ms), focus-glow on inputs",
+      "accessibilityNotes": "Has form validation with error messaging. Missing: aria-invalid, aria-describedby.",
+      "tokens": ["brand", "brand-dim", "brand-fg", "s1", "s3", "border", "border2", "foreground", "destructive"]
+    },
+
+    "human-audit-form": {
+      "source": "src/components/human-audit-form.tsx",
+      "classification": "component",
+      "category": "input",
+      "anatomy": ["root", "url-input", "email-input", "error", "submit-button"],
+      "props": { "onRequested": { "type": "function" } },
+      "states": ["idle", "error"],
+      "dependencies": ["urlSchema (lib/schemas)"],
+      "composedFrom": [],
+      "usedIn": [],
+      "isReferenced": false,
+      "hasMotion": true,
+      "motionDetails": "animate-fade-in on error message (400ms)",
+      "accessibilityNotes": "Has input placeholders and email validation. Missing: aria-invalid, aria-describedby, aria-label on inputs.",
+      "tokens": ["background", "border", "foreground", "muted-foreground", "destructive"]
+    },
+
+    "human-audit-confirmation": {
+      "source": "src/components/human-audit-confirmation.tsx",
+      "classification": "component",
+      "category": "feedback",
+      "anatomy": ["root", "check-icon", "heading", "description", "email-display", "timeline", "back-button"],
+      "props": {
+        "url": { "type": "string" },
+        "email": { "type": "string" },
+        "onReset": { "type": "function" }
+      },
+      "dependencies": [],
+      "composedFrom": [],
+      "usedIn": ["page.tsx (HomeClient)"],
+      "hasMotion": true,
+      "motionDetails": "animate-fade-in (400ms)",
+      "accessibilityNotes": "Has semantic h2 and CheckCircle2 success icon. Missing: role='status' or role='alert'.",
+      "tokens": ["score-high", "foreground", "border2", "s1"]
+    },
+
+    "footer": {
+      "source": "src/components/footer.tsx",
+      "classification": "component",
+      "category": "navigation",
+      "anatomy": ["root", "brand-text", "user-counter", "nav-links"],
+      "subComponents": ["AnimatedNumber"],
+      "dependencies": [],
+      "composedFrom": [],
+      "usedIn": ["results-report.tsx", "page.tsx (HomeClient)"],
+      "hasMotion": true,
+      "motionDetails": "animate-fade-in on counter (400ms), AnimatedNumber RAF count-up (1200ms cubic-bezier easing)",
+      "accessibilityNotes": "Has aria-label='Footer navigation' on nav. Good semantic nav structure.",
+      "tokens": ["foreground", "border"]
+    },
+
+    "hero": {
+      "source": "src/components/hero.tsx",
+      "classification": "screen-section",
+      "category": "layout",
+      "anatomy": ["root", "three-js-bg", "icons-illustration", "headline", "rotating-text", "subheadline", "url-form", "feature-badges"],
+      "subComponents": ["RotatingText", "HeroBackground (lazy-loaded)", "HeroIcons", "UrlForm"],
+      "props": {
+        "onSubmit": { "type": "function" },
+        "isLoading": { "type": "boolean" }
+      },
+      "dependencies": ["UrlForm", "HeroIcons", "HeroBackground (dynamic import)"],
+      "composedFrom": ["url-form", "hero-icons"],
+      "usedIn": ["page.tsx (HomeClient)"],
+      "hasMotion": true,
+      "motionDetails": "RotatingText cycles words every 2.8s with 500ms slide+blur animations, animate-fade-in on badges (250ms delay), animate-slide-up on h1/p/form (staggered 60ms/120ms)",
+      "accessibilityNotes": "Has semantic h1. Missing: prefers-reduced-motion handling on RotatingText, aria labels on animated badges.",
+      "tokens": ["foreground", "brand"]
+    },
+
+    "hero-icons": {
+      "source": "src/components/hero-icons.tsx",
+      "classification": "one-off",
+      "category": "layout",
+      "anatomy": ["root", "left-card", "right-card", "center-card", "sparkle-stars"],
+      "dependencies": [],
+      "composedFrom": [],
+      "usedIn": ["hero.tsx"],
+      "hasMotion": true,
+      "motionDetails": "Extensive SVG animations: heroSlideLeft/Right (13s infinite), heroFloat (6s/8s ease-in-out infinite), heroFade (13s infinite), heroPopSpark (13s infinite with complex scale/opacity). All use transform-origin and cubic-bezier.",
+      "accessibilityNotes": "Excellent: Has aria-hidden='true' (correct for decorative SVG).",
+      "tokens": ["brand-900", "#EAE8F4", "#DCA854", "#F6E9D5", "#54A0DC", "#D5E7F6", "#B1A9DA"]
+    }
+  },
+
+  "patterns": {
+    "hero-section": {
+      "description": "Animated hero with three-card SVG illustration, rotating text headline, and browser-chrome URL form",
+      "components": ["hero", "hero-icons", "url-form"],
+      "filePaths": ["src/components/hero.tsx", "src/components/hero-icons.tsx", "src/components/url-form.tsx"],
+      "usedIn": ["home screen"],
+      "layoutCharacteristics": "Centered column, max-width 780px, stagger-animated entry, Three.js background (lazy)",
+      "tokenUsage": ["foreground", "brand", "brand-fg", "brand-glow", "s1"]
+    },
+    "url-audit-form": {
+      "description": "Browser-chrome styled URL input with traffic light dots, blinking caret, and glow focus",
+      "components": ["url-form"],
+      "filePaths": ["src/components/url-form.tsx"],
+      "usedIn": ["home screen (hero)"],
+      "layoutCharacteristics": "Full-width, rounded-[14px], browser-chrome header with 3 dots, inner text input + action bar",
+      "tokenUsage": ["s1", "foreground", "brand", "brand-fg", "brand-glow"]
+    },
+    "pricing-grid": {
+      "description": "3-column pricing cards with feature checklists and current plan detection",
+      "components": ["pricing-cards"],
+      "filePaths": ["src/components/pricing-cards.tsx"],
+      "usedIn": ["pricing screen", "limit-reached screen-section"],
+      "layoutCharacteristics": "3-column grid (gap-3), equal-height cards, popular card highlighted",
+      "tokenUsage": ["foreground", "background", "card", "border", "brand", "brand-fg"]
+    },
+    "diagnostic-pipeline": {
+      "description": "10-step animated pipeline showing audit progress with blinking dots and step states",
+      "components": ["loading-state"],
+      "filePaths": ["src/components/loading-state.tsx"],
+      "usedIn": ["home screen (during audit)"],
+      "layoutCharacteristics": "Centered column, numbered steps with status indicators, staggered dot animations",
+      "tokenUsage": ["brand", "brand-dim", "brand-glow", "score-high", "foreground"]
+    },
+    "error-retry": {
+      "description": "Centered error message with status dot and retry button",
+      "components": ["error-state"],
+      "filePaths": ["src/components/error-state.tsx"],
+      "usedIn": ["home screen (on audit failure)"],
+      "layoutCharacteristics": "Centered column with large vertical padding (py-32), max-width-sm text",
+      "tokenUsage": ["score-low", "foreground", "border2", "s1"]
+    },
+    "sticky-header": {
+      "description": "Blurred sticky header with logo, nav links, auth controls, and collapsible beta banner",
+      "components": ["header"],
+      "filePaths": ["src/components/header.tsx"],
+      "usedIn": ["all screens"],
+      "layoutCharacteristics": "Fixed top, full-width, h-14, backdrop-blur, z-50",
+      "tokenUsage": ["foreground", "brand", "brand-dim", "border", "plan-*"]
+    },
+    "install-pwa": {
+      "description": "Floating bottom-center banner for mobile PWA install with Android native prompt / iOS share instructions",
+      "components": ["install-banner"],
+      "filePaths": ["src/components/install-banner.tsx"],
+      "usedIn": ["all screens (mobile only)"],
+      "layoutCharacteristics": "Fixed bottom-center, w-360px max, rounded-2xl, slide-up animation",
+      "tokenUsage": ["brand", "brand-fg", "border2"]
+    },
+    "audit-report": {
+      "description": "Full audit dashboard with score gauge, categories, findings, rewrites, heuristics, visual analysis, and competitor benchmarking",
+      "components": ["results-report", "screenshot-section", "competitor-section", "chat-widget", "pdf-export-button", "scroll-reveal", "footer"],
+      "filePaths": ["src/components/results-report.tsx"],
+      "usedIn": ["home screen (after audit)", "audit detail screen"],
+      "layoutCharacteristics": "Max-width 960px centered, sectioned layout with ScrollReveal, DashSection containers",
+      "tokenUsage": ["brand", "brand-dim", "brand-fg", "s1", "s2", "s3", "border", "border2", "foreground", "score-high", "score-mid", "score-low"]
+    },
+    "chat-interface": {
+      "description": "Floating AI chat FAB + panel with suggestion chips, streaming messages, credits counter",
+      "components": ["chat-widget"],
+      "filePaths": ["src/components/chat-widget.tsx"],
+      "usedIn": ["audit report (Pro+ only)"],
+      "layoutCharacteristics": "Fixed bottom-right, 400x560px panel, z-50, rounded-2xl",
+      "tokenUsage": ["brand", "brand-fg", "brand-dim", "s1", "s2", "foreground", "border"]
+    },
+    "competitor-benchmark": {
+      "description": "Score comparison with expandable competitor cards and category-by-category breakdown",
+      "components": ["competitor-section"],
+      "filePaths": ["src/components/competitor-section.tsx"],
+      "usedIn": ["audit report (Pro+ only)"],
+      "layoutCharacteristics": "Full-width section with accordion cards, score bars, comparison grid",
+      "tokenUsage": ["score-high", "score-mid", "score-low", "brand", "s1", "s2", "border"]
+    },
+    "limit-paywall": {
+      "description": "Usage exhausted state with usage bar, pricing cards, human audit CTA, and subscription verification",
+      "components": ["limit-reached", "pricing-cards"],
+      "filePaths": ["src/components/limit-reached.tsx", "src/components/pricing-cards.tsx"],
+      "usedIn": ["home screen (when limit reached)"],
+      "layoutCharacteristics": "Centered column, usage progress bar, embedded pricing grid, form sections",
+      "tokenUsage": ["brand", "brand-dim", "brand-fg", "s1", "border", "foreground", "destructive"]
+    },
+    "feature-showcase": {
+      "description": "FeatureSection layout with marketing copy + animated mock component for landing page SEO content",
+      "components": ["landing-mocks", "scroll-reveal"],
+      "filePaths": ["src/components/landing-mocks.tsx"],
+      "usedIn": ["home screen (below fold)"],
+      "layoutCharacteristics": "Alternating left/right layout, ScrollReveal on each section, mock cards with ring-fill animation",
+      "tokenUsage": ["brand", "brand-dim", "brand-fg", "s1", "s2", "border", "score-high", "score-mid", "score-low"]
+    },
+    "before-after-rewrite": {
+      "description": "Side-by-side before/after hero rewrite with original → improved copy comparison",
+      "components": ["results-report (HeroRewrite sub-component)"],
+      "filePaths": ["src/components/results-report.tsx"],
+      "usedIn": ["audit report (improvements section)"],
+      "layoutCharacteristics": "Two-column comparison, original faded with improved highlighted",
+      "tokenUsage": ["brand", "brand-dim", "foreground", "score-high"]
+    }
+  },
+
+  "screens": [
+    {
+      "name": "Home / Landing",
+      "route": "/",
+      "filePath": "src/app/page.tsx",
+      "purpose": "Primary landing page and audit tool. Users enter a URL, see loading pipeline, then full audit results. Also contains below-fold SEO content with feature showcases.",
+      "screenType": "landing",
+      "authRequired": false,
+      "mainComponents": ["hero", "url-form", "hero-icons", "loading-state", "error-state", "results-report", "limit-reached", "human-audit-confirmation", "landing-mocks", "footer"],
+      "patternsUsed": ["hero-section", "url-audit-form", "diagnostic-pipeline", "error-retry", "audit-report", "limit-paywall", "feature-showcase"],
+      "layoutType": "single-column centered (max-width 960px)",
+      "priority": "critical",
+      "states": ["idle (hero + SEO)", "loading (pipeline)", "error", "limit-reached", "results", "human-audit-requested"]
+    },
+    {
+      "name": "Dashboard",
+      "route": "/dashboard",
+      "filePath": "src/app/dashboard/page.tsx",
+      "purpose": "Authenticated user dashboard showing audit history, plan info, usage metrics, and API key management.",
+      "screenType": "dashboard",
+      "authRequired": true,
+      "mainComponents": ["header", "footer"],
+      "patternsUsed": ["sticky-header"],
+      "layoutType": "single-column centered with card grid",
+      "priority": "high",
+      "states": ["loading", "empty", "populated", "deleting-audit"]
+    },
+    {
+      "name": "Audit Detail",
+      "route": "/audit/[id]",
+      "filePath": "src/app/audit/[id]/page.tsx",
+      "purpose": "Displays a saved/archived audit report. Full audit results with heatmap, heuristics, competitor analysis.",
+      "screenType": "detail",
+      "authRequired": true,
+      "mainComponents": ["results-report", "header", "footer"],
+      "patternsUsed": ["audit-report", "sticky-header"],
+      "layoutType": "single-column centered (max-width 960px)",
+      "priority": "high",
+      "states": ["loading", "loaded", "unauthorized"]
+    },
+    {
+      "name": "Pricing",
+      "route": "/pricing",
+      "filePath": "src/app/pricing/page.tsx",
+      "purpose": "Displays pricing tiers (Free/Starter/Pro/Agency) with feature comparison and LemonSqueezy checkout integration.",
+      "screenType": "marketing",
+      "authRequired": false,
+      "mainComponents": ["header", "pricing-cards", "footer"],
+      "patternsUsed": ["pricing-grid", "sticky-header"],
+      "layoutType": "single-column centered",
+      "priority": "high",
+      "states": ["anonymous", "authenticated (shows current plan)"]
+    },
+    {
+      "name": "Sign In",
+      "route": "/sign-in",
+      "filePath": "src/app/(auth)/sign-in/[[...sign-in]]/page.tsx",
+      "purpose": "Clerk-hosted sign-in authentication page.",
+      "screenType": "auth",
+      "authRequired": false,
+      "mainComponents": ["header", "Clerk SignIn widget"],
+      "patternsUsed": ["sticky-header"],
+      "layoutType": "centered flex with auth form",
+      "priority": "medium",
+      "states": ["sign-in form"]
+    },
+    {
+      "name": "Sign Up",
+      "route": "/sign-up",
+      "filePath": "src/app/(auth)/sign-up/[[...sign-up]]/page.tsx",
+      "purpose": "Clerk-hosted sign-up registration page.",
+      "screenType": "auth",
+      "authRequired": false,
+      "mainComponents": ["header", "Clerk SignUp widget"],
+      "patternsUsed": ["sticky-header"],
+      "layoutType": "centered flex with auth form",
+      "priority": "medium",
+      "states": ["sign-up form"]
+    }
+  ],
+
+  "audit": {
+    "unusedTokens": [
+      { "token": "--accent", "source": "globals.css", "reason": "Defined but never referenced in any component. Likely shadcn/ui default." },
+      { "token": "--accent-foreground", "source": "globals.css", "reason": "Defined but never referenced in any component." },
+      { "token": "--card-foreground", "source": "globals.css", "reason": "Defined but never directly referenced via var(). May be accessed via Tailwind's text-card-foreground." },
+      { "token": "--popover", "source": "globals.css", "reason": "Defined but no popover component uses it directly." },
+      { "token": "--popover-foreground", "source": "globals.css", "reason": "Defined but no popover component uses it directly." },
+      { "token": "--sidebar-*", "source": "globals.css", "reason": "6 sidebar tokens defined (sidebar, sidebar-foreground, sidebar-accent, sidebar-accent-foreground, sidebar-primary, sidebar-primary-foreground, sidebar-border, sidebar-ring) but no sidebar component exists." },
+      { "token": "--chart-1 through --chart-5", "source": "globals.css", "reason": "5 chart tokens defined but never referenced. Likely shadcn/ui defaults." },
+      { "token": "brand-900 through brand-25 scale", "source": "globals.css", "reason": "Full 11-step brand palette defined but never referenced. Only --brand (equivalent to brand-900) is used." }
+    ],
+    "unusedComponents": [
+      { "component": "HumanAuditForm", "source": "src/components/human-audit-form.tsx", "reason": "Exported but never imported anywhere in the codebase. The form functionality is inlined in limit-reached.tsx instead." }
+    ],
+    "inconsistencies": [
+      { "type": "motion-a11y", "description": "prefers-reduced-motion is only respected in scroll-reveal.tsx. All other animated components (hero.tsx, loading-state.tsx, hero-icons.tsx, install-banner.tsx, url-form.tsx) ignore the user's motion preference." },
+      { "type": "missing-aria", "description": "Form components (url-form.tsx, human-audit-form.tsx) lack aria-invalid and aria-describedby for error states. Loading-state.tsx lacks role='progressbar'. Error-state.tsx lacks role='alert'." },
+      { "type": "focus-management", "description": "install-banner.tsx iOS guide overlay and chat-widget.tsx panel lack focus traps. Focus can escape to background content." },
+      { "type": "color-hardcoding", "description": "hero-icons.tsx uses hardcoded hex colors (#EAE8F4, #DCA854, etc.) instead of CSS variables. These are not part of the token system." },
+      { "type": "oklch-in-components", "description": "results-report.tsx and other components use inline oklch() values (e.g., 'oklch(0.55 0.17 20 / 8%)') instead of referencing CSS variables. These are semantic colors that should be tokenized." },
+      { "type": "duplicate-patterns", "description": "The focus-glow pattern (box-shadow with 600px blur) is defined in globals.css as .focus-glow class but also manually replicated inline in url-form.tsx button hover states." }
+    ],
+    "recommendations": [
+      { "priority": "high", "action": "Add prefers-reduced-motion handling to all animated components, especially hero.tsx RotatingText, loading-state.tsx pipeline dots, and hero-icons.tsx SVG animations." },
+      { "priority": "high", "action": "Add missing ARIA attributes: role='progressbar' + aria-valuenow on loading-state, role='alert' on error-state, aria-expanded on all accordion/expandable sections, aria-label on all icon-only buttons." },
+      { "priority": "medium", "action": "Remove or consolidate unused tokens: all 8 sidebar-* tokens, all 5 chart-* tokens, --accent/--accent-foreground, --popover/--popover-foreground. These add noise to the design system." },
+      { "priority": "medium", "action": "Tokenize the full brand palette (brand-900 through brand-25) if it will be used, or remove it from globals.css if only --brand is needed." },
+      { "priority": "medium", "action": "Add focus traps to modal/overlay components: install-banner iOS guide and chat-widget panel." },
+      { "priority": "low", "action": "Move hardcoded colors in hero-icons.tsx to CSS variables for consistency." },
+      { "priority": "low", "action": "Extract inline oklch values in results-report.tsx into named CSS variables (e.g., --severity-critical-accent, --category-bg-hover)." },
+      { "priority": "low", "action": "Remove human-audit-form.tsx if its functionality is fully covered by the inline form in limit-reached.tsx." }
+    ]
+  },
+
+  "assets": {
+    "icon": {
+      "source": "src/app/icon.svg",
+      "description": "App icon — fan rotor on #EAE8F4 rounded rect",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 959 960\"><rect width=\"959\" height=\"960\" rx=\"250\" fill=\"#EAE8F4\"/><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M632.152 263.312L543.036 311.394L603.22 312.221C634.143 312.645 664.374 321.434 690.702 337.653L796 402.519L736.18 499.563L649.965 446.453L679.343 498.97C694.437 525.955 701.939 556.522 701.053 587.426L697.508 711.019L583.528 707.752L586.431 606.557L555.624 658.248C539.795 684.809 517.065 706.588 489.849 721.273L381.008 780L326.848 679.688L415.964 631.604L355.781 630.778C324.857 630.354 294.625 621.566 268.296 605.346L163 540.481L222.82 443.436L309.032 496.546L279.656 444.03C264.562 417.045 257.06 386.478 257.946 355.574L261.492 231.981L375.472 235.248L372.568 336.442L403.376 284.75C419.205 258.191 441.934 236.412 469.15 221.728L577.992 163L632.152 263.312ZM439.138 447.453C430.545 461.872 430.299 479.781 438.494 494.43C446.685 509.073 462.078 518.235 478.855 518.465C495.632 518.695 511.271 509.959 519.861 495.546C528.454 481.127 528.7 463.218 520.506 448.569C512.314 433.925 496.921 424.763 480.144 424.533C463.367 424.303 447.728 433.04 439.138 447.453Z\" fill=\"#4C2CFF\"/></svg>"
+    },
+    "file": {
+      "source": "public/file.svg",
+      "description": "Document icon, #666",
+      "svg": "<svg fill=\"none\" viewBox=\"0 0 16 16\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M14.5 13.5V5.41a1 1 0 0 0-.3-.7L9.8.29A1 1 0 0 0 9.08 0H1.5v13.5A2.5 2.5 0 0 0 4 16h8a2.5 2.5 0 0 0 2.5-2.5m-1.5 0v-7H8v-5H3v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1M9.5 5V2.12L12.38 5zM5.13 5h-.62v1.25h2.12V5zm-.62 3h7.12v1.25H4.5zm.62 3h-.62v1.25h7.12V11z\" clip-rule=\"evenodd\" fill=\"#666\" fill-rule=\"evenodd\"/></svg>"
+    },
+    "globe": {
+      "source": "public/globe.svg",
+      "description": "Globe icon, #666",
+      "svg": "<svg fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\"><g clip-path=\"url(#a)\"><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M10.27 14.1a6.5 6.5 0 0 0 3.67-3.45q-1.24.21-2.7.34-.31 1.83-.97 3.1M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.48-1.52a7 7 0 0 1-.96 0H7.5a4 4 0 0 1-.84-1.32q-.38-.89-.63-2.08a40 40 0 0 0 3.92 0q-.25 1.2-.63 2.08a4 4 0 0 1-.84 1.31zm2.94-4.76q1.66-.15 2.95-.43a7 7 0 0 0 0-2.58q-1.3-.27-2.95-.43a18 18 0 0 1 0 3.44m-1.27-3.54a17 17 0 0 1 0 3.64 39 39 0 0 1-4.3 0 17 17 0 0 1 0-3.64 39 39 0 0 1 4.3 0m1.1-1.17q1.45.13 2.69.34a6.5 6.5 0 0 0-3.67-3.44q.65 1.26.98 3.1M8.48 1.5l.01.02q.41.37.84 1.31.38.89.63 2.08a40 40 0 0 0-3.92 0q.25-1.2.63-2.08a4 4 0 0 1 .85-1.32 7 7 0 0 1 .96 0m-2.75.4a6.5 6.5 0 0 0-3.67 3.44 29 29 0 0 1 2.7-.34q.31-1.83.97-3.1M4.58 6.28q-1.66.16-2.95.43a7 7 0 0 0 0 2.58q1.3.27 2.95.43a18 18 0 0 1 0-3.44m.17 4.71q-1.45-.12-2.69-.34a6.5 6.5 0 0 0 3.67 3.44q-.65-1.27-.98-3.1\" fill=\"#666\"/></g><defs><clipPath id=\"a\"><path fill=\"#fff\" d=\"M0 0h16v16H0z\"/></clipPath></defs></svg>"
+    },
+    "window": {
+      "source": "public/window.svg",
+      "description": "Browser window icon, #666",
+      "svg": "<svg fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\"><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M1.5 2.5h13v10a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1zM0 1h16v11.5a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 0 12.5zm3.75 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5M7 4.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0m1.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5\" fill=\"#666\"/></svg>"
+    },
+    "next": {
+      "source": "public/next.svg",
+      "description": "Next.js logo, #000"
+    },
+    "vercel": {
+      "source": "public/vercel.svg",
+      "description": "Vercel triangle, #fff"
+    },
+    "logo-full": {
+      "source": "src/components/header.tsx (inline Logo component)",
+      "description": "Full UXLens logo — fan rotor icon + 'UXLens' wordmark, viewBox 0 0 2141 617, #4C2CFF icon + currentColor text"
+    }
+  }
+}

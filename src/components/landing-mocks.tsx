@@ -16,8 +16,8 @@ function MockContainer({
 }) {
   return (
     <div
-      className={`relative rounded-2xl border overflow-hidden ${className}`}
-      style={{ background: "var(--card)", borderColor: "var(--border2)" }}
+      className={`relative rounded-2xl shadow-elevation-2 overflow-hidden ${className}`}
+      style={{ background: "var(--card)" }}
     >
       {glow && (
         <div
@@ -56,8 +56,8 @@ export function ExecutiveSummaryMock() {
     <div className="grid grid-cols-5 gap-2">
       {/* UX Score — large gauge card */}
       <div
-        className="col-span-2 sm:col-span-1 dash-card rounded-xl border p-3 flex flex-col items-center justify-center"
-        style={{ background: "var(--s1)", borderColor: "var(--border)" }}
+        className="col-span-2 sm:col-span-1 dash-card rounded-xl shadow-elevation-1 p-3 flex flex-col items-center justify-center"
+        style={{ background: "var(--s1)" }}
       >
         <div className="relative w-[52px] h-[52px] mb-1.5">
           <svg className="-rotate-90 w-full h-full" viewBox="0 0 100 100">
@@ -99,8 +99,8 @@ export function ExecutiveSummaryMock() {
       <MiniMetricCard label="Trust" value={70} suffix="/100" color={scoreColor(70)} />
       {/* Complexity */}
       <div
-        className="dash-card rounded-xl border p-2.5 flex flex-col items-center justify-center text-center"
-        style={{ background: "var(--s1)", borderColor: "var(--border)" }}
+        className="dash-card rounded-xl shadow-elevation-1 p-2.5 flex flex-col items-center justify-center text-center"
+        style={{ background: "var(--s1)" }}
       >
         <span className="text-[14px] font-bold mb-0.5" style={{ color: "var(--score-mid)" }}>Medium</span>
         <span className="text-[10px] text-foreground/40 font-medium">Complexity</span>
@@ -112,8 +112,8 @@ export function ExecutiveSummaryMock() {
 function MiniMetricCard({ label, value, suffix = "", color }: { label: string; value: number; suffix?: string; color: string }) {
   return (
     <div
-      className="dash-card rounded-xl border p-2.5 flex flex-col items-center justify-center text-center"
-      style={{ background: "var(--s1)", borderColor: "var(--border)" }}
+      className="dash-card rounded-xl shadow-elevation-1 p-2.5 flex flex-col items-center justify-center text-center"
+      style={{ background: "var(--s1)" }}
     >
       <div className="flex items-baseline gap-0.5 mb-0.5">
         <span className="text-[16px] font-bold tabular-nums" style={{ color }}>{value}</span>
@@ -206,8 +206,8 @@ export function MetricGridMock() {
         return (
           <div
             key={cat.label}
-            className="dash-card rounded-lg border p-2.5"
-            style={{ background: "var(--s1)", borderColor: "var(--border)" }}
+            className="dash-card rounded-lg shadow-elevation-1 p-2.5"
+            style={{ background: "var(--s1)" }}
           >
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[10px] text-foreground/55 truncate">{cat.label}</span>
@@ -657,8 +657,8 @@ export function RewriteMock() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Before */}
           <div
-            className="rounded-xl border p-4"
-            style={{ borderColor: "var(--border)", background: "var(--s2)" }}
+            className="rounded-xl shadow-elevation-1 p-4"
+            style={{ background: "var(--s2)" }}
           >
             <p className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/45 mb-3">
               Before
@@ -676,9 +676,8 @@ export function RewriteMock() {
 
           {/* After */}
           <div
-            className="rounded-xl border p-4"
+            className="rounded-xl shadow-elevation-1 p-4"
             style={{
-              borderColor: "var(--brand-glow)",
               background: "var(--s1)",
             }}
           >
@@ -727,13 +726,13 @@ export function ProductPreviewMock() {
 
       <div className="relative perspective-tilt">
         <div
-          className="rounded-2xl border overflow-hidden"
-          style={{ background: "var(--card)", borderColor: "var(--border2)" }}
+          className="rounded-2xl shadow-elevation-2 overflow-hidden"
+          style={{ background: "var(--card)" }}
         >
           {/* Browser chrome */}
           <div
-            className="flex items-center gap-2 px-4 py-2.5 border-b"
-            style={{ borderColor: "var(--border)" }}
+            className="flex items-center gap-2 px-4 py-2.5"
+            style={{ background: "var(--s1)" }}
           >
             <div
               className="w-[9px] h-[9px] rounded-full"
@@ -769,8 +768,8 @@ export function ProductPreviewMock() {
 
             {/* Conversion Killers Bar Chart */}
             <div
-              className="rounded-xl border p-3.5"
-              style={{ background: "var(--s1)", borderColor: "var(--border)" }}
+              className="rounded-xl shadow-elevation-1 p-3.5"
+              style={{ background: "var(--s1)" }}
             >
               <div className="flex items-center gap-2 mb-3">
                 <div

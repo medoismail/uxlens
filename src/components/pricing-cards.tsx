@@ -82,12 +82,12 @@ export function PricingCards({ email, currentPlan }: PricingCardsProps) {
         return (
           <div
             key={plan.name}
-            className={`relative rounded-2xl border p-6 transition-all duration-250 hover:shadow-elevation-2 ${
+            className={`relative rounded-2xl p-6 transition-all duration-250 hover:shadow-elevation-2 ${
               isCurrent
-                ? "border-foreground/20 shadow-elevation-1 bg-card"
+                ? "shadow-elevation-1 bg-card"
                 : plan.popular && !currentPlan
-                ? "border-foreground/15 shadow-elevation-1 bg-card"
-                : "border-border/40 bg-card/50 hover:border-border/60"
+                ? "shadow-elevation-1 bg-card"
+                : "shadow-elevation-1 bg-card/50"
             }`}
           >
             {/* Badge: Current Plan > Popular */}
@@ -126,8 +126,8 @@ export function PricingCards({ email, currentPlan }: PricingCardsProps) {
 
             {isCurrent ? (
               <div
-                className="flex items-center justify-center w-full mt-6 rounded-xl py-2.5 text-[14px] font-medium border"
-                style={{ borderColor: "var(--brand-glow)", color: "var(--brand)", background: "var(--brand-dim)" }}
+                className="flex items-center justify-center w-full mt-6 rounded-xl py-2.5 text-[14px] font-medium"
+                style={{ color: "var(--brand)", background: "var(--brand-dim)" }}
               >
                 Your Current Plan
               </div>
@@ -138,10 +138,10 @@ export function PricingCards({ email, currentPlan }: PricingCardsProps) {
                   isHigher
                     ? "bg-foreground text-background hover:opacity-90"
                     : isLower
-                    ? "border border-border/50 bg-background text-foreground/50 hover:border-border hover:text-foreground"
+                    ? "bg-background text-foreground/50 hover:text-foreground"
                     : plan.popular
                     ? "bg-foreground text-background hover:opacity-90"
-                    : "border border-border/50 bg-background text-foreground hover:border-border hover:shadow-elevation-1"
+                    : "bg-background text-foreground hover:shadow-elevation-1"
                 }`}
               >
                 {isHigher ? `Upgrade to ${plan.name}` : isLower ? `Switch to ${plan.name}` : `Get ${plan.name}`}

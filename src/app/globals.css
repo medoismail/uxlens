@@ -71,8 +71,8 @@
   /* ── Safe area for notched devices (iPhone home indicator) ── */
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 
-  /* ── Backgrounds — very faint brand-tinted off-white ── */
-  --background: oklch(0.99 0.004 290);
+  /* ── Backgrounds — brand-tinted off-white (slightly darker) ── */
+  --background: oklch(0.975 0.006 290);
   --foreground: oklch(0.145 0.004 285);
 
   --card: oklch(0.995 0.002 290);
@@ -96,9 +96,9 @@
   /* ── Error (hue 17) ── */
   --destructive: oklch(0.513 0.168 17);
 
-  /* ── Borders & Inputs — neutral gray ── */
-  --border: oklch(0.922 0.004 264);
-  --input: oklch(0.902 0.004 264);
+  /* ── Borders & Inputs — very subtle, not heavy ── */
+  --border: oklch(0.94 0.003 280);
+  --input: oklch(0.94 0.003 264);
   --ring: oklch(0.504 0.282 276 / 25%);
 
   /* ── Charts — aligned with score + category palette ── */
@@ -120,11 +120,11 @@
   --sidebar-border: oklch(0.922 0.004 264);
   --sidebar-ring: oklch(0.504 0.282 276 / 25%);
 
-  /* ── Surface levels — faint brand tint → gray progression ── */
+  /* ── Surface levels — brand tint progression ── */
   --s1: oklch(0.995 0.002 290);
-  --s2: oklch(0.97 0.003 264);
-  --s3: oklch(0.91 0.004 264);
-  --border2: oklch(0.88 0.004 264);
+  --s2: oklch(0.965 0.004 290);
+  --s3: oklch(0.92 0.003 264);
+  --border2: oklch(0.92 0.004 280);
 
   /* ── Brand palette — #4C2CFF base ── */
   --brand-900: oklch(0.504 0.282 276.1);  /* #4C2CFF */
@@ -386,23 +386,23 @@
   50% { opacity: 0; }
 }
 
-/* Soft elevation system — barely-visible, warm shadows */
+/* Soft elevation system — brand-tinted glow, no dark shadows */
 .shadow-elevation-1 {
   box-shadow:
-    0 1px 2px oklch(0 0 0 / 3%),
-    0 1px 4px oklch(0 0 0 / 2%);
+    0 1px 3px oklch(0.504 0.12 276 / 5%),
+    0 2px 8px oklch(0.504 0.12 276 / 3%);
 }
 
 .shadow-elevation-2 {
   box-shadow:
-    0 2px 4px oklch(0 0 0 / 3%),
-    0 4px 16px oklch(0 0 0 / 3%);
+    0 2px 6px oklch(0.504 0.12 276 / 6%),
+    0 4px 20px oklch(0.504 0.12 276 / 4%);
 }
 
 .shadow-elevation-3 {
   box-shadow:
-    0 4px 8px oklch(0 0 0 / 4%),
-    0 8px 32px oklch(0 0 0 / 3%);
+    0 4px 12px oklch(0.504 0.12 276 / 8%),
+    0 8px 32px oklch(0.504 0.12 276 / 5%);
 }
 
 /* Score color utilities */
@@ -464,7 +464,7 @@
 }
 .dash-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px oklch(0 0 0 / 4%), 0 1px 3px oklch(0 0 0 / 2%);
+  box-shadow: 0 4px 20px oklch(0.504 0.12 276 / 8%), 0 2px 6px oklch(0.504 0.12 276 / 4%);
 }
 
 /* ── Loading step card animations ─────────────────────── */

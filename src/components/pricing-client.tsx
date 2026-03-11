@@ -73,8 +73,8 @@ export function PricingClient({
         {/* Current Plan & Usage Banner (signed-in users only) */}
         {isSignedIn && (
           <div
-            className="rounded-xl border p-4 mb-6 flex flex-col sm:flex-row sm:items-center gap-4"
-            style={{ borderColor: "var(--brand-glow)", background: "var(--brand-dim)" }}
+            className="rounded-xl p-4 mb-6 flex flex-col sm:flex-row sm:items-center gap-4"
+            style={{ background: "var(--brand-dim)" }}
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <div
@@ -123,10 +123,10 @@ export function PricingClient({
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 w-full">
           {/* Free Card */}
           <div
-            className={`relative rounded-2xl border p-6 transition-all duration-250 ${
+            className={`relative rounded-2xl p-6 transition-all duration-250 ${
               isSignedIn && currentPlan === "free"
-                ? "border-foreground/20 shadow-elevation-1 bg-card"
-                : "border-border/40 bg-card/50 hover:border-border/60"
+                ? "shadow-elevation-1 bg-card"
+                : "shadow-elevation-1 bg-card/50"
             }`}
           >
             {isSignedIn && currentPlan === "free" && (
@@ -164,15 +164,15 @@ export function PricingClient({
 
             {isSignedIn && currentPlan === "free" ? (
               <div
-                className="flex items-center justify-center w-full mt-6 rounded-xl py-2.5 text-[14px] font-medium border"
-                style={{ borderColor: "var(--brand-glow)", color: "var(--brand)", background: "var(--brand-dim)" }}
+                className="flex items-center justify-center w-full mt-6 rounded-xl py-2.5 text-[14px] font-medium"
+                style={{ color: "var(--brand)", background: "var(--brand-dim)" }}
               >
                 Your Current Plan
               </div>
             ) : (
               <Link
                 href="/"
-                className="flex items-center justify-center w-full mt-6 rounded-xl py-2.5 text-[14px] font-medium border border-border/50 bg-background text-foreground hover:border-border hover:shadow-elevation-1 transition-all duration-150 active:scale-[0.98]"
+                className="flex items-center justify-center w-full mt-6 rounded-xl py-2.5 text-[14px] font-medium bg-background text-foreground hover:shadow-elevation-1 transition-all duration-150 active:scale-[0.98]"
               >
                 Get Started Free
               </Link>
@@ -187,13 +187,13 @@ export function PricingClient({
 
         {/* Divider */}
         <div className="flex items-center gap-4 my-12 text-foreground/35 text-[12px] uppercase tracking-[2px]">
-          <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+          <div className="flex-1 h-px" style={{ background: "var(--s3)" }} />
           or
-          <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+          <div className="flex-1 h-px" style={{ background: "var(--s3)" }} />
         </div>
 
         {/* Human Audit */}
-        <div className="max-w-xl mx-auto rounded-2xl border p-7" style={{ background: "var(--s1)", borderColor: "var(--border2)" }}>
+        <div className="max-w-xl mx-auto rounded-2xl shadow-elevation-1 p-7" style={{ background: "var(--s1)" }}>
           <div className="flex items-center gap-3 mb-4">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg shrink-0" style={{ background: "var(--brand)" }}>
               <User className="h-4 w-4" style={{ color: "var(--brand-fg)" }} />
@@ -240,8 +240,8 @@ export function PricingClient({
             <p className="text-[12px] text-foreground/50 mb-3">Sign in to manage your subscription</p>
             <Link
               href="/sign-in"
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg border px-4 text-[12px] font-medium text-foreground transition-all duration-150 hover:border-foreground/20 active:scale-[0.98]"
-              style={{ borderColor: "var(--border2)", background: "var(--s1)" }}
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg px-4 text-[12px] font-medium text-foreground transition-all duration-150 active:scale-[0.98]"
+              style={{ background: "var(--s1)" }}
             >
               Sign In
             </Link>
@@ -254,8 +254,8 @@ export function PricingClient({
             <p className="text-[12px] text-foreground/50 mb-3">Manage your audits and subscription</p>
             <Link
               href="/dashboard"
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg border px-4 text-[12px] font-medium text-foreground transition-all duration-150 hover:border-foreground/20 active:scale-[0.98]"
-              style={{ borderColor: "var(--border2)", background: "var(--s1)" }}
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg px-4 text-[12px] font-medium text-foreground transition-all duration-150 active:scale-[0.98]"
+              style={{ background: "var(--s1)" }}
             >
               Go to Dashboard
               <ArrowRight className="h-3 w-3" />

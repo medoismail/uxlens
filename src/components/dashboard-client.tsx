@@ -59,8 +59,8 @@ function PlanCard({ planInfo, totalAudits }: { planInfo: PlanInfo; totalAudits: 
 
   return (
     <div
-      className="rounded-2xl border p-5 mb-8"
-      style={{ borderColor: config.border, background: config.bg }}
+      className="rounded-2xl p-5 mb-8"
+      style={{ background: config.bg }}
     >
       <div className="flex items-center justify-between gap-4 flex-wrap">
         {/* Plan info */}
@@ -120,9 +120,8 @@ function PlanCard({ planInfo, totalAudits }: { planInfo: PlanInfo; totalAudits: 
           {nextPlan && (
             <Link
               href="/pricing"
-              className="inline-flex items-center gap-1 text-[12px] font-medium px-3 py-1.5 rounded-lg border transition-all hover:opacity-80"
+              className="inline-flex items-center gap-1 text-[12px] font-medium px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
               style={{
-                borderColor: "var(--brand-glow)",
                 color: "var(--brand)",
                 background: "var(--brand-dim)",
               }}
@@ -262,8 +261,8 @@ function ApiKeysSection() {
 
   return (
     <div
-      className="rounded-2xl border p-6 mb-8"
-      style={{ borderColor: "var(--border)", background: "var(--s1)" }}
+      className="rounded-2xl shadow-elevation-1 p-6 mb-8"
+      style={{ background: "var(--s1)" }}
     >
       <div className="flex items-center gap-3 mb-4">
         <div
@@ -282,8 +281,8 @@ function ApiKeysSection() {
       <div>
         <p className="text-[10px] uppercase tracking-wider text-foreground/50 mb-1.5 font-medium">Install Command</p>
         <div
-          className="rounded-lg border overflow-hidden"
-          style={{ borderColor: "var(--border)", background: "var(--s2)" }}
+          className="rounded-lg overflow-hidden"
+          style={{ background: "var(--s2)" }}
         >
           {/* Command row */}
           <div className="flex items-center gap-2 px-3 py-2">
@@ -307,8 +306,7 @@ function ApiKeysSection() {
           {/* Key row — inside the same box */}
           {!loading && activeKey && (
             <div
-              className="flex items-center gap-2 px-3 py-2 border-t"
-              style={{ borderColor: "var(--border)" }}
+              className="flex items-center gap-2 px-3 py-2"
             >
               <Key className="w-3.5 h-3.5 text-foreground/40 shrink-0" />
               <code className="text-[12px] font-mono text-foreground/50 flex-1 truncate select-all">
@@ -496,8 +494,8 @@ export function DashboardClient() {
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
-                className="rounded-2xl border p-5 animate-pulse"
-                style={{ borderColor: "var(--border)", background: "var(--s1)" }}
+                className="rounded-2xl shadow-elevation-1 p-5 animate-pulse"
+                style={{ background: "var(--s1)" }}
               >
                 <div className="h-4 w-3/4 rounded-lg" style={{ background: "var(--s3)" }} />
                 <div className="h-3 w-1/2 rounded-lg mt-3" style={{ background: "var(--s3)" }} />
@@ -542,14 +540,14 @@ export function DashboardClient() {
                 return (
                   <div
                     key={audit.id}
-                    className="group relative rounded-2xl border p-5 transition-all duration-250 hover:shadow-elevation-2 hover:border-foreground/10"
-                    style={{ borderColor: "var(--border)", background: "var(--s1)" }}
+                    className="group relative rounded-2xl shadow-elevation-1 p-5 transition-all duration-250 hover:shadow-elevation-2"
+                    style={{ background: "var(--s1)" }}
                   >
                     {/* Delete button (top-right, visible on hover) */}
                     <button
                       onClick={(e) => { e.stopPropagation(); setDeleteTarget(audit); }}
-                      className="absolute top-4 right-4 z-10 p-1.5 rounded-xl border opacity-0 group-hover:opacity-100 transition-all duration-150 hover:border-red-200 hover:bg-red-50"
-                      style={{ borderColor: "var(--border)", background: "var(--s1)" }}
+                      className="absolute top-4 right-4 z-10 p-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-150 hover:bg-red-50"
+                      style={{ background: "var(--s1)" }}
                       title="Delete audit"
                     >
                       <Trash2 className="h-3.5 w-3.5 text-foreground/50 hover:text-red-500 transition-colors" />
@@ -558,7 +556,7 @@ export function DashboardClient() {
                     <Link href={`/audit/${audit.id}`} className="block">
                       {/* Thumbnail */}
                       {audit.screenshotPath && (
-                        <div className="relative rounded-xl overflow-hidden mb-4 border h-32" style={{ borderColor: "var(--border)" }}>
+                        <div className="relative rounded-xl overflow-hidden mb-4 h-32">
                           <Image
                             src={audit.screenshotPath}
                             alt={`Screenshot of ${domain}`}
@@ -613,8 +611,7 @@ export function DashboardClient() {
                 <button
                   onClick={() => setPage(Math.max(1, page - 1))}
                   disabled={page === 1}
-                  className="p-2 rounded-lg border transition-all disabled:opacity-30"
-                  style={{ borderColor: "var(--border)" }}
+                  className="p-2 rounded-lg transition-all disabled:opacity-30"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
@@ -624,8 +621,7 @@ export function DashboardClient() {
                 <button
                   onClick={() => setPage(Math.min(totalPages, page + 1))}
                   disabled={page === totalPages}
-                  className="p-2 rounded-lg border transition-all disabled:opacity-30"
-                  style={{ borderColor: "var(--border)" }}
+                  className="p-2 rounded-lg transition-all disabled:opacity-30"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </button>
@@ -677,8 +673,8 @@ function DeleteConfirmModal({
 
       {/* Modal */}
       <div
-        className="relative w-full max-w-md rounded-xl border p-6 shadow-lg animate-fade-in"
-        style={{ background: "var(--s1)", borderColor: "var(--border)" }}
+        className="relative w-full max-w-md rounded-xl p-6 shadow-elevation-3 animate-fade-in"
+        style={{ background: "var(--s1)" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
@@ -716,8 +712,8 @@ function DeleteConfirmModal({
 
         {/* Input */}
         <div
-          className="rounded-lg border transition-all duration-200 mb-5"
-          style={{ borderColor: isMatch ? "var(--score-low)" : "var(--border)", background: "white" }}
+          className="rounded-lg transition-all duration-200 mb-5"
+          style={{ background: "white" }}
         >
           <input
             type="text"
@@ -735,8 +731,7 @@ function DeleteConfirmModal({
           <button
             onClick={onCancel}
             disabled={deleting}
-            className="px-4 py-2 text-[14px] font-medium rounded-lg border transition-all duration-150 hover:border-foreground/20 disabled:opacity-30"
-            style={{ borderColor: "var(--border)", background: "var(--s1)" }}
+            className="px-4 py-2 text-[14px] font-medium rounded-lg transition-all duration-150 disabled:opacity-30"
           >
             Cancel
           </button>
