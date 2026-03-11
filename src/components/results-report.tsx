@@ -759,7 +759,7 @@ function MetricCard({ label, value, suffix = "", color }: { label: string; value
 /* ── Bar Chart Row ── */
 function BarChartRow({ label, score, color, note }: { label: string; score: number; color: string; note: string }) {
   return (
-    <div className="group relative">
+    <div className="group">
       <div className="flex items-center gap-3">
         <span className="text-[11px] text-foreground/45 w-[130px] sm:w-[155px] shrink-0 truncate">{label}</span>
         <div className="flex-1 h-[8px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
@@ -767,8 +767,14 @@ function BarChartRow({ label, score, color, note }: { label: string; score: numb
         </div>
         <span className="text-[13px] font-bold font-mono w-8 text-right" style={{ color }}>{score}</span>
       </div>
-      {/* Hover tooltip */}
-      <div className="bar-tooltip absolute left-[150px] sm:left-[175px] -bottom-6 text-[10px] text-foreground/40 max-w-[300px] truncate z-10">{note}</div>
+      {/* Note — slides open on hover */}
+      {note && (
+        <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-200">
+          <div className="overflow-hidden">
+            <p className="text-[10px] text-foreground/35 leading-relaxed pt-1.5 pl-[130px] sm:pl-[155px] ml-3">{note}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
