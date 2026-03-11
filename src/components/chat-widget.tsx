@@ -184,7 +184,7 @@ export function ChatWidget({ auditId, plan }: ChatWidgetProps) {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full px-4 py-3 text-[13px] font-medium shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full px-4 py-3 text-[14px] font-medium shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
           style={{
             background: "var(--brand)",
             color: "var(--brand-fg)",
@@ -214,7 +214,7 @@ export function ChatWidget({ auditId, plan }: ChatWidgetProps) {
           >
             <div className="flex items-center gap-2">
               <Sparkles className="h-4 w-4" style={{ color: "var(--brand)" }} />
-              <span className="text-[13px] font-semibold">UXLens AI</span>
+              <span className="text-[14px] font-semibold">UXLens AI</span>
               {remaining !== null && (
                 <span
                   className="text-[12px] px-2 py-0.5 rounded-full"
@@ -240,11 +240,11 @@ export function ChatWidget({ auditId, plan }: ChatWidgetProps) {
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
             {messages.length === 0 && !isLoading && (
               <div className="flex flex-col items-center justify-center h-full text-center py-8">
-                <Sparkles className="h-8 w-8 mb-3 text-foreground/15" />
-                <p className="text-[13px] font-medium text-foreground/50 mb-1">
+                <Sparkles className="h-8 w-8 mb-3 text-foreground/35" />
+                <p className="text-[14px] font-medium text-foreground/50 mb-1">
                   Ask about your audit
                 </p>
-                <p className="text-[12px] text-foreground/30 max-w-[260px] leading-relaxed">
+                <p className="text-[12px] text-foreground/50 max-w-[260px] leading-relaxed">
                   I can explain findings, suggest fixes, help prioritize issues, or rewrite copy.
                 </p>
                 <div className="flex flex-wrap gap-1.5 mt-4 justify-center">
@@ -275,7 +275,7 @@ export function ChatWidget({ auditId, plan }: ChatWidgetProps) {
                 className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-[12.5px] leading-relaxed ${
+                  className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-[12px] leading-relaxed ${
                     msg.role === "user"
                       ? "rounded-br-md"
                       : "rounded-bl-md"
@@ -337,7 +337,7 @@ export function ChatWidget({ auditId, plan }: ChatWidgetProps) {
                 onKeyDown={handleKeyDown}
                 placeholder="Ask about your audit..."
                 rows={1}
-                className="flex-1 resize-none rounded-xl border px-3.5 py-2.5 text-[12.5px] text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-foreground/20 transition-colors"
+                className="flex-1 resize-none rounded-xl border px-3.5 py-2.5 text-[12px] text-foreground placeholder:text-foreground/50 focus:outline-none focus:border-foreground/20 transition-colors"
                 style={{
                   borderColor: "var(--border)",
                   background: "var(--s1)",

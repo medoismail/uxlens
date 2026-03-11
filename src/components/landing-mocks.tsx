@@ -87,8 +87,8 @@ export function ExecutiveSummaryMock() {
             </span>
           </div>
         </div>
-        <span className="text-[9px] text-foreground/40 font-medium">UX Score</span>
-        <span className="text-[8px] text-foreground/25">{MOCK_GRADE}</span>
+        <span className="text-[10px] text-foreground/40 font-medium">UX Score</span>
+        <span className="text-[10px] text-foreground/45">{MOCK_GRADE}</span>
       </div>
 
       {/* Conv. Risk */}
@@ -103,7 +103,7 @@ export function ExecutiveSummaryMock() {
         style={{ background: "var(--s1)", borderColor: "var(--border)" }}
       >
         <span className="text-[14px] font-bold mb-0.5" style={{ color: "var(--score-mid)" }}>Medium</span>
-        <span className="text-[9px] text-foreground/40 font-medium">Complexity</span>
+        <span className="text-[10px] text-foreground/40 font-medium">Complexity</span>
       </div>
     </div>
   );
@@ -117,9 +117,9 @@ function MiniMetricCard({ label, value, suffix = "", color }: { label: string; v
     >
       <div className="flex items-baseline gap-0.5 mb-0.5">
         <span className="text-[16px] font-bold tabular-nums" style={{ color }}>{value}</span>
-        {suffix && <span className="text-[9px] text-foreground/30">{suffix}</span>}
+        {suffix && <span className="text-[10px] text-foreground/50">{suffix}</span>}
       </div>
-      <span className="text-[9px] text-foreground/40 font-medium">{label}</span>
+      <span className="text-[10px] text-foreground/40 font-medium">{label}</span>
     </div>
   );
 }
@@ -160,7 +160,7 @@ export function BarChartMock() {
             />
           </div>
           <span
-            className="text-[11px] font-bold font-mono w-6 text-right"
+            className="text-[12px] font-bold font-mono w-6 text-right"
             style={{ color: cat.color }}
           >
             {cat.score}
@@ -210,9 +210,9 @@ export function MetricGridMock() {
             style={{ background: "var(--s1)", borderColor: "var(--border)" }}
           >
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[9px] text-foreground/35 truncate">{cat.label}</span>
+              <span className="text-[10px] text-foreground/55 truncate">{cat.label}</span>
               <span
-                className="text-[13px] font-bold font-mono"
+                className="text-[14px] font-bold font-mono"
                 style={{ color: cat.color }}
               >
                 {cat.score}
@@ -336,7 +336,7 @@ export function RadarChartMock() {
                 y={p.y}
                 textAnchor="middle"
                 dominantBaseline="central"
-                className="text-[9px] fill-foreground/35"
+                className="text-[10px] fill-foreground/35"
               >
                 {label}
               </text>
@@ -346,7 +346,7 @@ export function RadarChartMock() {
 
         {/* Bottom score summary */}
         <div className="flex items-center gap-4 mt-3">
-          <div className="flex items-center gap-1.5 text-[10px] text-foreground/35">
+          <div className="flex items-center gap-1.5 text-[10px] text-foreground/55">
             <span
               className="w-2 h-2 rounded-full"
               style={{ background: "var(--brand)" }}
@@ -438,7 +438,7 @@ export function HeatmapMock() {
           ].map((item) => (
             <div
               key={item.label}
-              className="flex items-center gap-1.5 text-[10px] text-foreground/35"
+              className="flex items-center gap-1.5 text-[10px] text-foreground/55"
             >
               <span
                 className="w-2 h-2 rounded-full"
@@ -465,7 +465,7 @@ export function ChatMock() {
           style={{ borderColor: "var(--border)" }}
         >
           <Sparkles className="h-4 w-4" style={{ color: "var(--brand)" }} />
-          <span className="text-[13px] font-semibold text-foreground">
+          <span className="text-[14px] font-semibold text-foreground">
             UXLens AI
           </span>
           <span
@@ -528,7 +528,7 @@ export function ChatMock() {
           {["Explain my trust score", "Rewrite my headline"].map((q) => (
             <span
               key={q}
-              className="text-[10px] px-2.5 py-1 rounded-full border text-foreground/35"
+              className="text-[10px] px-2.5 py-1 rounded-full border text-foreground/55"
               style={{ borderColor: "var(--border)" }}
             >
               {q}
@@ -542,7 +542,7 @@ export function ChatMock() {
           style={{ borderColor: "var(--border)" }}
         >
           <div
-            className="flex-1 h-8 rounded-lg px-3 flex items-center text-[11px] text-foreground/20"
+            className="flex-1 h-8 rounded-lg px-3 flex items-center text-[12px] text-foreground/40"
             style={{ background: "var(--s2)" }}
           >
             Ask about your audit...
@@ -583,7 +583,7 @@ export function CompetitorMock() {
   return (
     <MockContainer glow>
       <div className="p-4">
-        <p className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/25 mb-4">
+        <p className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/45 mb-4">
           Overall Score Comparison
         </p>
 
@@ -624,7 +624,7 @@ export function CompetitorMock() {
         </div>
 
         <div
-          className="mt-4 pt-3 border-t text-[11px] text-foreground/35"
+          className="mt-4 pt-3 border-t text-[12px] text-foreground/55"
           style={{ borderColor: "var(--border)" }}
         >
           Average competitor score:{" "}
@@ -643,7 +643,7 @@ export function RewriteMock() {
       <div className="p-5">
         {/* Header */}
         <div className="flex items-center gap-2 mb-5">
-          <h4 className="text-[13px] font-semibold text-foreground">
+          <h4 className="text-[14px] font-semibold text-foreground">
             Hero Rewrite
           </h4>
           <span
@@ -660,16 +660,16 @@ export function RewriteMock() {
             className="rounded-xl border p-4"
             style={{ borderColor: "var(--border)", background: "var(--s2)" }}
           >
-            <p className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/25 mb-3">
+            <p className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/45 mb-3">
               Before
             </p>
-            <p className="text-[15px] font-semibold text-foreground/25 line-through leading-snug mb-2">
+            <p className="text-[15px] font-semibold text-foreground/45 line-through leading-snug mb-2">
               Build Better Products
             </p>
-            <p className="text-[11px] text-foreground/20 line-through leading-relaxed mb-3">
+            <p className="text-[12px] text-foreground/40 line-through leading-relaxed mb-3">
               We help teams create amazing experiences with our platform.
             </p>
-            <span className="inline-block text-[11px] px-3 py-1.5 rounded-md border text-foreground/20 line-through border-foreground/10">
+            <span className="inline-block text-[12px] px-3 py-1.5 rounded-md border text-foreground/40 line-through border-foreground/10">
               Learn More
             </span>
           </div>
@@ -688,12 +688,12 @@ export function RewriteMock() {
             <p className="text-[15px] font-semibold text-foreground leading-snug mb-2">
               Ship Faster With AI-Powered Design Reviews
             </p>
-            <p className="text-[11px] text-foreground/55 leading-relaxed mb-3">
+            <p className="text-[12px] text-foreground/55 leading-relaxed mb-3">
               Get instant UX feedback on any page in 30 seconds. No manual
               audits, no waiting.
             </p>
             <span
-              className="inline-block text-[11px] font-bold px-3 py-1.5 rounded-md"
+              className="inline-block text-[12px] font-bold px-3 py-1.5 rounded-md"
               style={{
                 background: "var(--brand)",
                 color: "var(--brand-fg)",
@@ -747,7 +747,7 @@ export function ProductPreviewMock() {
               className="w-[9px] h-[9px] rounded-full"
               style={{ background: "#28c840" }}
             />
-            <span className="ml-2 text-[10px] font-mono text-foreground/25">
+            <span className="ml-2 text-[10px] font-mono text-foreground/45">
               uxlens.pro/audit/demo-landing-page
             </span>
           </div>
@@ -756,7 +756,7 @@ export function ProductPreviewMock() {
           <div className="p-4 sm:p-5 space-y-3">
             {/* Report header */}
             <div className="text-center mb-1">
-              <p className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/25 mb-1">
+              <p className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/45 mb-1">
                 Diagnostic Engine v5 — UX Dashboard
               </p>
               <p className="text-[14px] font-semibold text-foreground">
@@ -782,7 +782,7 @@ export function ProductPreviewMock() {
                     <path d="M8 15h8" /><path d="M8 18h8" /><path d="M10 21h4" />
                   </svg>
                 </div>
-                <span className="text-[11px] font-semibold text-foreground/70">Conversion Killers</span>
+                <span className="text-[12px] font-semibold text-foreground/70">Conversion Killers</span>
               </div>
               <BarChartMock />
             </div>
@@ -825,12 +825,12 @@ export function FeatureSection({
         {/* Copy side */}
         <ScrollReveal className={`space-y-4 ${reversed ? "lg:order-2" : ""}`}>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/25">
+            <span className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/45">
               {label}
             </span>
             {tier && (
               <span
-                className="text-[9px] font-mono px-1.5 py-0.5 rounded font-bold"
+                className="text-[10px] font-mono px-1.5 py-0.5 rounded font-bold"
                 style={{
                   background: "var(--brand-dim)",
                   color: "var(--brand)",
@@ -843,7 +843,7 @@ export function FeatureSection({
           <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground leading-tight">
             {headline}
           </h2>
-          <p className="text-[13px] text-foreground/45 leading-relaxed max-w-md">
+          <p className="text-[14px] text-foreground/45 leading-relaxed max-w-md">
             {description}
           </p>
           <ul className="space-y-2 pt-1">

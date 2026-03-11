@@ -34,7 +34,7 @@ export function LoadingState() {
       {/* Title */}
       <div className="flex items-center gap-2.5 mb-2">
         <div className="h-2 w-2 rounded-full" style={{ background: "var(--brand)", animation: "blink-dot 1.8s ease-in-out infinite" }} />
-        <p className="text-[12px] font-mono uppercase tracking-[2.5px] text-foreground/30">
+        <p className="text-[12px] font-mono uppercase tracking-[2.5px] text-foreground/50">
           Diagnostic pipeline running
         </p>
       </div>
@@ -87,7 +87,7 @@ export function LoadingState() {
               {/* Info */}
               <div>
                 <div className="text-[12px] font-medium text-foreground">{step.name}</div>
-                <div className="text-[12px] text-foreground/35 leading-snug">{step.desc}</div>
+                <div className="text-[12px] text-foreground/55 leading-snug">{step.desc}</div>
               </div>
 
               {/* Status */}

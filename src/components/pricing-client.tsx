@@ -52,7 +52,7 @@ export function PricingClient({
           <h1 className="text-[clamp(28px,4vw,42px)] font-bold tracking-[-1px] text-foreground">
             Simple, transparent pricing
           </h1>
-          <p className="mt-3 text-[13px] text-foreground/40 max-w-md leading-relaxed">
+          <p className="mt-3 text-[14px] text-foreground/40 max-w-md leading-relaxed">
             Start free with 5 audits per month. Upgrade for unlimited AI heatmaps, visual design analysis, strategic fixes, PDF export, and AI chat.
           </p>
         </div>
@@ -72,7 +72,7 @@ export function PricingClient({
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="text-[13px] font-semibold text-foreground">
+                  <p className="text-[14px] font-semibold text-foreground">
                     {planLabel} Plan
                   </p>
                   <span
@@ -99,7 +99,7 @@ export function PricingClient({
                   }}
                 />
               </div>
-              <span className="text-[11px] font-medium text-foreground/50 shrink-0 tabular-nums">
+              <span className="text-[12px] font-medium text-foreground/50 shrink-0 tabular-nums">
                 {auditsUsed}/{monthlyLimit}
               </span>
             </div>
@@ -126,7 +126,7 @@ export function PricingClient({
                 </span>
               </div>
             )}
-            <p className="text-[13px] font-semibold text-foreground">Free</p>
+            <p className="text-[14px] font-semibold text-foreground">Free</p>
             <div className="mt-2 flex items-baseline gap-0.5">
               <span className="text-2xl font-bold tracking-tight text-foreground">$0</span>
               <span className="text-[12px] text-muted-foreground/60">/mo</span>
@@ -143,7 +143,7 @@ export function PricingClient({
                 "Audit history dashboard",
               ].map((f) => (
                 <li key={f} className="flex items-start gap-2 text-[12px] text-muted-foreground">
-                  <Check className="h-3 w-3 text-foreground/30 mt-0.5 shrink-0" />
+                  <Check className="h-3 w-3 text-foreground/50 mt-0.5 shrink-0" />
                   {f}
                 </li>
               ))}
@@ -151,7 +151,7 @@ export function PricingClient({
 
             {isSignedIn && currentPlan === "free" ? (
               <div
-                className="flex items-center justify-center w-full mt-5 rounded-lg py-2 text-[13px] font-medium border"
+                className="flex items-center justify-center w-full mt-5 rounded-lg py-2 text-[14px] font-medium border"
                 style={{ borderColor: "var(--brand-glow)", color: "var(--brand)", background: "var(--brand-dim)" }}
               >
                 Your Current Plan
@@ -159,7 +159,7 @@ export function PricingClient({
             ) : (
               <Link
                 href="/"
-                className="flex items-center justify-center w-full mt-5 rounded-lg py-2 text-[13px] font-medium border border-border/50 bg-background text-foreground hover:border-border hover:shadow-elevation-1 transition-all duration-150 active:scale-[0.98]"
+                className="flex items-center justify-center w-full mt-5 rounded-lg py-2 text-[14px] font-medium border border-border/50 bg-background text-foreground hover:border-border hover:shadow-elevation-1 transition-all duration-150 active:scale-[0.98]"
               >
                 Get Started Free
               </Link>
@@ -173,7 +173,7 @@ export function PricingClient({
         </div>
 
         {/* Divider */}
-        <div className="flex items-center gap-4 my-12 text-foreground/15 text-[12px] uppercase tracking-[2px]">
+        <div className="flex items-center gap-4 my-12 text-foreground/35 text-[12px] uppercase tracking-[2px]">
           <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
           or
           <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
@@ -187,7 +187,7 @@ export function PricingClient({
             </div>
             <div className="flex-1">
               <h2 className="text-[15px] font-semibold tracking-tight">Get a Human Audit</h2>
-              <p className="text-[12px] text-foreground/35">Senior UX professional review — delivered in 2–3 business days</p>
+              <p className="text-[12px] text-foreground/55">Senior UX professional review — delivered in 2–3 business days</p>
             </div>
             <span className="text-[20px] font-bold tracking-tight shrink-0">$300</span>
           </div>
@@ -196,7 +196,7 @@ export function PricingClient({
           </p>
           <button
             onClick={handleHumanAudit}
-            className="inline-flex w-full h-10 items-center justify-center gap-2 rounded-lg px-5 text-[13px] font-bold transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
+            className="inline-flex w-full h-10 items-center justify-center gap-2 rounded-lg px-5 text-[14px] font-bold transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
             style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
           >
             Request Human Audit
@@ -207,7 +207,7 @@ export function PricingClient({
         {/* Sign-in CTA for anonymous users */}
         <Show when="signed-out">
           <div className="mt-10 mb-16 text-center">
-            <p className="text-[12px] text-foreground/30 mb-3">Sign in to manage your subscription</p>
+            <p className="text-[12px] text-foreground/50 mb-3">Sign in to manage your subscription</p>
             <Link
               href="/sign-in"
               className="inline-flex h-9 items-center gap-1.5 rounded-lg border px-4 text-[12px] font-medium text-foreground transition-all duration-150 hover:border-foreground/20 active:scale-[0.98]"
@@ -221,7 +221,7 @@ export function PricingClient({
         {/* Dashboard link for signed-in users */}
         <Show when="signed-in">
           <div className="mt-10 mb-16 text-center">
-            <p className="text-[12px] text-foreground/30 mb-3">Manage your audits and subscription</p>
+            <p className="text-[12px] text-foreground/50 mb-3">Manage your audits and subscription</p>
             <Link
               href="/dashboard"
               className="inline-flex h-9 items-center gap-1.5 rounded-lg border px-4 text-[12px] font-medium text-foreground transition-all duration-150 hover:border-foreground/20 active:scale-[0.98]"

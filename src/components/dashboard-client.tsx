@@ -74,23 +74,23 @@ function PlanCard({ planInfo, totalAudits }: { planInfo: PlanInfo; totalAudits: 
           <div>
             <div className="flex items-center gap-2">
               <span
-                className="text-[13px] font-bold"
+                className="text-[14px] font-bold"
                 style={{ color: config.color }}
               >
                 {config.label} Plan
               </span>
               {planInfo.features.pdfExport && (
-                <span className="text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded" style={{ background: config.color + "15", color: config.color }}>
+                <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded" style={{ background: config.color + "15", color: config.color }}>
                   PDF
                 </span>
               )}
               {planInfo.features.aiChat && (
-                <span className="text-[9px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded" style={{ background: config.color + "15", color: config.color }}>
+                <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded" style={{ background: config.color + "15", color: config.color }}>
                   AI Chat
                 </span>
               )}
             </div>
-            <p className="text-[11px] text-foreground/40 mt-0.5">
+            <p className="text-[12px] text-foreground/40 mt-0.5">
               {totalAudits} of {planInfo.planLimit} audits this month
             </p>
           </div>
@@ -112,7 +112,7 @@ function PlanCard({ planInfo, totalAudits }: { planInfo: PlanInfo; totalAudits: 
                 }}
               />
             </div>
-            <p className="text-[10px] text-foreground/30 mt-1 text-right">
+            <p className="text-[10px] text-foreground/50 mt-1 text-right">
               {usagePercent}% used
             </p>
           </div>
@@ -120,7 +120,7 @@ function PlanCard({ planInfo, totalAudits }: { planInfo: PlanInfo; totalAudits: 
           {nextPlan && (
             <Link
               href="/pricing"
-              className="inline-flex items-center gap-1 text-[11px] font-medium px-3 py-1.5 rounded-lg border transition-all hover:opacity-80"
+              className="inline-flex items-center gap-1 text-[12px] font-medium px-3 py-1.5 rounded-lg border transition-all hover:opacity-80"
               style={{
                 borderColor: "var(--brand-glow)",
                 color: "var(--brand)",
@@ -273,22 +273,22 @@ function ApiKeysSection() {
           <Key className="w-4 h-4" style={{ color: "#16a34a" }} />
         </div>
         <div>
-          <h3 className="text-[13px] font-bold text-foreground">UXLens Skill</h3>
-          <p className="text-[11px] text-foreground/40">Use UXLens inside Claude Code and other AI tools</p>
+          <h3 className="text-[14px] font-bold text-foreground">UXLens Skill</h3>
+          <p className="text-[12px] text-foreground/40">Use UXLens inside Claude Code and other AI tools</p>
         </div>
       </div>
 
       {/* Install command + key — single unified box */}
       <div>
-        <p className="text-[10px] uppercase tracking-wider text-foreground/30 mb-1.5 font-medium">Install Command</p>
+        <p className="text-[10px] uppercase tracking-wider text-foreground/50 mb-1.5 font-medium">Install Command</p>
         <div
           className="rounded-lg border overflow-hidden"
           style={{ borderColor: "var(--border)", background: "var(--s2)" }}
         >
           {/* Command row */}
           <div className="flex items-center gap-2 px-3 py-2">
-            <Terminal className="w-3.5 h-3.5 text-foreground/30 shrink-0" />
-            <code className="text-[11px] text-foreground/60 flex-1 font-mono truncate">
+            <Terminal className="w-3.5 h-3.5 text-foreground/50 shrink-0" />
+            <code className="text-[12px] text-foreground/60 flex-1 font-mono truncate">
               {installCmd}
             </code>
             <button
@@ -299,7 +299,7 @@ function ApiKeysSection() {
               {copiedCmd ? (
                 <Check className="w-3.5 h-3.5 text-green-600" />
               ) : (
-                <Copy className="w-3.5 h-3.5 text-foreground/30" />
+                <Copy className="w-3.5 h-3.5 text-foreground/50" />
               )}
             </button>
           </div>
@@ -310,8 +310,8 @@ function ApiKeysSection() {
               className="flex items-center gap-2 px-3 py-2 border-t"
               style={{ borderColor: "var(--border)" }}
             >
-              <Key className="w-3.5 h-3.5 text-foreground/20 shrink-0" />
-              <code className="text-[11px] font-mono text-foreground/50 flex-1 truncate select-all">
+              <Key className="w-3.5 h-3.5 text-foreground/40 shrink-0" />
+              <code className="text-[12px] font-mono text-foreground/50 flex-1 truncate select-all">
                 {displayKey}
               </code>
 
@@ -323,11 +323,11 @@ function ApiKeysSection() {
                 title={visible ? "Hide key" : "Reveal key"}
               >
                 {revealing ? (
-                  <Loader2 className="w-3.5 h-3.5 text-foreground/30 animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 text-foreground/50 animate-spin" />
                 ) : visible ? (
-                  <EyeOff className="w-3.5 h-3.5 text-foreground/30" />
+                  <EyeOff className="w-3.5 h-3.5 text-foreground/50" />
                 ) : (
-                  <Eye className="w-3.5 h-3.5 text-foreground/30" />
+                  <Eye className="w-3.5 h-3.5 text-foreground/50" />
                 )}
               </button>
 
@@ -341,7 +341,7 @@ function ApiKeysSection() {
                   {copied ? (
                     <Check className="w-3.5 h-3.5 text-green-600" />
                   ) : (
-                    <Copy className="w-3.5 h-3.5 text-foreground/30" />
+                    <Copy className="w-3.5 h-3.5 text-foreground/50" />
                   )}
                 </button>
               )}
@@ -352,11 +352,11 @@ function ApiKeysSection() {
                 className="shrink-0 p-1 rounded hover:bg-red-50 transition-colors group"
                 title="Revoke key"
               >
-                <Trash2 className="w-3.5 h-3.5 text-foreground/20 group-hover:text-red-500 transition-colors" />
+                <Trash2 className="w-3.5 h-3.5 text-foreground/40 group-hover:text-red-500 transition-colors" />
               </button>
 
               {/* Meta */}
-              <span className="shrink-0 text-[10px] text-foreground/20 hidden sm:inline">
+              <span className="shrink-0 text-[10px] text-foreground/40 hidden sm:inline">
                 {activeKey.lastUsedAt
                   ? `Used ${new Date(activeKey.lastUsedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
                   : `Created ${new Date(activeKey.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`}
@@ -366,7 +366,7 @@ function ApiKeysSection() {
         </div>
 
         {!activeKey && !loading && (
-          <p className="text-[10px] text-foreground/25 mt-1">
+          <p className="text-[10px] text-foreground/45 mt-1">
             Generate an API key below, then the command will include it automatically
           </p>
         )}
@@ -507,16 +507,16 @@ export function DashboardClient() {
 
         {!loading && audits.length === 0 && (
           <div className="text-center py-20">
-            <BarChart3 className="h-10 w-10 mx-auto mb-4 text-foreground/15" />
+            <BarChart3 className="h-10 w-10 mx-auto mb-4 text-foreground/35" />
             <h2 className="text-[16px] font-semibold text-foreground/50 mb-2">
               No audits yet
             </h2>
-            <p className="text-[12px] text-foreground/30 mb-6 max-w-sm mx-auto">
+            <p className="text-[12px] text-foreground/50 mb-6 max-w-sm mx-auto">
               Run your first UX audit to see it appear here. All your audits will be saved automatically.
             </p>
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-[13px] font-medium px-5 py-2.5 rounded-lg transition-all duration-150 hover:opacity-80"
+              className="inline-flex items-center gap-2 text-[14px] font-medium px-5 py-2.5 rounded-lg transition-all duration-150 hover:opacity-80"
               style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
             >
               <FileText className="h-3.5 w-3.5" />
@@ -550,7 +550,7 @@ export function DashboardClient() {
                       style={{ borderColor: "var(--border)", background: "var(--s1)" }}
                       title="Delete audit"
                     >
-                      <Trash2 className="h-3.5 w-3.5 text-foreground/30 hover:text-red-500 transition-colors" />
+                      <Trash2 className="h-3.5 w-3.5 text-foreground/50 hover:text-red-500 transition-colors" />
                     </button>
 
                     <Link href={`/audit/${audit.id}`} className="block">
@@ -570,10 +570,10 @@ export function DashboardClient() {
 
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
-                          <p className="text-[13px] font-medium text-foreground truncate group-hover:text-foreground/80 transition-colors">
+                          <p className="text-[14px] font-medium text-foreground truncate group-hover:text-foreground/80 transition-colors">
                             {domain}
                           </p>
-                          <p className="text-[12px] text-foreground/30 mt-0.5">{date}</p>
+                          <p className="text-[12px] text-foreground/50 mt-0.5">{date}</p>
                         </div>
 
                         <div className="flex items-center gap-1.5 shrink-0">
@@ -595,7 +595,7 @@ export function DashboardClient() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1 mt-3 text-[12px] text-foreground/25 group-hover:text-foreground/40 transition-colors">
+                      <div className="flex items-center gap-1 mt-3 text-[12px] text-foreground/45 group-hover:text-foreground/40 transition-colors">
                         <ExternalLink className="h-3 w-3" />
                         <span>View full report</span>
                       </div>
@@ -683,7 +683,7 @@ function DeleteConfirmModal({
         <button
           onClick={onCancel}
           disabled={deleting}
-          className="absolute top-4 right-4 text-foreground/30 hover:text-foreground/50 transition-colors disabled:opacity-30"
+          className="absolute top-4 right-4 text-foreground/50 hover:text-foreground/50 transition-colors disabled:opacity-30"
         >
           <X className="h-4 w-4" />
         </button>
@@ -697,7 +697,7 @@ function DeleteConfirmModal({
         </div>
 
         {/* Warning text */}
-        <p className="text-[13px] text-foreground/50 leading-relaxed mb-4">
+        <p className="text-[14px] text-foreground/50 leading-relaxed mb-4">
           This will permanently delete the audit for{" "}
           <span className="font-semibold text-foreground/70">{domain}</span>.
           This action cannot be undone.
@@ -724,7 +724,7 @@ function DeleteConfirmModal({
             placeholder={confirmText}
             disabled={deleting}
             autoFocus
-            className="h-10 w-full rounded-lg bg-transparent px-4 text-[13px] text-foreground placeholder:text-foreground/20 focus:outline-none font-mono disabled:opacity-50"
+            className="h-10 w-full rounded-lg bg-transparent px-4 text-[14px] text-foreground placeholder:text-foreground/40 focus:outline-none font-mono disabled:opacity-50"
           />
         </div>
 
@@ -733,7 +733,7 @@ function DeleteConfirmModal({
           <button
             onClick={onCancel}
             disabled={deleting}
-            className="px-4 py-2 text-[13px] font-medium rounded-lg border transition-all duration-150 hover:border-foreground/20 disabled:opacity-30"
+            className="px-4 py-2 text-[14px] font-medium rounded-lg border transition-all duration-150 hover:border-foreground/20 disabled:opacity-30"
             style={{ borderColor: "var(--border)", background: "var(--s1)" }}
           >
             Cancel
@@ -741,7 +741,7 @@ function DeleteConfirmModal({
           <button
             onClick={onConfirm}
             disabled={!isMatch || deleting}
-            className="px-4 py-2 text-[13px] font-bold rounded-lg transition-all duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none"
+            className="px-4 py-2 text-[14px] font-bold rounded-lg transition-all duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none"
             style={{ background: isMatch ? "var(--score-low)" : "var(--s3)", color: isMatch ? "white" : "var(--foreground)" }}
           >
             {deleting ? "Deleting..." : "Delete Audit"}

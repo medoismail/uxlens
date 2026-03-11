@@ -104,7 +104,7 @@ export function PdfExportButton({
       )}
     </button>
     {error && (
-      <p className="text-[11px] mt-1" style={{ color: "var(--score-low, #ef4444)" }}>
+      <p className="text-[12px] mt-1" style={{ color: "var(--score-low, #ef4444)" }}>
         {error}
       </p>
     )}

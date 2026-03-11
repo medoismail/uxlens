@@ -150,10 +150,10 @@ export function InstallBanner() {
 
         {/* Text */}
         <div className="min-w-0 flex-1">
-          <p className="text-[13px] font-semibold text-white">
+          <p className="text-[14px] font-semibold text-white">
             Install UXLens
           </p>
-          <p className="text-[11px] text-white/50">
+          <p className="text-[12px] text-white/50">
             Quick access from your home screen
           </p>
         </div>
@@ -214,12 +214,12 @@ export function InstallBanner() {
                   1
                 </div>
                 <div>
-                  <p className="text-[13px] text-white">
+                  <p className="text-[14px] text-white">
                     Tap the{" "}
                     <Share className="inline h-4 w-4 text-[#007AFF] align-text-bottom" />{" "}
                     <span className="font-medium text-white">Share</span> button in Safari
                   </p>
-                  <p className="text-[11px] text-white/40 mt-0.5">
+                  <p className="text-[12px] text-white/40 mt-0.5">
                     It&apos;s at the bottom of your screen
                   </p>
                 </div>
@@ -234,7 +234,7 @@ export function InstallBanner() {
                   2
                 </div>
                 <div>
-                  <p className="text-[13px] text-white">
+                  <p className="text-[14px] text-white">
                     Scroll down and tap{" "}
                     <span className="font-medium text-white">&quot;Add to Home Screen&quot;</span>
                   </p>
@@ -250,7 +250,7 @@ export function InstallBanner() {
                   3
                 </div>
                 <div>
-                  <p className="text-[13px] text-white">
+                  <p className="text-[14px] text-white">
                     Tap <span className="font-medium text-white">&quot;Add&quot;</span> to confirm
                   </p>
                 </div>
@@ -262,7 +262,7 @@ export function InstallBanner() {
                 setShowIOSGuide(false);
                 dismiss();
               }}
-              className="mt-5 w-full rounded-lg py-2.5 text-[13px] font-semibold text-white/60 transition-colors hover:text-white border"
+              className="mt-5 w-full rounded-lg py-2.5 text-[14px] font-semibold text-white/60 transition-colors hover:text-white border"
               style={{ borderColor: "var(--border)" }}
             >
               Got it

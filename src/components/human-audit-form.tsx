@@ -57,14 +57,14 @@ export function HumanAuditForm({ onRequested }: HumanAuditFormProps) {
           placeholder="https://your-landing-page.com"
           value={url}
           onChange={(e) => { setUrl(e.target.value); if (error) setError(""); }}
-          className="h-11 w-full rounded-t-xl bg-transparent px-4 text-[13px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none border-b border-border/30"
+          className="h-11 w-full rounded-t-xl bg-transparent px-4 text-[14px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none border-b border-border/30"
         />
         <input
           type="email"
           placeholder="you@example.com"
           value={email}
           onChange={(e) => { setEmail(e.target.value); if (error) setError(""); }}
-          className="h-11 w-full rounded-b-xl bg-transparent px-4 text-[13px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none"
+          className="h-11 w-full rounded-b-xl bg-transparent px-4 text-[14px] text-foreground placeholder:text-muted-foreground/50 focus:outline-none"
         />
       </div>
 
@@ -75,7 +75,7 @@ export function HumanAuditForm({ onRequested }: HumanAuditFormProps) {
       <button
         type="submit"
         disabled={!url.trim() || !email.trim()}
-        className="inline-flex w-full h-11 items-center justify-center gap-2 rounded-xl bg-foreground px-5 text-[13px] font-medium text-background transition-all duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none"
+        className="inline-flex w-full h-11 items-center justify-center gap-2 rounded-xl bg-foreground px-5 text-[14px] font-medium text-background transition-all duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none"
       >
         <User className="h-3.5 w-3.5" />
         Request Human Audit

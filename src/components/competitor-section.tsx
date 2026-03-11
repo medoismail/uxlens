@@ -43,7 +43,7 @@ function normalizeCategory(cat: string): string {
 function ScoreBar({ label, score, maxWidth = "100%" }: { label: string; score: number; maxWidth?: string }) {
   return (
     <div className="flex items-center gap-3" style={{ maxWidth }}>
-      <span className="text-[11px] text-foreground/40 w-28 shrink-0 truncate">{label}</span>
+      <span className="text-[12px] text-foreground/40 w-28 shrink-0 truncate">{label}</span>
       <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
         <div
           className="h-full rounded-full transition-all duration-500"
@@ -75,11 +75,11 @@ function CompetitorCard({ profile, index }: { profile: CompetitorProfile; index:
             <Target className="h-4 w-4 text-foreground/40" />
           </div>
           <div className="text-left">
-            <div className="text-[12.5px] font-semibold flex items-center gap-2">
+            <div className="text-[12px] font-semibold flex items-center gap-2">
               {profile.name}
-              <span className="text-[10px] font-mono text-foreground/30">Competitor {index + 1}</span>
+              <span className="text-[10px] font-mono text-foreground/50">Competitor {index + 1}</span>
             </div>
-            <div className="text-[11px] text-foreground/30 mt-0.5 flex items-center gap-1">
+            <div className="text-[12px] text-foreground/50 mt-0.5 flex items-center gap-1">
               {domain}
               <ExternalLink className="h-2.5 w-2.5" />
             </div>
@@ -95,7 +95,7 @@ function CompetitorCard({ profile, index }: { profile: CompetitorProfile; index:
           >
             {profile.estimatedGrade}
           </span>
-          <ChevronDown className={`h-3.5 w-3.5 text-foreground/30 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+          <ChevronDown className={`h-3.5 w-3.5 text-foreground/50 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
         </div>
       </button>
 
@@ -103,7 +103,7 @@ function CompetitorCard({ profile, index }: { profile: CompetitorProfile; index:
         <div className="border-t px-5 py-5 space-y-5" style={{ borderColor: "var(--border)" }}>
           {/* Category scores */}
           <div className="space-y-2">
-            <p className="text-[10px] font-mono uppercase tracking-[1.5px] text-foreground/25 mb-3">Category Scores</p>
+            <p className="text-[10px] font-mono uppercase tracking-[1.5px] text-foreground/45 mb-3">Category Scores</p>
             <ScoreBar label="Message Clarity" score={profile.categories.messageClarity.score} />
             <ScoreBar label="Cognitive Load" score={profile.categories.cognitiveLoad.score} />
             <ScoreBar label="Conversion Arch." score={profile.categories.conversionArch.score} />
@@ -115,7 +115,7 @@ function CompetitorCard({ profile, index }: { profile: CompetitorProfile; index:
           {/* Strengths & weaknesses */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <p className="text-[10px] font-mono uppercase tracking-[1.5px] text-foreground/25 mb-2.5">Their Strengths</p>
+              <p className="text-[10px] font-mono uppercase tracking-[1.5px] text-foreground/45 mb-2.5">Their Strengths</p>
               <ul className="space-y-2">
                 {profile.strengths.map((s, i) => (
                   <li key={i} className="text-[12px] text-foreground/60 leading-relaxed flex items-start gap-2">
@@ -126,7 +126,7 @@ function CompetitorCard({ profile, index }: { profile: CompetitorProfile; index:
               </ul>
             </div>
             <div>
-              <p className="text-[10px] font-mono uppercase tracking-[1.5px] text-foreground/25 mb-2.5">Your Advantages</p>
+              <p className="text-[10px] font-mono uppercase tracking-[1.5px] text-foreground/45 mb-2.5">Your Advantages</p>
               <ul className="space-y-2">
                 {profile.weaknesses.map((w, i) => (
                   <li key={i} className="text-[12px] text-foreground/60 leading-relaxed flex items-start gap-2">
@@ -167,7 +167,7 @@ function ComparisonRow({ comp, comp1Name, comp2Name }: { comp: CategoryCompariso
         <ScoreBar label={comp1Name} score={comp.competitor1Score} />
         <ScoreBar label={comp2Name} score={comp.competitor2Score} />
       </div>
-      <p className="text-[11px] text-foreground/35 leading-relaxed">{comp.insight}</p>
+      <p className="text-[12px] text-foreground/55 leading-relaxed">{comp.insight}</p>
     </div>
   );
 }
@@ -221,7 +221,7 @@ export function CompetitorLockedPreview() {
       </p>
       <Link
         href="/pricing"
-        className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-[13px] font-bold transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
+        className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-[14px] font-bold transition-all duration-150 hover:opacity-90 active:scale-[0.98]"
         style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
       >
         <Lock className="h-3.5 w-3.5" />
@@ -303,7 +303,7 @@ function ManualCompetitorInput({
               <button
                 type="button"
                 onClick={() => removeField(i)}
-                className="text-foreground/25 hover:text-foreground/50 transition-colors p-1 shrink-0"
+                className="text-foreground/45 hover:text-foreground/50 transition-colors p-1 shrink-0"
               >
                 <Minus className="h-3.5 w-3.5" />
               </button>
@@ -314,7 +314,7 @@ function ManualCompetitorInput({
           <button
             type="button"
             onClick={addField}
-            className="inline-flex items-center gap-1.5 text-[11px] font-medium transition-colors hover:text-foreground/50 px-1 py-1"
+            className="inline-flex items-center gap-1.5 text-[12px] font-medium transition-colors hover:text-foreground/50 px-1 py-1"
             style={{ color: "var(--brand)" }}
           >
             <Plus className="h-3 w-3" /> Add competitor
@@ -344,7 +344,7 @@ function ManualCompetitorInput({
           <button
             type="button"
             onClick={() => { setOpen(false); setUrls([""]); }}
-            className="text-[11px] text-foreground/30 hover:text-foreground/50 transition-colors px-2 py-2"
+            className="text-[12px] text-foreground/50 hover:text-foreground/50 transition-colors px-2 py-2"
           >
             Cancel
           </button>
@@ -371,8 +371,8 @@ export function CompetitorSection({
     return (
       <div className="space-y-3">
         <div className="rounded-xl border p-5 text-center" style={{ borderColor: "var(--border)", background: "var(--s1)" }}>
-          <Swords className="h-5 w-5 mx-auto mb-2 text-foreground/20" />
-          <p className="text-[12px] text-foreground/35">
+          <Swords className="h-5 w-5 mx-auto mb-2 text-foreground/40" />
+          <p className="text-[12px] text-foreground/55">
             Competitor analysis couldn&apos;t be completed for this page.
           </p>
         </div>
@@ -396,11 +396,11 @@ export function CompetitorSection({
             <Swords className="h-4 w-4" style={{ color: "var(--brand)" }} />
           </div>
           <div className="flex-1">
-            <h3 className="text-[13px] font-semibold">Competitive Position</h3>
+            <h3 className="text-[14px] font-semibold">Competitive Position</h3>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span style={{ color: gap.color }}>{gap.icon}</span>
-              <span className="text-[11px] font-medium" style={{ color: gap.color }}>{gap.label}</span>
-              <span className="text-[11px] text-foreground/25">vs. competitors</span>
+              <span className="text-[12px] font-medium" style={{ color: gap.color }}>{gap.label}</span>
+              <span className="text-[12px] text-foreground/45">vs. competitors</span>
             </div>
           </div>
         </div>
@@ -414,7 +414,7 @@ export function CompetitorSection({
 
       {/* Score Comparison */}
       <div className="rounded-xl border p-5" style={{ borderColor: "var(--border)", background: "var(--s1)" }}>
-        <p className="text-[10px] font-mono uppercase tracking-[1.5px] text-foreground/25 mb-4">Overall Score Comparison</p>
+        <p className="text-[10px] font-mono uppercase tracking-[1.5px] text-foreground/45 mb-4">Overall Score Comparison</p>
         <div className="space-y-3">
           <ScoreBar label="Your site" score={data.userOverallScore} />
           {data.competitors.map((c, i) => (
@@ -422,8 +422,8 @@ export function CompetitorSection({
           ))}
         </div>
         <div className="mt-3 pt-3 border-t flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
-          <span className="text-[11px] text-foreground/30">Average competitor score</span>
-          <span className="text-[13px] font-bold tabular-nums" style={{ color: scoreColor(data.averageCompetitorScore) }}>
+          <span className="text-[12px] text-foreground/50">Average competitor score</span>
+          <span className="text-[14px] font-bold tabular-nums" style={{ color: scoreColor(data.averageCompetitorScore) }}>
             {data.averageCompetitorScore}
           </span>
         </div>
@@ -453,8 +453,8 @@ export function CompetitorSection({
               <ArrowUpRight className="h-4 w-4" style={{ color: "var(--score-high)" }} />
             </div>
             <div>
-              <h3 className="text-[13px] font-semibold">Competitive Advantages</h3>
-              <p className="text-[11px] text-foreground/30 mt-0.5">Actionable recommendations based on competitor gaps</p>
+              <h3 className="text-[14px] font-semibold">Competitive Advantages</h3>
+              <p className="text-[12px] text-foreground/50 mt-0.5">Actionable recommendations based on competitor gaps</p>
             </div>
           </div>
           <ol className="space-y-3">
@@ -502,13 +502,13 @@ function ComparisonAccordion({
             <Trophy className="h-4 w-4 text-foreground/40" />
           </div>
           <div className="text-left">
-            <div className="text-[12.5px] font-semibold">Category-by-Category</div>
-            <div className="text-[11px] text-foreground/30 mt-0.5">
+            <div className="text-[12px] font-semibold">Category-by-Category</div>
+            <div className="text-[12px] text-foreground/50 mt-0.5">
               You win {userWins} of {comparisons.length} categories
             </div>
           </div>
         </div>
-        <ChevronDown className={`h-3.5 w-3.5 text-foreground/30 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`h-3.5 w-3.5 text-foreground/50 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
         <div className="border-t px-5 py-3" style={{ borderColor: "var(--border)" }}>

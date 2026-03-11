@@ -81,7 +81,7 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
 
       {/* Subheadline */}
       <p
-        className="animate-slide-up mt-5 text-[13.5px] leading-relaxed text-foreground/40 max-w-[540px] relative z-[1]"
+        className="animate-slide-up mt-5 text-[14px] leading-relaxed text-foreground/40 max-w-[540px] relative z-[1]"
         style={{ animationDelay: "60ms" }}
       >
         Paste any URL. Get a 10-layer AI audit with heuristic evaluation, attention heatmaps,
@@ -110,7 +110,7 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
         ].map((badge) => (
           <span
             key={badge}
-            className="text-[11px] font-mono px-2.5 py-1 rounded-md text-foreground/25 tracking-wide"
+            className="text-[12px] font-mono px-2.5 py-1 rounded-md text-foreground/45 tracking-wide"
             style={{
               border: "1px solid rgba(0,0,0,0.05)",
               background: "rgba(0,0,0,0.015)",

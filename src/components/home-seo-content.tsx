@@ -45,7 +45,7 @@ function SocialProofBar() {
         className="border-y py-5"
         style={{ borderColor: "rgba(0,0,0,0.05)" }}
       >
-        <div className="max-w-[960px] mx-auto px-7 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[12px] text-foreground/30">
+        <div className="max-w-[960px] mx-auto px-7 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[12px] text-foreground/50">
           {count !== null && (
             <span className="flex items-center gap-1.5 font-medium text-foreground/50">
               <Users className="h-3.5 w-3.5" />
@@ -71,7 +71,7 @@ function SocialProofBar() {
 function Divider({ label }: { label: string }) {
   return (
     <ScrollReveal className="max-w-[960px] mx-auto px-7">
-      <div className="flex items-center gap-4 text-foreground/30 text-[11px] uppercase tracking-[2.5px] font-medium">
+      <div className="flex items-center gap-4 text-foreground/50 text-[12px] uppercase tracking-[2.5px] font-medium">
         <div className="flex-1 h-px" style={{ background: "rgba(0,0,0,0.08)" }} />
         {label}
         <div className="flex-1 h-px" style={{ background: "rgba(0,0,0,0.08)" }} />
@@ -193,13 +193,13 @@ export function HomeSEOContent() {
       {/* ── Product Preview (the big visual hero) ── */}
       <section className="max-w-[960px] mx-auto px-7 pt-14 pb-20">
         <ScrollReveal className="text-center mb-8">
-          <p className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/25 mb-2">
+          <p className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/45 mb-2">
             Sample Audit Report
           </p>
           <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
             See exactly what you get
           </h2>
-          <p className="mt-2 text-[13px] text-foreground/40 max-w-md mx-auto leading-relaxed">
+          <p className="mt-2 text-[14px] text-foreground/40 max-w-md mx-auto leading-relaxed">
             Every audit delivers a comprehensive report with scores, heatmaps,
             conversion killers, and actionable fixes.
           </p>
@@ -218,7 +218,7 @@ export function HomeSEOContent() {
           {STEPS.map((step, i) => (
             <ScrollReveal key={step.num} delay={i} className="space-y-3.5">
               <span
-                className="inline-block text-[11px] font-mono font-bold px-2.5 py-1 rounded-md"
+                className="inline-block text-[12px] font-mono font-bold px-2.5 py-1 rounded-md"
                 style={{
                   background: "var(--brand-dim)",
                   color: "var(--brand)",
@@ -229,7 +229,7 @@ export function HomeSEOContent() {
               <h3 className="text-[15px] font-semibold text-foreground tracking-tight">
                 {step.title}
               </h3>
-              <p className="text-[12.5px] text-foreground/35 leading-relaxed">
+              <p className="text-[12px] text-foreground/55 leading-relaxed">
                 {step.desc}
               </p>
             </ScrollReveal>
@@ -308,7 +308,7 @@ export function HomeSEOContent() {
           <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
             Your hero section, rewritten by AI
           </h2>
-          <p className="mt-2 text-[13px] text-foreground/40 max-w-lg mx-auto leading-relaxed">
+          <p className="mt-2 text-[14px] text-foreground/40 max-w-lg mx-auto leading-relaxed">
             UXLens rewrites your headline, subheadline, and CTA based on
             conversion principles and your page&apos;s specific context. Before and
             after, side by side.
@@ -327,7 +327,7 @@ export function HomeSEOContent() {
           <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
             Built for teams that ship
           </h2>
-          <p className="mt-2 text-[13px] text-foreground/40 max-w-lg mx-auto leading-relaxed">
+          <p className="mt-2 text-[14px] text-foreground/40 max-w-lg mx-auto leading-relaxed">
             Whether you&apos;re a solo founder or an agency managing dozens of
             clients, UXLens gives you the insights to fix conversion issues
             fast.
@@ -351,7 +351,7 @@ export function HomeSEOContent() {
                 <h3 className="text-[14px] font-semibold text-foreground mb-2">
                   {uc.title}
                 </h3>
-                <p className="text-[12.5px] text-foreground/35 leading-relaxed">
+                <p className="text-[12px] text-foreground/55 leading-relaxed">
                   {uc.desc}
                 </p>
               </div>
@@ -368,7 +368,7 @@ export function HomeSEOContent() {
           <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
             Simple, transparent pricing
           </h2>
-          <p className="mt-2 text-[13px] text-foreground/40 max-w-md mx-auto leading-relaxed">
+          <p className="mt-2 text-[14px] text-foreground/40 max-w-md mx-auto leading-relaxed">
             Start free. Upgrade when you need more audits and advanced features.
           </p>
         </ScrollReveal>
@@ -399,16 +399,16 @@ export function HomeSEOContent() {
                   Popular
                 </span>
               )}
-              <p className="text-[13px] font-semibold text-foreground mb-1">
+              <p className="text-[14px] font-semibold text-foreground mb-1">
                 {plan.name}
               </p>
               <p className="text-[28px] font-bold text-foreground tracking-tight">
                 {plan.price}
-                <span className="text-[12px] font-normal text-foreground/35">
+                <span className="text-[12px] font-normal text-foreground/55">
                   /mo
                 </span>
               </p>
-              <p className="text-[11px] text-foreground/35 mb-4">
+              <p className="text-[12px] text-foreground/55 mb-4">
                 {plan.audits}
               </p>
               <ul className="space-y-2">
@@ -433,7 +433,7 @@ export function HomeSEOContent() {
         <ScrollReveal className="text-center mt-6">
           <Link
             href="/pricing"
-            className="inline-flex items-center gap-1.5 text-[13px] font-medium transition-colors hover:opacity-80"
+            className="inline-flex items-center gap-1.5 text-[14px] font-medium transition-colors hover:opacity-80"
             style={{ color: "var(--brand)" }}
           >
             Compare all plans
@@ -454,13 +454,13 @@ export function HomeSEOContent() {
           <h2 className="text-[20px] font-bold tracking-tight text-foreground mb-2">
             Stop guessing. Start auditing.
           </h2>
-          <p className="text-[13px] text-foreground/40 mb-5 max-w-md mx-auto leading-relaxed">
+          <p className="text-[14px] text-foreground/40 mb-5 max-w-md mx-auto leading-relaxed">
             Run your first AI-powered UX audit in 30 seconds. Free, no credit
             card, no signup required.
           </p>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-[13px] font-bold transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+            className="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-[14px] font-bold transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
             style={{
               background: "var(--brand)",
               color: "var(--brand-fg)",
@@ -509,7 +509,7 @@ export function HomeSEOContent() {
           className="max-w-2xl mx-auto mt-10 pt-8"
           style={{ borderTop: "1px solid var(--border)" }}
         >
-          <p className="text-[12px] text-foreground/25 leading-relaxed text-center">
+          <p className="text-[12px] text-foreground/45 leading-relaxed text-center">
             UXLens applies{" "}
             <a
               href="https://www.nngroup.com/articles/ten-usability-heuristics/"

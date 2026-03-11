@@ -100,7 +100,7 @@ export function Header() {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-1.5 text-[11px] font-bold border rounded-full px-2.5 py-0.5 tracking-wider" style={{ color: "#16a34a", background: "#f0fdf4", borderColor: "#bbf7d0" }}>
+            <div className="hidden sm:flex items-center gap-1.5 text-[12px] font-bold border rounded-full px-2.5 py-0.5 tracking-wider" style={{ color: "#16a34a", background: "#f0fdf4", borderColor: "#bbf7d0" }}>
               <span className="w-[5px] h-[5px] rounded-full" style={{ background: "#16a34a", animation: "blink-dot 1.8s ease-in-out infinite" }} />
               v5
             </div>
@@ -145,7 +145,7 @@ export function Header() {
                 willChange: "opacity",
               }}
             >
-              <p className="text-[11px] text-foreground/50 leading-relaxed max-w-[700px] mx-auto">
+              <p className="text-[12px] text-foreground/50 leading-relaxed max-w-[700px] mx-auto">
                 <span className="font-semibold" style={{ color: "var(--brand)" }}>Beta</span>
                 {" — "}This product is under active development. Plans are not active yet, but you can test it for free with the free plan limitations.
                 {" "}Need Pro access?{" "}

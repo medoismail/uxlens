@@ -117,7 +117,7 @@ export function HeatmapOverlay({
             }}
           >
             <div className="h-3.5 w-3.5 border-2 border-white/20 border-t-white/70 rounded-full animate-spin" />
-            <span className="text-[11px] text-white/80 font-medium">
+            <span className="text-[12px] text-white/80 font-medium">
               AI analyzing visual attention...
             </span>
           </div>
@@ -127,7 +127,7 @@ export function HeatmapOverlay({
       {/* Gradient legend bar */}
       {showHeatmap && hasZones && (
         <div className="flex items-center justify-center gap-3">
-          <span className="text-[11px] text-foreground/35 font-medium">Low</span>
+          <span className="text-[12px] text-foreground/55 font-medium">Low</span>
           <div
             className="h-2.5 rounded-full"
             style={{
@@ -135,7 +135,7 @@ export function HeatmapOverlay({
               background: "linear-gradient(to right, rgba(255,255,0,0.7), rgba(255,165,0,0.8), rgba(255,50,0,0.9))",
             }}
           />
-          <span className="text-[11px] text-foreground/35 font-medium">High</span>
+          <span className="text-[12px] text-foreground/55 font-medium">High</span>
         </div>
       )}
     </div>

@@ -118,7 +118,7 @@ export function PricingCards({ email, currentPlan }: PricingCardsProps) {
               </div>
             ) : null}
 
-            <p className="text-[13px] font-semibold text-foreground">{plan.name}</p>
+            <p className="text-[14px] font-semibold text-foreground">{plan.name}</p>
             <div className="mt-2 flex items-baseline gap-0.5">
               <span className="text-2xl font-bold tracking-tight text-foreground">{plan.price}</span>
               <span className="text-[12px] text-muted-foreground/60">{plan.period}</span>
@@ -128,7 +128,7 @@ export function PricingCards({ email, currentPlan }: PricingCardsProps) {
             <ul className="mt-4 space-y-2">
               {plan.features.map((f) => (
                 <li key={f} className="flex items-start gap-2 text-[12px] text-muted-foreground">
-                  <Check className="h-3 w-3 text-foreground/30 mt-0.5 shrink-0" />
+                  <Check className="h-3 w-3 text-foreground/50 mt-0.5 shrink-0" />
                   {f}
                 </li>
               ))}
@@ -136,7 +136,7 @@ export function PricingCards({ email, currentPlan }: PricingCardsProps) {
 
             {isCurrent ? (
               <div
-                className="flex items-center justify-center w-full mt-5 rounded-lg py-2 text-[13px] font-medium border"
+                className="flex items-center justify-center w-full mt-5 rounded-lg py-2 text-[14px] font-medium border"
                 style={{ borderColor: "var(--brand-glow)", color: "var(--brand)", background: "var(--brand-dim)" }}
               >
                 Your Current Plan
@@ -144,7 +144,7 @@ export function PricingCards({ email, currentPlan }: PricingCardsProps) {
             ) : (
               <button
                 onClick={() => handleSelect(plan.checkoutKey)}
-                className={`w-full mt-5 rounded-lg py-2 text-[13px] font-medium transition-all duration-150 active:scale-[0.98] ${
+                className={`w-full mt-5 rounded-lg py-2 text-[14px] font-medium transition-all duration-150 active:scale-[0.98] ${
                   isHigher
                     ? "bg-foreground text-background hover:opacity-90"
                     : isLower
