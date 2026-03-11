@@ -17,7 +17,7 @@ function MockContainer({
   return (
     <div
       className={`relative rounded-2xl border overflow-hidden ${className}`}
-      style={{ background: "var(--s1)", borderColor: "var(--border2)" }}
+      style={{ background: "var(--card)", borderColor: "var(--border2)" }}
     >
       {glow && (
         <div
@@ -728,7 +728,7 @@ export function ProductPreviewMock() {
       <div className="relative perspective-tilt">
         <div
           className="rounded-2xl border overflow-hidden"
-          style={{ background: "var(--s1)", borderColor: "var(--border2)" }}
+          style={{ background: "var(--card)", borderColor: "var(--border2)" }}
         >
           {/* Browser chrome */}
           <div
