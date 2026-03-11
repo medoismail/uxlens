@@ -149,6 +149,13 @@ const PLANS = [
     features: ["Everything in Starter", "AI chat assistant", "Competitor analysis", "Priority queue"],
     popular: true,
   },
+  {
+    name: "Agency",
+    price: "$79",
+    audits: "1,000 audits / month",
+    features: ["Everything in Pro", "200 AI chat messages", "Priority analysis queue", "Team-scale volume"],
+    popular: false,
+  },
 ];
 
 /* ── FAQ ── */
@@ -374,7 +381,7 @@ export function HomeSEOContent() {
         </ScrollReveal>
 
         <ScrollReveal>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {PLANS.map((plan) => (
             <div
               key={plan.name}

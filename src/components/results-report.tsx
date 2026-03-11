@@ -1039,13 +1039,13 @@ function SectionCard({ section, isExpanded, onClick }: { section: AuditSection; 
 
 /* ── Radar Chart (SVG) ── */
 function RadarChart({ categories }: { categories: UXAuditResult["categories"] }) {
-  const size = 240;
+  const size = 280;
   const cx = size / 2;
   const cy = size / 2;
-  const maxR = 68;
+  const maxR = 72;
   const cats = [
     { label: "Clarity", score: categories.messageClarity.score, color: "oklch(0.62 0.18 275)" },
-    { label: "Cog Load", score: categories.cognitiveLoad.score, color: "oklch(0.62 0.14 245)" },
+    { label: "Cog. Load", score: categories.cognitiveLoad.score, color: "oklch(0.62 0.14 245)" },
     { label: "Conversion", score: categories.conversionArch.score, color: "oklch(0.65 0.16 55)" },
     { label: "Trust", score: categories.trustSignals.score, color: "oklch(0.62 0.15 160)" },
     { label: "Contradictions", score: categories.contradictions.score, color: "oklch(0.62 0.16 15)" },

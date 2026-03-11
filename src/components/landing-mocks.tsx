@@ -245,10 +245,10 @@ export function MetricGridMock() {
    ════════════════════════════════════════════════════════════ */
 
 export function RadarChartMock() {
-  const size = 200;
+  const size = 260;
   const cx = size / 2;
   const cy = size / 2;
-  const maxR = 80;
+  const maxR = 72;
   const labels = ["Clarity", "Cog. Load", "Conv.", "Trust", "Contra.", "1st Screen"];
   const scores = [88, 72, 79, 70, 85, 76];
 
