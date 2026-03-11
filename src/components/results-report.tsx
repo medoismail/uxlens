@@ -150,7 +150,21 @@ function generateSparkData(score: number, index: number = 0): number[] {
   return pattern.map(m => Math.min(1, Math.max(0.08, s * m)));
 }
 
-/* ── Top findings extractor ── */
+/* ── Dedup helper: check if two finding titles are too similar ── */
+function titleWords(t: string): Set<string> {
+  return new Set(t.toLowerCase().replace(/[^a-z0-9\s]/g, "").split(/\s+/).filter(w => w.length > 2));
+}
+function isSimilar(a: string, b: string): boolean {
+  const wa = titleWords(a);
+  const wb = titleWords(b);
+  if (wa.size === 0 || wb.size === 0) return false;
+  let overlap = 0;
+  for (const w of wa) if (wb.has(w)) overlap++;
+  const similarity = overlap / Math.min(wa.size, wb.size);
+  return similarity >= 0.6;
+}
+
+/* ── Top findings extractor (deduped) ── */
 function getTopFindings(sections: AuditSection[], max: number = 4): Finding[] {
   const all: Finding[] = [];
   for (const sec of sections) {
@@ -169,7 +183,15 @@ function getTopFindings(sections: AuditSection[], max: number = 4): Finding[] {
     if (aSev !== bSev) return aSev - bSev;
     return (impOrder[a.impact] ?? 1) - (impOrder[b.impact] ?? 1);
   });
-  return all.slice(0, max);
+  // Deduplicate: skip findings whose title is too similar to an already-picked one
+  const picked: Finding[] = [];
+  for (const f of all) {
+    if (picked.length >= max) break;
+    if (!picked.some(p => isSimilar(p.title, f.title))) {
+      picked.push(f);
+    }
+  }
+  return picked;
 }
 
 /* ── Severity counter ── */

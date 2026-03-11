@@ -112,6 +112,7 @@ Assume the visitor is:
 - Do NOT make assumptions without justification
 - If evidence is limited, say so briefly and stay grounded
 - Prioritize meaningful findings over quantity
+- NEVER repeat the same issue across different sections. Each finding must be unique. If "lack of social proof" is flagged in the Trust section, do NOT flag it again in First Screen or Hero. Cross-reference your findings before finalizing to eliminate overlaps and duplicates.
 - Prefer precision over verbosity
 - Focus on user impact, not design taste
 - Judge the page by real-world UX and conversion standards, not by whether it simply "looks modern"
