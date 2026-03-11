@@ -3,13 +3,9 @@
 import { Check } from "lucide-react";
 import type { PlanTier } from "@/lib/types";
 
-/* Next.js inlines NEXT_PUBLIC_ vars at build time via static analysis.
-   Dynamic access like process.env[key] does NOT work — must be literal. */
-const CHECKOUT_URLS: Record<string, string> = {
-  starter: process.env.NEXT_PUBLIC_LS_CHECKOUT_STARTER || "",
-  pro: process.env.NEXT_PUBLIC_LS_CHECKOUT_PRO || "",
-  agency: process.env.NEXT_PUBLIC_LS_CHECKOUT_AGENCY || "",
-};
+/* Single Gumroad membership product with 3 tiers (Starter/Pro/Agency).
+   The tier is selected via ?tier= query param on the checkout URL. */
+const GUMROAD_PRODUCT_URL = process.env.NEXT_PUBLIC_GUMROAD_PRODUCT || "";
 
 const PLANS = [
   {
@@ -26,7 +22,6 @@ const PLANS = [
       "Strategic fixes & recommendations",
       "PDF export with heatmap",
     ],
-    checkoutKey: "starter",
     popular: false,
   },
   {
@@ -41,7 +36,6 @@ const PLANS = [
       "UXLens Skill (MCP for Claude Code)",
       "Full audit history dashboard",
     ],
-    checkoutKey: "pro",
     popular: true,
   },
   {
@@ -56,7 +50,6 @@ const PLANS = [
       "1,000 audits per month",
       "Team-scale usage",
     ],
-    checkoutKey: "agency",
     popular: false,
   },
 ];
@@ -67,19 +60,12 @@ interface PricingCardsProps {
 }
 
 export function PricingCards({ email, currentPlan }: PricingCardsProps) {
-  function handleSelect(checkoutKey: string) {
-    const baseUrl = CHECKOUT_URLS[checkoutKey];
-    if (!baseUrl) return;
-    const url = new URL(baseUrl);
-    if (email) url.searchParams.set("checkout[email]", email);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const win = window as any;
-    if (win.LemonSqueezy?.Url?.Open) {
-      win.LemonSqueezy.Url.Open(url.toString());
-    } else {
-      window.open(url.toString(), "_blank");
-    }
+  function handleSelect(tierName: string) {
+    if (!GUMROAD_PRODUCT_URL) return;
+    const url = new URL(GUMROAD_PRODUCT_URL);
+    url.searchParams.set("tier", tierName);
+    if (email) url.searchParams.set("email", email);
+    window.open(url.toString(), "_blank");
   }
 
   return (
@@ -143,7 +129,7 @@ export function PricingCards({ email, currentPlan }: PricingCardsProps) {
               </div>
             ) : (
               <button
-                onClick={() => handleSelect(plan.checkoutKey)}
+                onClick={() => handleSelect(plan.name)}
                 className={`w-full mt-5 rounded-lg py-2 text-[14px] font-medium transition-all duration-150 active:scale-[0.98] ${
                   isHigher
                     ? "bg-foreground text-background hover:opacity-90"

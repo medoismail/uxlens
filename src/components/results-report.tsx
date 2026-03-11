@@ -304,7 +304,7 @@ export function ResultsReport({
     <div className="w-full max-w-[860px] mx-auto py-8 px-5 sm:px-6 relative z-[1]">
       {/* ─── Report Header ─── */}
       <div className="text-center animate-fade-in mb-6">
-        <p className="text-[12px] font-mono uppercase tracking-[2px] text-foreground/50 mb-1.5">Diagnostic Engine v5 — UX Dashboard</p>
+        <p className="text-[12px] font-mono uppercase tracking-[2px] text-foreground/50 mb-1.5">Diagnostic Engine v0.6 — UX Dashboard</p>
         <h1 className="text-lg font-semibold tracking-tight text-foreground">{domain}</h1>
         {features.pdfExport && (
           <div className="mt-3">
@@ -1355,15 +1355,11 @@ function HumanAuditCTA({ url, onRequested }: { url: string; onRequested: (url: s
     e.preventDefault();
     setError("");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("Please enter a valid email"); return; }
-    const baseUrl = process.env.NEXT_PUBLIC_LS_CHECKOUT_HUMAN_AUDIT || "#";
+    const baseUrl = process.env.NEXT_PUBLIC_GUMROAD_HUMAN_AUDIT || "#";
     if (baseUrl !== "#") {
       const checkoutUrl = new URL(baseUrl);
-      checkoutUrl.searchParams.set("checkout[email]", email);
-      checkoutUrl.searchParams.set("checkout[custom][url]", url);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const win = window as any;
-      if (win.LemonSqueezy?.Url?.Open) { win.LemonSqueezy.Url.Open(checkoutUrl.toString()); }
-      else { window.open(checkoutUrl.toString(), "_blank"); }
+      checkoutUrl.searchParams.set("email", email);
+      window.open(checkoutUrl.toString(), "_blank");
     }
     onRequested(url, email.trim());
   }

@@ -404,6 +404,7 @@ function ApiKeysSection() {
 export function DashboardClient() {
   const [audits, setAudits] = useState<AuditItem[]>([]);
   const [total, setTotal] = useState(0);
+  const [auditsUsed, setAuditsUsed] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [planInfo, setPlanInfo] = useState<PlanInfo | null>(null);
@@ -422,6 +423,7 @@ export function DashboardClient() {
       const data = await res.json();
       setAudits(data.audits || []);
       setTotal(data.total || 0);
+      setAuditsUsed(data.auditsUsed ?? data.total ?? 0);
       if (data.plan) {
         setPlanInfo({
           plan: data.plan,
@@ -482,7 +484,7 @@ export function DashboardClient() {
         </div>
 
         {/* Plan info card */}
-        {planInfo && <PlanCard planInfo={planInfo} totalAudits={total} />}
+        {planInfo && <PlanCard planInfo={planInfo} totalAudits={auditsUsed} />}
 
         {/* API Keys (Pro/Agency only) */}
         {planInfo && (planInfo.plan === "pro" || planInfo.plan === "agency") && (

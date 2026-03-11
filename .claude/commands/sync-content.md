@@ -5,7 +5,7 @@ After any feature addition, upgrade, or version bump, run a full content sync ac
 ## Checklist — scan and update ALL of these files:
 
 ### Version & Engine References
-- `src/components/header.tsx` — version badge (e.g. "v5")
+- `src/components/header.tsx` — version badge (e.g. "v0.6")
 - `src/components/footer.tsx` — "Diagnostic Engine vX"
 - `src/components/results-report.tsx` — report header "Diagnostic Engine vX"
 - `src/lib/pdf/audit-pdf.tsx` — PDF subtitle "Diagnostic Engine vX"
@@ -42,7 +42,7 @@ After any feature addition, upgrade, or version bump, run a full content sync ac
 6. Commit with a clear message describing what was synced
 
 ## Current Product State (update this when things change):
-- **Engine Version:** v5
+- **Engine Version:** v0.6
 - **Layer Count:** 10
 - **Layers:** Structural Decomposition, Message Clarity, Cognitive Load, Conversion Architecture, Trust Signals, Contradiction Detection, First-Screen Hypothesis, Self-Critique, Synthesis & Rewrite, Heuristic Evaluation
 - **Key Features:** 10-layer diagnostic, Nielsen's heuristic evaluation, AI attention heatmap, visual design analysis, AI chat, competitor analysis, PDF export, per-section rewrites, UX strengths, professional findings (severity/category/fix)

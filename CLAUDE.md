@@ -4,7 +4,7 @@
 UXLens is an AI-powered UX audit SaaS platform. It analyzes landing pages using a 10-layer diagnostic engine with Nielsen's heuristic evaluation, AI attention heatmaps, visual design analysis, competitor benchmarking, and AI chat.
 
 **Live:** https://www.uxlens.pro
-**Engine Version:** v5
+**Engine Version:** v0.6
 **Diagnostic Layers:** 10
 
 ## Critical Rule: Content Sync on Feature Changes
@@ -39,7 +39,7 @@ After updating, always run these greps to catch stragglers:
 
 | Property | Value |
 |----------|-------|
-| Engine Version | v5 |
+| Engine Version | v0.6 |
 | Layer Count | 10 |
 | AI Model | GPT-4o |
 | Max Tokens | 16,384 |
@@ -77,7 +77,7 @@ After updating, always run these greps to catch stragglers:
 - OpenAI GPT-4o (chat + vision)
 - Supabase (PostgreSQL + Storage)
 - Upstash Redis (rate limiting)
-- Clerk (auth) + LemonSqueezy (payments)
+- Clerk (auth) + Gumroad (payments)
 - @react-pdf/renderer (Noto Sans for Unicode)
 - @modelcontextprotocol/sdk (MCP)
 

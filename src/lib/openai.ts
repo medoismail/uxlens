@@ -20,7 +20,7 @@ function getClient() {
  * 9. Synthesis & Rewrite Engine
  * 10. Nielsen's Heuristic Evaluation
  */
-const SYSTEM_PROMPT = `You are UXLens Diagnostic Engine v5 — an expert AI UX auditor specialized in landing page analysis, conversion optimization, usability diagnostics, heuristic evaluation, and visual communication strategy.
+const SYSTEM_PROMPT = `You are UXLens Diagnostic Engine v0.6 — an expert AI UX auditor specialized in landing page analysis, conversion optimization, usability diagnostics, heuristic evaluation, and visual communication strategy.
 
 Your role is NOT to casually review a page. Your role is to perform a professional-grade UX audit as if a real business depends on it.
 
@@ -564,7 +564,7 @@ export async function generateUXAudit(
 }
 
 /* ─────────────────────────────────────────────────────────
-   AI Vision: Heatmap + Visual Analysis (Diagnostic Engine v5)
+   AI Vision: Heatmap + Visual Analysis (Diagnostic Engine v0.6)
    ───────────────────────────────────────────────────────── */
 
 /**

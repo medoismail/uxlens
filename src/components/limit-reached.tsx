@@ -67,19 +67,11 @@ export function LimitReached({
       return;
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_LS_CHECKOUT_HUMAN_AUDIT || "#";
+    const baseUrl = process.env.NEXT_PUBLIC_GUMROAD_HUMAN_AUDIT || "#";
     if (baseUrl !== "#") {
       const checkoutUrl = new URL(baseUrl);
-      checkoutUrl.searchParams.set("checkout[email]", email);
-      checkoutUrl.searchParams.set("checkout[custom][url]", auditUrl.trim());
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const win = window as any;
-      if (win.LemonSqueezy?.Url?.Open) {
-        win.LemonSqueezy.Url.Open(checkoutUrl.toString());
-      } else {
-        window.open(checkoutUrl.toString(), "_blank");
-      }
+      checkoutUrl.searchParams.set("email", email);
+      window.open(checkoutUrl.toString(), "_blank");
     }
 
     onHumanAuditRequested(auditUrl.trim(), email.trim());

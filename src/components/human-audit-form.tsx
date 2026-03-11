@@ -29,20 +29,12 @@ export function HumanAuditForm({ onRequested }: HumanAuditFormProps) {
       return;
     }
 
-    // Open LemonSqueezy checkout
-    const baseUrl = process.env.NEXT_PUBLIC_LS_CHECKOUT_HUMAN_AUDIT || "#";
+    // Open Gumroad checkout
+    const baseUrl = process.env.NEXT_PUBLIC_GUMROAD_HUMAN_AUDIT || "#";
     if (baseUrl !== "#") {
       const checkoutUrl = new URL(baseUrl);
-      checkoutUrl.searchParams.set("checkout[email]", email);
-      checkoutUrl.searchParams.set("checkout[custom][url]", url.trim());
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const win = window as any;
-      if (win.LemonSqueezy?.Url?.Open) {
-        win.LemonSqueezy.Url.Open(checkoutUrl.toString());
-      } else {
-        window.open(checkoutUrl.toString(), "_blank");
-      }
+      checkoutUrl.searchParams.set("email", email);
+      window.open(checkoutUrl.toString(), "_blank");
     }
 
     // Trigger confirmation regardless (user completes payment externally)

@@ -59,7 +59,7 @@ export async function getUserPlan(clerkId: string): Promise<PlanTier> {
 }
 
 /**
- * Update a user's plan (called from LemonSqueezy webhook).
+ * Update a user's plan (called from Gumroad webhook).
  */
 export async function updateUserPlan(email: string, plan: PlanTier): Promise<void> {
   const sb = getSupabase();

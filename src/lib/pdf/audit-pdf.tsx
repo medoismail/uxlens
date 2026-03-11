@@ -148,7 +148,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
         <View style={styles.header}>
           <View>
             <Text style={styles.logo}>UXLens</Text>
-            <Text style={styles.subtitle}>Diagnostic Engine v5 — Full UX Report</Text>
+            <Text style={styles.subtitle}>Diagnostic Engine v0.6 — Full UX Report</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
             <Text style={{ fontSize: 10, fontFamily: font, fontWeight: 700 }}>{domain}</Text>

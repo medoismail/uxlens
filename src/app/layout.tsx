@@ -216,10 +216,6 @@ export default function RootLayout({
             </Script>
           </>
         )}
-        <Script
-          src="https://app.lemonsqueezy.com/js/lemon.js"
-          strategy="lazyOnload"
-        />
         <InstallBanner />
       </body>
     </html>

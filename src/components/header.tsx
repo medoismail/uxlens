@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Show, UserButton, SignInButton } from "@clerk/nextjs";
 import { useSubscription } from "@/hooks/use-subscription";
@@ -62,14 +61,6 @@ function Logo({ height = 26 }: { height?: number }) {
 }
 
 export function Header() {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   return (
     <>
@@ -102,7 +93,7 @@ export function Header() {
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-1.5 text-[12px] font-bold border rounded-full px-2.5 py-0.5 tracking-wider" style={{ color: "#16a34a", background: "#f0fdf4", borderColor: "#bbf7d0" }}>
               <span className="w-[5px] h-[5px] rounded-full" style={{ background: "#16a34a", animation: "blink-dot 1.8s ease-in-out infinite" }} />
-              v5
+              v0.6
             </div>
 
             <Show when="signed-out">
@@ -126,40 +117,6 @@ export function Header() {
           </div>
         </nav>
 
-        {/* Beta development banner — hides on scroll (grid-row + opacity for GPU-composited smoothness) */}
-        <div
-          className="grid overflow-hidden"
-          style={{
-            gridTemplateRows: scrolled ? "0fr" : "1fr",
-            transition: "grid-template-rows 500ms cubic-bezier(0.16, 1, 0.3, 1)",
-          }}
-        >
-          <div className="overflow-hidden min-h-0">
-            <div
-              className="w-full border-t text-center py-2.5 px-4"
-              style={{
-                borderColor: "rgba(0,0,0,0.04)",
-                background: "linear-gradient(90deg, var(--brand-dim), oklch(0.98 0.005 276), var(--brand-dim))",
-                opacity: scrolled ? 0 : 1,
-                transition: "opacity 400ms cubic-bezier(0.16, 1, 0.3, 1)",
-                willChange: "opacity",
-              }}
-            >
-              <p className="text-[12px] text-foreground/50 leading-relaxed max-w-[700px] mx-auto">
-                <span className="font-semibold" style={{ color: "var(--brand)" }}>Beta</span>
-                {" — "}This product is under active development. Plans are not active yet, but you can test it for free with the free plan limitations.
-                {" "}Need Pro access?{" "}
-                <a
-                  href="mailto:hi@medoismail.design"
-                  className="font-medium underline underline-offset-2 transition-colors hover:opacity-70"
-                  style={{ color: "var(--brand)" }}
-                >
-                  hi@medoismail.design
-                </a>
-              </p>
-            </div>
-          </div>
-        </div>
       </header>
     </>
   );

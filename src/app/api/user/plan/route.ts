@@ -6,7 +6,7 @@ import type { PlanTier } from "@/lib/types";
 
 /**
  * GET /api/user/plan
- * Returns the authenticated user's plan from Redis or LemonSqueezy.
+ * Returns the authenticated user's plan from Redis or Gumroad.
  * Falls back to "free" if no subscription found.
  */
 export async function GET() {
@@ -52,10 +52,10 @@ export async function GET() {
       return NextResponse.json({ plan: dbPlan });
     }
 
-    // If email found, check LemonSqueezy directly as final fallback
+    // If email found, check Gumroad directly as final fallback
     if (email) {
       try {
-        const { checkSubscriptionByEmail } = await import("@/lib/lemonsqueezy");
+        const { checkSubscriptionByEmail } = await import("@/lib/gumroad");
         const status = await checkSubscriptionByEmail(email);
         if (status.isActive) {
           // Cache in Redis for both email and Clerk userId
@@ -68,7 +68,7 @@ export async function GET() {
           return NextResponse.json({ plan: status.plan });
         }
       } catch {
-        // LemonSqueezy check failed, fall through to free
+        // Gumroad check failed, fall through to free
       }
     }
 

@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { checkSubscriptionByEmail } from "@/lib/lemonsqueezy";
+import { checkSubscriptionByEmail } from "@/lib/gumroad";
 import { getRedis } from "@/lib/server-usage";
 
 const requestSchema = z.object({
   email: z.string().email("Invalid email address"),
 });
 
-/** Verify subscription status by email via LemonSqueezy API */
+/** Verify subscription status by email via Gumroad API */
 export async function POST(request: Request) {
   try {
     // Rate limit: 5 requests per IP per minute

@@ -29,7 +29,7 @@ function getClientIP(request: Request): string {
 
 /**
  * Resolve the user's plan server-side.
- * Checks Clerk userId first (if auth'd), then email, then LemonSqueezy API.
+ * Checks Clerk userId first (if auth'd), then email, then Gumroad API.
  * Falls back to "free" if no identity or not subscribed.
  */
 async function resolveplan(email: string | undefined, clerkUserId?: string): Promise<PlanTier> {
@@ -76,10 +76,10 @@ async function resolveplan(email: string | undefined, clerkUserId?: string): Pro
     }
   }
 
-  // 4. Verify with LemonSqueezy (only if we have email)
+  // 4. Verify with Gumroad (only if we have email)
   if (email) {
     try {
-      const { checkSubscriptionByEmail } = await import("./lemonsqueezy");
+      const { checkSubscriptionByEmail } = await import("./gumroad");
       const status = await checkSubscriptionByEmail(email);
 
       if (r) {

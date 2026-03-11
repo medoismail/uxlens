@@ -26,17 +26,9 @@ export function PricingClient({
   const auditsRemaining = Math.max(0, monthlyLimit - auditsUsed);
 
   function handleHumanAudit() {
-    const baseUrl = process.env.NEXT_PUBLIC_LS_CHECKOUT_HUMAN_AUDIT || "#";
+    const baseUrl = process.env.NEXT_PUBLIC_GUMROAD_HUMAN_AUDIT || "#";
     if (baseUrl === "#") return;
-    const url = new URL(baseUrl);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const win = window as any;
-    if (win.LemonSqueezy?.Url?.Open) {
-      win.LemonSqueezy.Url.Open(url.toString());
-    } else {
-      window.open(url.toString(), "_blank");
-    }
+    window.open(baseUrl, "_blank");
   }
 
   return (

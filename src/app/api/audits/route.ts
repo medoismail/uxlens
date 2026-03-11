@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { getUserByClerkId, upsertUser } from "@/lib/db/users";
 import { getAuditsByUser, deleteAudit } from "@/lib/db/audits";
+import { getUserUsage } from "@/lib/server-usage";
 import { PLAN_LIMITS, PLAN_FEATURES } from "@/lib/types";
 import type { PlanTier } from "@/lib/types";
 
@@ -35,6 +36,9 @@ export async function GET(request: Request) {
     const plan = (dbUser.plan || "free") as PlanTier;
     const features = PLAN_FEATURES[plan];
 
+    // Get actual usage from Redis (persists even after audit deletion)
+    const { auditsUsed } = await getUserUsage(userId, plan);
+
     return NextResponse.json({
       audits: audits.map((a) => ({
         id: a.id,
@@ -45,6 +49,7 @@ export async function GET(request: Request) {
         createdAt: a.created_at,
       })),
       total,
+      auditsUsed,
       page,
       plan,
       planLimit: PLAN_LIMITS[plan],
