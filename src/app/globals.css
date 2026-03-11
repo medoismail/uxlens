@@ -158,6 +158,20 @@
   * {
     @apply border-border outline-ring/50;
   }
+  button, [role="button"], a {
+    cursor: pointer;
+  }
+  /* Keep default arrow cursor on text — users can still select/copy */
+  h1, h2, h3, h4, h5, h6, p, span, li, label, div {
+    cursor: default;
+  }
+  /* Restore pointer for interactive elements inside text containers */
+  a, button, [role="button"], input, textarea, select, [tabindex] {
+    cursor: pointer;
+  }
+  input, textarea, select {
+    cursor: text;
+  }
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-inter-tight), ui-sans-serif, system-ui, -apple-system, sans-serif;
