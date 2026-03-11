@@ -50,31 +50,35 @@ function auditHasRTL(data: UXAuditResult): boolean {
 const BRAND = "#4C2CFF";
 const BRAND_LIGHT = "#EDEAFF";
 
-/** Build styles with the correct font family for the detected script */
-function buildStyles(font: string) {
+/** Build styles with the correct font family and direction for the detected script */
+function buildStyles(font: string, rtl: boolean = false) {
+  const align = rtl ? ("right" as const) : ("left" as const);
+  const flexDir = rtl ? ("row-reverse" as const) : ("row" as const);
+  const borderSide = rtl ? "borderRight" : "borderLeft";
+
   return StyleSheet.create({
     page: { padding: 40, paddingBottom: 60, fontSize: 10, fontFamily: font, color: "#1a1a2e" },
-    header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 30, borderBottom: "2px solid " + BRAND, paddingBottom: 15 },
+    header: { flexDirection: flexDir, justifyContent: "space-between", alignItems: "center", marginBottom: 30, borderBottom: "2px solid " + BRAND, paddingBottom: 15 },
     logo: { fontSize: 20, fontFamily: font, fontWeight: 700, color: BRAND },
-    subtitle: { fontSize: 9, color: "#888" },
+    subtitle: { fontSize: 9, color: "#888", textAlign: align },
     scoreBox: { alignItems: "center", padding: 20, backgroundColor: BRAND_LIGHT, borderRadius: 8, marginBottom: 20 },
     bigScore: { fontSize: 48, fontFamily: font, fontWeight: 700, color: BRAND },
     grade: { fontSize: 14, fontFamily: font, fontWeight: 700, color: BRAND, marginTop: 4 },
-    sectionTitle: { fontSize: 14, fontFamily: font, fontWeight: 700, color: BRAND, marginTop: 20, marginBottom: 8 },
-    sectionSubtitle: { fontSize: 11, fontFamily: font, fontWeight: 700, color: "#1a1a2e", marginTop: 14, marginBottom: 6 },
-    text: { fontSize: 10, lineHeight: 1.5, color: "#333", marginBottom: 4 },
-    bulletItem: { flexDirection: "row", marginBottom: 4, paddingLeft: 8 },
-    bullet: { width: 12, fontSize: 10, color: BRAND },
-    bulletText: { flex: 1, fontSize: 10, lineHeight: 1.5, color: "#333" },
-    categoryRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 6, borderBottom: "1px solid #eee" },
-    categoryLabel: { fontSize: 10, color: "#555" },
+    sectionTitle: { fontSize: 14, fontFamily: font, fontWeight: 700, color: BRAND, marginTop: 20, marginBottom: 8, textAlign: align },
+    sectionSubtitle: { fontSize: 11, fontFamily: font, fontWeight: 700, color: "#1a1a2e", marginTop: 14, marginBottom: 6, textAlign: align },
+    text: { fontSize: 10, lineHeight: 1.5, color: "#333", marginBottom: 4, textAlign: align },
+    bulletItem: { flexDirection: flexDir, marginBottom: 4, ...(rtl ? { paddingRight: 8 } : { paddingLeft: 8 }) },
+    bullet: { width: 12, fontSize: 10, color: BRAND, textAlign: align },
+    bulletText: { flex: 1, fontSize: 10, lineHeight: 1.5, color: "#333", textAlign: align },
+    categoryRow: { flexDirection: flexDir, justifyContent: "space-between", alignItems: "center", paddingVertical: 6, borderBottom: "1px solid #eee" },
+    categoryLabel: { fontSize: 10, color: "#555", textAlign: align },
     categoryScore: { fontSize: 10, fontFamily: font, fontWeight: 700 },
-    findingBox: { marginBottom: 6, padding: 8, backgroundColor: "#f9f9fb", borderRadius: 4, borderLeft: "3px solid " + BRAND },
-    findingTitle: { fontSize: 10, fontFamily: font, fontWeight: 700, color: "#1a1a2e" },
-    findingDesc: { fontSize: 9, color: "#555", marginTop: 2, lineHeight: 1.4 },
+    findingBox: { marginBottom: 6, padding: 8, backgroundColor: "#f9f9fb", borderRadius: 4, [borderSide]: "3px solid " + BRAND },
+    findingTitle: { fontSize: 10, fontFamily: font, fontWeight: 700, color: "#1a1a2e", textAlign: align },
+    findingDesc: { fontSize: 9, color: "#555", marginTop: 2, lineHeight: 1.4, textAlign: align },
     rewriteBox: { padding: 10, backgroundColor: BRAND_LIGHT, borderRadius: 6, marginTop: 6 },
-    rewriteLabel: { fontSize: 8, fontFamily: font, fontWeight: 700, color: BRAND, marginBottom: 3 },
-    rewriteText: { fontSize: 10, color: "#333", lineHeight: 1.4 },
+    rewriteLabel: { fontSize: 8, fontFamily: font, fontWeight: 700, color: BRAND, marginBottom: 3, textAlign: align },
+    rewriteText: { fontSize: 10, color: "#333", lineHeight: 1.4, textAlign: align },
     footer: { position: "absolute", bottom: 25, left: 40, right: 40, flexDirection: "row", justifyContent: "space-between", fontSize: 8, color: "#aaa" },
     divider: { borderBottom: "1px solid #eee", marginVertical: 12 },
   });
@@ -120,10 +124,10 @@ interface AuditPDFProps {
 }
 
 export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAnalysis }: AuditPDFProps) {
-  // Auto-detect script — use Arabic font when RTL content is detected
+  // Auto-detect script — use Arabic font + RTL layout when RTL content is detected
   const isRTL = auditHasRTL(data);
   const font = isRTL ? "NotoSansArabic" : "NotoSans";
-  const styles = buildStyles(font);
+  const styles = buildStyles(font, isRTL);
 
   let domain = url;
   try { domain = new URL(url).hostname.replace("www.", ""); } catch {}
@@ -306,7 +310,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
             </Text>
             {section.findings.slice(0, 3).map((finding, fi) => (
               <View key={fi} style={styles.findingBox}>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 2 }}>
+                <View style={{ flexDirection: isRTL ? "row-reverse" : "row", alignItems: "center", gap: 6, marginBottom: 2 }}>
                   <Text style={styles.findingTitle}>
                     {finding.type === "issue" ? "⚠" : finding.type === "positive" ? "✓" : "!"} {finding.title}
                   </Text>
@@ -318,7 +322,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
                 </View>
                 <Text style={styles.findingDesc}>{finding.desc}</Text>
                 {finding.recommendedFix && (
-                  <Text style={{ fontSize: 8, color: "#22c55e", marginTop: 3, lineHeight: 1.4 }}>
+                  <Text style={{ fontSize: 8, color: "#22c55e", marginTop: 3, lineHeight: 1.4, textAlign: isRTL ? "right" : "left" }}>
                     Fix: {finding.recommendedFix}
                   </Text>
                 )}
@@ -340,13 +344,13 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
               <View style={{ marginTop: 4, marginBottom: 8 }}>
                 <Text style={[styles.rewriteLabel, { fontSize: 9, marginBottom: 4 }]}>AI REWRITE</Text>
                 {section.rewrite.items.slice(0, 3).map((item, ii) => (
-                  <View key={ii} style={{ flexDirection: "row", gap: 8, marginBottom: 6 }}>
+                  <View key={ii} style={{ flexDirection: isRTL ? "row-reverse" : "row", gap: 8, marginBottom: 6 }}>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 8, fontFamily: font, fontWeight: 700, color: "#888", marginBottom: 2 }}>{item.label} — BEFORE</Text>
+                      <Text style={{ fontSize: 8, fontFamily: font, fontWeight: 700, color: "#888", marginBottom: 2, textAlign: isRTL ? "right" : "left" }}>{item.label} — BEFORE</Text>
                       <Text style={[styles.text, { fontSize: 9, color: "#999" }]}>{item.before}</Text>
                     </View>
                     <View style={[{ flex: 1 }, styles.rewriteBox]}>
-                      <Text style={{ fontSize: 8, fontFamily: font, fontWeight: 700, color: BRAND, marginBottom: 2 }}>{item.label} — AFTER</Text>
+                      <Text style={{ fontSize: 8, fontFamily: font, fontWeight: 700, color: BRAND, marginBottom: 2, textAlign: isRTL ? "right" : "left" }}>{item.label} — AFTER</Text>
                       <Text style={[styles.rewriteText, { fontSize: 9 }]}>{item.after}</Text>
                     </View>
                   </View>
@@ -358,7 +362,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
                 <Text style={[styles.rewriteLabel, { fontSize: 9, marginBottom: 4 }]}>STRUCTURE REWRITE</Text>
                 {section.rewrite.suggestedOrder?.length > 0 && (
                   <View style={{ marginBottom: 4 }}>
-                    <Text style={{ fontSize: 8, fontFamily: font, fontWeight: 700, color: "#555", marginBottom: 2 }}>Suggested Order</Text>
+                    <Text style={{ fontSize: 8, fontFamily: font, fontWeight: 700, color: "#555", marginBottom: 2, textAlign: isRTL ? "right" : "left" }}>Suggested Order</Text>
                     {section.rewrite.suggestedOrder.map((s, si) => (
                       <View key={si} style={styles.bulletItem}>
                         <Text style={[styles.bullet, { color: BRAND }]}>{si + 1}.</Text>
@@ -369,7 +373,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
                 )}
                 {section.rewrite.additions?.length > 0 && (
                   <View style={{ marginBottom: 4 }}>
-                    <Text style={{ fontSize: 8, fontFamily: font, fontWeight: 700, color: "#22c55e", marginBottom: 2 }}>Add</Text>
+                    <Text style={{ fontSize: 8, fontFamily: font, fontWeight: 700, color: "#22c55e", marginBottom: 2, textAlign: isRTL ? "right" : "left" }}>Add</Text>
                     {section.rewrite.additions.map((a, ai) => (
                       <View key={ai} style={styles.bulletItem}>
                         <Text style={[styles.bullet, { color: "#22c55e" }]}>+</Text>
@@ -380,7 +384,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
                 )}
                 {section.rewrite.removals?.length > 0 && (
                   <View style={{ marginBottom: 4 }}>
-                    <Text style={{ fontSize: 8, fontFamily: font, fontWeight: 700, color: "#ef4444", marginBottom: 2 }}>Remove / Reword</Text>
+                    <Text style={{ fontSize: 8, fontFamily: font, fontWeight: 700, color: "#ef4444", marginBottom: 2, textAlign: isRTL ? "right" : "left" }}>Remove / Reword</Text>
                     {section.rewrite.removals.map((r, ri) => (
                       <View key={ri} style={styles.bulletItem}>
                         <Text style={[styles.bullet, { color: "#ef4444" }]}>−</Text>
@@ -398,7 +402,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
 
         {/* Before/After Rewrite */}
         <Text style={styles.sectionTitle}>Hero Rewrite</Text>
-        <View style={{ flexDirection: "row", gap: 8 }}>
+        <View style={{ flexDirection: isRTL ? "row-reverse" : "row", gap: 8 }}>
           <View style={{ flex: 1 }}>
             <Text style={styles.rewriteLabel}>BEFORE</Text>
             <Text style={styles.text}>{data.rewrite.beforeHeadline}</Text>
@@ -430,9 +434,9 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
           </Text>
 
           {data.heuristicEvaluation.heuristics.map((h, hi) => (
-            <View key={hi} wrap={false} minPresenceAhead={40} style={{ marginBottom: 10, padding: 8, backgroundColor: "#f9f9fb", borderRadius: 4, borderLeft: `3px solid ${heuristicColorStr(h.score)}` }}>
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                <Text style={{ fontSize: 10, fontFamily: font, fontWeight: 700, color: "#1a1a2e", flex: 1 }}>{h.name}</Text>
+            <View key={hi} wrap={false} minPresenceAhead={40} style={{ marginBottom: 10, padding: 8, backgroundColor: "#f9f9fb", borderRadius: 4, [isRTL ? "borderRight" : "borderLeft"]: `3px solid ${heuristicColorStr(h.score)}` }}>
+              <View style={{ flexDirection: isRTL ? "row-reverse" : "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                <Text style={{ fontSize: 10, fontFamily: font, fontWeight: 700, color: "#1a1a2e", flex: 1, textAlign: isRTL ? "right" : "left" }}>{h.name}</Text>
                 <Text style={{ fontSize: 11, fontFamily: font, fontWeight: 700, color: heuristicColorStr(h.score) }}>{h.score}/10</Text>
               </View>
               {/* Progress bar */}
@@ -440,10 +444,10 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
                 <View style={{ height: 3, backgroundColor: heuristicColorStr(h.score), borderRadius: 2, width: `${(h.score / 10) * 100}%` }} />
               </View>
               {h.issues.length > 0 && h.issues.slice(0, 2).map((issue, ii) => (
-                <Text key={ii} style={{ fontSize: 8, color: "#ef4444", lineHeight: 1.4, marginLeft: 4 }}>✕ {issue}</Text>
+                <Text key={ii} style={{ fontSize: 8, color: "#ef4444", lineHeight: 1.4, textAlign: isRTL ? "right" : "left", ...(isRTL ? { marginRight: 4 } : { marginLeft: 4 }) }}>✕ {issue}</Text>
               ))}
               {h.passes.length > 0 && h.passes.slice(0, 1).map((pass, pi) => (
-                <Text key={pi} style={{ fontSize: 8, color: "#22c55e", lineHeight: 1.4, marginLeft: 4 }}>✓ {pass}</Text>
+                <Text key={pi} style={{ fontSize: 8, color: "#22c55e", lineHeight: 1.4, textAlign: isRTL ? "right" : "left", ...(isRTL ? { marginRight: 4 } : { marginLeft: 4 }) }}>✓ {pass}</Text>
               ))}
             </View>
           ))}
@@ -493,7 +497,7 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
           {competitorAnalysis.categoryComparisons.map((cat, i) => (
             <View key={i} style={{ marginBottom: 8 }}>
               <Text style={styles.sectionSubtitle}>{cat.category}</Text>
-              <View style={{ flexDirection: "row", gap: 12, marginBottom: 2 }}>
+              <View style={{ flexDirection: isRTL ? "row-reverse" : "row", gap: 12, marginBottom: 2 }}>
                 <Text style={[styles.text, { flex: 1 }]}>You: {cat.userScore}</Text>
                 <Text style={[styles.text, { flex: 1 }]}>{competitorAnalysis.competitors[0]?.name || "Comp 1"}: {cat.competitor1Score}</Text>
                 {competitorAnalysis.competitors.length > 1 && (
