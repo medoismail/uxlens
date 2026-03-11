@@ -33,17 +33,26 @@ export function UrlForm({ onSubmit, isLoading }: UrlFormProps) {
           <div className="w-[10px] h-[10px] rounded-full" style={{ background: "#ff5f57" }} />
           <div className="w-[10px] h-[10px] rounded-full" style={{ background: "#ffbd2e" }} />
           <div className="w-[10px] h-[10px] rounded-full" style={{ background: "#28c840" }} />
-          <input
-            type="text"
-            placeholder="https://your-landing-page.com"
-            value={url}
-            onChange={(e) => {
-              setUrl(e.target.value);
-              if (error) setError("");
-            }}
-            disabled={isLoading}
-            className="flex-1 bg-transparent text-[12px] font-mono text-foreground/40 placeholder:text-foreground/20 focus:outline-none disabled:opacity-50 ml-2"
-          />
+          <div className="flex-1 relative ml-2">
+            {/* Fake blinking caret when input is empty and not focused */}
+            {!url && (
+              <span
+                className="absolute left-0 top-1/2 -translate-y-1/2 w-[1.5px] h-[14px] rounded-full pointer-events-none"
+                style={{ background: "var(--foreground)", opacity: 0.35, animation: "caretBlink 1s step-end infinite" }}
+              />
+            )}
+            <input
+              type="text"
+              placeholder="https://your-landing-page.com"
+              value={url}
+              onChange={(e) => {
+                setUrl(e.target.value);
+                if (error) setError("");
+              }}
+              disabled={isLoading}
+              className="w-full bg-transparent text-[12px] font-mono text-foreground/40 placeholder:text-foreground/20 focus:outline-none disabled:opacity-50"
+            />
+          </div>
         </div>
 
         {/* Action bar */}

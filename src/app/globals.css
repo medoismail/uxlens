@@ -360,12 +360,16 @@
   animation-delay: 200ms;
 }
 
-/* Focus glow for inputs — subtle purple accent */
+/* Focus glow for inputs — ultra-soft blur that blends with bg */
 .focus-glow:focus-within {
-  border-color: oklch(0.495 0.172 295 / 40%) !important;
-  box-shadow:
-    0 0 0 3px oklch(0.495 0.172 295 / 7%),
-    0 1px 2px oklch(0 0 0 / 5%);
+  border-color: oklch(0.495 0.172 295 / 25%) !important;
+  box-shadow: 0 0 600px 40px oklch(0.495 0.172 295 / 8%);
+}
+
+/* Blinking caret for idle input */
+@keyframes caretBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 /* Soft elevation system */
