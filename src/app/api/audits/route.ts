@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { getUserByClerkId, upsertUser } from "@/lib/db/users";
-import { getAuditsByUser } from "@/lib/db/audits";
+import { getAuditsByUser, deleteAudit } from "@/lib/db/audits";
 import { PLAN_LIMITS, PLAN_FEATURES } from "@/lib/types";
 import type { PlanTier } from "@/lib/types";
 
@@ -57,5 +57,40 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error("Error fetching audits:", error);
     return NextResponse.json({ error: "Failed to fetch audits" }, { status: 500 });
+  }
+}
+
+/**
+ * DELETE /api/audits
+ * Permanently deletes an audit owned by the authenticated user.
+ */
+export async function DELETE(request: Request) {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const dbUser = await getUserByClerkId(userId);
+    if (!dbUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const body = await request.json();
+    const { auditId } = body;
+
+    if (!auditId || typeof auditId !== "string") {
+      return NextResponse.json({ error: "Missing auditId" }, { status: 400 });
+    }
+
+    const ok = await deleteAudit(auditId, dbUser.id);
+    if (!ok) {
+      return NextResponse.json({ error: "Failed to delete audit" }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting audit:", error);
+    return NextResponse.json({ error: "Failed to delete audit" }, { status: 500 });
   }
 }

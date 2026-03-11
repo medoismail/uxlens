@@ -99,6 +99,30 @@ export async function getAuditById(
 }
 
 /**
+ * Delete an audit by ID. Verifies ownership via user_id.
+ */
+export async function deleteAudit(
+  auditId: string,
+  userId: string
+): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+
+  const { error } = await sb
+    .from("audits")
+    .delete()
+    .eq("id", auditId)
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("deleteAudit error:", error);
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * Update competitor analysis for an existing audit.
  * Uses clerk_id to resolve the user, then verifies audit ownership.
  */

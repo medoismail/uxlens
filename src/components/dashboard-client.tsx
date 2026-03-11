@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import { FileText, ExternalLink, ChevronLeft, ChevronRight, BarChart3, Crown, ArrowUpRight, Key, Copy, Check, Trash2, Terminal } from "lucide-react";
+import { FileText, ExternalLink, ChevronLeft, ChevronRight, BarChart3, Crown, ArrowUpRight, Key, Copy, Check, Trash2, Terminal, X, AlertTriangle } from "lucide-react";
 import type { PlanTier } from "@/lib/types";
 
 interface ApiKeyItem {
@@ -355,6 +355,8 @@ export function DashboardClient() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [planInfo, setPlanInfo] = useState<PlanInfo | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AuditItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const perPage = 12;
 
   useEffect(() => {
@@ -379,6 +381,27 @@ export function DashboardClient() {
       setAudits([]);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleDeleteAudit(auditId: string) {
+    setDeleting(true);
+    try {
+      const res = await fetch("/api/audits", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ auditId }),
+      });
+      if (res.ok) {
+        setDeleteTarget(null);
+        fetchAudits(page);
+      } else {
+        alert("Failed to delete audit");
+      }
+    } catch {
+      alert("Failed to delete audit");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -463,58 +486,69 @@ export function DashboardClient() {
                 });
 
                 return (
-                  <Link
+                  <div
                     key={audit.id}
-                    href={`/audit/${audit.id}`}
-                    className="group rounded-xl border p-4 transition-all duration-200 hover:shadow-elevation-1 hover:border-foreground/15"
+                    className="group relative rounded-xl border p-4 transition-all duration-200 hover:shadow-elevation-1 hover:border-foreground/15"
                     style={{ borderColor: "var(--border)", background: "var(--s1)" }}
                   >
-                    {/* Thumbnail */}
-                    {audit.screenshotPath && (
-                      <div className="relative rounded-lg overflow-hidden mb-3 border h-28" style={{ borderColor: "var(--border)" }}>
-                        <Image
-                          src={audit.screenshotPath}
-                          alt={`Screenshot of ${domain}`}
-                          fill
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          className="object-cover object-top"
-                          unoptimized
-                        />
-                      </div>
-                    )}
+                    {/* Delete button (top-right, visible on hover) */}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setDeleteTarget(audit); }}
+                      className="absolute top-3 right-3 z-10 p-1.5 rounded-lg border opacity-0 group-hover:opacity-100 transition-all duration-150 hover:border-red-200 hover:bg-red-50"
+                      style={{ borderColor: "var(--border)", background: "var(--s1)" }}
+                      title="Delete audit"
+                    >
+                      <Trash2 className="h-3.5 w-3.5 text-foreground/30 hover:text-red-500 transition-colors" />
+                    </button>
 
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[13px] font-medium text-foreground truncate group-hover:text-foreground/80 transition-colors">
-                          {domain}
-                        </p>
-                        <p className="text-[12px] text-foreground/30 mt-0.5">{date}</p>
+                    <Link href={`/audit/${audit.id}`} className="block">
+                      {/* Thumbnail */}
+                      {audit.screenshotPath && (
+                        <div className="relative rounded-lg overflow-hidden mb-3 border h-28" style={{ borderColor: "var(--border)" }}>
+                          <Image
+                            src={audit.screenshotPath}
+                            alt={`Screenshot of ${domain}`}
+                            fill
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            className="object-cover object-top"
+                            unoptimized
+                          />
+                        </div>
+                      )}
+
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[13px] font-medium text-foreground truncate group-hover:text-foreground/80 transition-colors">
+                            {domain}
+                          </p>
+                          <p className="text-[12px] text-foreground/30 mt-0.5">{date}</p>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span
+                            className="text-[18px] font-bold tabular-nums"
+                            style={{ color: scoreColor(audit.score) }}
+                          >
+                            {audit.score}
+                          </span>
+                          <span
+                            className="text-[12px] font-mono px-1.5 py-0.5 rounded"
+                            style={{
+                              background: `${scoreColor(audit.score)}15`,
+                              color: scoreColor(audit.score),
+                            }}
+                          >
+                            {audit.grade}
+                          </span>
+                        </div>
                       </div>
 
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <span
-                          className="text-[18px] font-bold tabular-nums"
-                          style={{ color: scoreColor(audit.score) }}
-                        >
-                          {audit.score}
-                        </span>
-                        <span
-                          className="text-[12px] font-mono px-1.5 py-0.5 rounded"
-                          style={{
-                            background: `${scoreColor(audit.score)}15`,
-                            color: scoreColor(audit.score),
-                          }}
-                        >
-                          {audit.grade}
-                        </span>
+                      <div className="flex items-center gap-1 mt-3 text-[12px] text-foreground/25 group-hover:text-foreground/40 transition-colors">
+                        <ExternalLink className="h-3 w-3" />
+                        <span>View full report</span>
                       </div>
-                    </div>
-
-                    <div className="flex items-center gap-1 mt-3 text-[12px] text-foreground/25 group-hover:text-foreground/40 transition-colors">
-                      <ExternalLink className="h-3 w-3" />
-                      <span>View full report</span>
-                    </div>
-                  </Link>
+                    </Link>
+                  </div>
                 );
               })}
             </div>
@@ -547,6 +581,121 @@ export function DashboardClient() {
         )}
       </main>
       <Footer />
+
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <DeleteConfirmModal
+          audit={deleteTarget}
+          deleting={deleting}
+          onConfirm={() => handleDeleteAudit(deleteTarget.id)}
+          onCancel={() => { if (!deleting) setDeleteTarget(null); }}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ── Delete Confirmation Modal ── */
+
+function DeleteConfirmModal({
+  audit,
+  deleting,
+  onConfirm,
+  onCancel,
+}: {
+  audit: AuditItem;
+  deleting: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  const [input, setInput] = useState("");
+
+  let domain = audit.url;
+  try { domain = new URL(audit.url).hostname.replace("www.", ""); } catch {}
+
+  const confirmText = `delete ${domain}`;
+  const isMatch = input.trim().toLowerCase() === confirmText.toLowerCase();
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onCancel}>
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+
+      {/* Modal */}
+      <div
+        className="relative w-full max-w-md rounded-xl border p-6 shadow-lg animate-fade-in"
+        style={{ background: "var(--s1)", borderColor: "var(--border)" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onCancel}
+          disabled={deleting}
+          className="absolute top-4 right-4 text-foreground/30 hover:text-foreground/50 transition-colors disabled:opacity-30"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-9 h-9 rounded-lg grid place-items-center" style={{ background: "oklch(0.55 0.17 20 / 8%)" }}>
+            <AlertTriangle className="h-4 w-4" style={{ color: "var(--score-low)" }} />
+          </div>
+          <h3 className="text-[15px] font-semibold">Delete Audit</h3>
+        </div>
+
+        {/* Warning text */}
+        <p className="text-[13px] text-foreground/50 leading-relaxed mb-4">
+          This will permanently delete the audit for{" "}
+          <span className="font-semibold text-foreground/70">{domain}</span>.
+          This action cannot be undone.
+        </p>
+
+        {/* Confirmation prompt */}
+        <p className="text-[12px] text-foreground/40 mb-2.5">
+          Type{" "}
+          <code className="font-mono text-[12px] px-2 py-0.5 rounded" style={{ background: "var(--s2)", color: "var(--foreground)" }}>
+            {confirmText}
+          </code>{" "}
+          to confirm:
+        </p>
+
+        {/* Input */}
+        <div
+          className="rounded-lg border transition-all duration-200 mb-5"
+          style={{ borderColor: isMatch ? "var(--score-low)" : "var(--border)", background: "white" }}
+        >
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder={confirmText}
+            disabled={deleting}
+            autoFocus
+            className="h-10 w-full rounded-lg bg-transparent px-4 text-[13px] text-foreground placeholder:text-foreground/20 focus:outline-none font-mono disabled:opacity-50"
+          />
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center justify-end gap-2.5">
+          <button
+            onClick={onCancel}
+            disabled={deleting}
+            className="px-4 py-2 text-[13px] font-medium rounded-lg border transition-all duration-150 hover:border-foreground/20 disabled:opacity-30"
+            style={{ borderColor: "var(--border)", background: "var(--s1)" }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={!isMatch || deleting}
+            className="px-4 py-2 text-[13px] font-bold rounded-lg transition-all duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none"
+            style={{ background: isMatch ? "var(--score-low)" : "var(--s3)", color: isMatch ? "white" : "var(--foreground)" }}
+          >
+            {deleting ? "Deleting..." : "Delete Audit"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
