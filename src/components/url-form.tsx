@@ -28,9 +28,9 @@ export function UrlForm({ onSubmit, isLoading }: UrlFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <div className="focus-glow relative overflow-hidden rounded-[14px] border transition-all duration-300" style={{ background: "var(--s1)", borderColor: "rgba(0,0,0,0.06)" }}>
+      <div className="focus-glow relative overflow-hidden rounded-[14px] border transition-all duration-300" style={{ background: "var(--s1)", borderColor: "rgba(0,0,0,0.03)" }}>
         {/* Browser dots */}
-        <div className="flex items-center gap-2.5 px-5 py-3.5 border-b" style={{ borderColor: "rgba(0,0,0,0.05)" }}>
+        <div className="flex items-center gap-2.5 px-5 py-3.5 border-b" style={{ borderColor: "rgba(0,0,0,0.03)" }}>
           <div className="w-[10px] h-[10px] rounded-full" style={{ background: "#ff5f57" }} />
           <div className="w-[10px] h-[10px] rounded-full" style={{ background: "#ffbd2e" }} />
           <div className="w-[10px] h-[10px] rounded-full" style={{ background: "#28c840" }} />
