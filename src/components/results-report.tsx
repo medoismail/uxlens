@@ -347,7 +347,7 @@ export function ResultsReport({
         <DashSection icon={<Flame className="h-4 w-4" style={{ color: "var(--score-low)" }} />} title="Conversion Killers" subtitle="Sorted by weakness — lowest scores first">
           <div className="flex flex-col gap-3">
             {sortedCategories.map((cat) => (
-              <BarChartRow key={cat.key} label={cat.label} score={cat.data.score} color={scoreColor(cat.data.score)} note={cat.data.note} />
+              <BarChartRow key={cat.key} label={cat.label} score={cat.data.score} color={cat.color} note={cat.data.note} />
             ))}
           </div>
         </DashSection>
@@ -490,7 +490,7 @@ export function ResultsReport({
                     ].map(dim => (
                       <div key={dim.label} className="flex items-center gap-2 text-[11px]">
                         <span className="w-16 text-foreground/40 shrink-0">{dim.label}</span>
-                        <div className="flex-1 h-[4px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
+                        <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
                           <div className="h-full rounded-full animate-bar-width" style={{ background: scoreColor(dim.score), width: `${dim.score}%`, "--bar-width": `${dim.score}%` } as React.CSSProperties} />
                         </div>
                         <span className="w-7 text-right font-mono font-bold" style={{ color: scoreColor(dim.score) }}>{dim.score}</span>
@@ -524,7 +524,7 @@ export function ResultsReport({
               {[...data.trustMatrix].sort((a, b) => a.score - b.score).map((item) => (
                 <div key={item.label} className="flex items-center gap-3">
                   <span className="text-[11px] text-foreground/45 w-[130px] sm:w-[155px] shrink-0 truncate">{item.label}</span>
-                  <div className="flex-1 h-[8px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
+                  <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
                     <div className="h-full rounded-full animate-bar-width" style={{ background: scoreColor(item.score), width: `${item.score}%`, "--bar-width": `${item.score}%` } as React.CSSProperties} />
                   </div>
                   <span className="text-[13px] font-bold font-mono w-8 text-right" style={{ color: scoreColor(item.score) }}>{item.score}</span>
@@ -550,7 +550,7 @@ export function ResultsReport({
               ].sort((a, b) => b.score - a.score).map((item) => (
                 <div key={item.label} className="flex items-center gap-3">
                   <span className="text-[11px] text-foreground/45 w-[130px] sm:w-[155px] shrink-0 truncate">{item.label}</span>
-                  <div className="flex-1 h-[8px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
+                  <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
                     <div className="h-full rounded-full animate-bar-width" style={{ background: scoreColor(100 - item.score), width: `${item.score}%`, "--bar-width": `${item.score}%` } as React.CSSProperties} />
                   </div>
                   <span className="text-[13px] font-bold font-mono w-8 text-right" style={{ color: scoreColor(100 - item.score) }}>{item.score}</span>
@@ -784,7 +784,7 @@ function BarChartRow({ label, score, color, note }: { label: string; score: numb
     <div className="group">
       <div className="flex items-center gap-3">
         <span className="text-[11px] text-foreground/45 w-[130px] sm:w-[155px] shrink-0 truncate">{label}</span>
-        <div className="flex-1 h-[8px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
+        <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
           <div className="h-full rounded-full animate-bar-width" style={{ background: color, width: `${score}%`, "--bar-width": `${score}%` } as React.CSSProperties} />
         </div>
         <span className="text-[13px] font-bold font-mono w-8 text-right" style={{ color }}>{score}</span>
@@ -822,7 +822,7 @@ function MetricGridCard({ label, score, color, icon, sparkData, note, desc }: { 
           <div key={i} className="flex-1 rounded-sm transition-all duration-500" style={{ background: color, height: `${v * 100}%`, opacity: 0.4 + v * 0.6 }} />
         ))}
       </div>
-      {note && <p className="text-[10px] text-foreground/30 leading-snug mt-2 line-clamp-2">{note}</p>}
+      {note && <p className="text-[10px] text-foreground/30 leading-snug mt-2">{note}</p>}
     </div>
   );
 }
@@ -904,18 +904,17 @@ function SectionCard({ section, isExpanded, onClick }: { section: AuditSection; 
 
 /* ── Radar Chart (SVG) ── */
 function RadarChart({ categories }: { categories: UXAuditResult["categories"] }) {
-  const size = 200;
+  const size = 280;
   const cx = size / 2;
   const cy = size / 2;
   const maxR = 80;
-  const labels = ["Clarity", "Cog Load", "Conversion", "Trust", "Contradictions", "First Screen"];
-  const scores = [
-    categories.messageClarity.score,
-    categories.cognitiveLoad.score,
-    categories.conversionArch.score,
-    categories.trustSignals.score,
-    categories.contradictions.score,
-    categories.firstScreen.score,
+  const cats = [
+    { label: "Clarity", score: categories.messageClarity.score, color: "oklch(0.62 0.18 275)" },
+    { label: "Cog Load", score: categories.cognitiveLoad.score, color: "oklch(0.62 0.14 245)" },
+    { label: "Conversion", score: categories.conversionArch.score, color: "oklch(0.65 0.16 55)" },
+    { label: "Trust", score: categories.trustSignals.score, color: "oklch(0.62 0.15 160)" },
+    { label: "Contradictions", score: categories.contradictions.score, color: "oklch(0.62 0.16 15)" },
+    { label: "First Screen", score: categories.firstScreen.score, color: "oklch(0.62 0.14 200)" },
   ];
 
   const getPoint = (index: number, value: number) => {
@@ -924,7 +923,6 @@ function RadarChart({ categories }: { categories: UXAuditResult["categories"] })
     return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
   };
 
-  // Grid lines at 25%, 50%, 75%, 100%
   const gridLevels = [25, 50, 75, 100];
 
   return (
@@ -941,17 +939,17 @@ function RadarChart({ categories }: { categories: UXAuditResult["categories"] })
       })}
       {/* Data polygon */}
       <polygon
-        points={scores.map((s, i) => { const p = getPoint(i, s); return `${p.x},${p.y}`; }).join(" ")}
+        points={cats.map((c, i) => { const p = getPoint(i, c.score); return `${p.x},${p.y}`; }).join(" ")}
         fill="oklch(0.504 0.282 276.1 / 12%)"
         stroke="var(--brand)"
         strokeWidth="2"
       />
-      {/* Data dots */}
-      {scores.map((s, i) => { const p = getPoint(i, s); return <circle key={i} cx={p.x} cy={p.y} r="3" fill="var(--brand)" />; })}
+      {/* Data dots — per-category color */}
+      {cats.map((c, i) => { const p = getPoint(i, c.score); return <circle key={i} cx={p.x} cy={p.y} r="3.5" fill={c.color} />; })}
       {/* Labels */}
-      {labels.map((label, i) => {
-        const p = getPoint(i, 125);
-        return <text key={i} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central" className="text-[9px] fill-foreground/35">{label}</text>;
+      {cats.map((c, i) => {
+        const p = getPoint(i, 130);
+        return <text key={i} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central" className="text-[10px] fill-foreground/35">{c.label}</text>;
       })}
     </svg>
   );

@@ -242,15 +242,24 @@ function ManualCompetitorInput({
   isLoading: boolean;
 }) {
   const [open, setOpen] = useState(false);
-  const [url1, setUrl1] = useState("");
-  const [url2, setUrl2] = useState("");
+  const [urls, setUrls] = useState<string[]>([""]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const urls = [url1.trim(), url2.trim()].filter(Boolean);
-    if (urls.length > 0) {
-      onSubmit(urls);
-    }
+    const valid = urls.map(u => u.trim()).filter(Boolean);
+    if (valid.length > 0) onSubmit(valid);
+  }
+
+  function addField() {
+    if (urls.length < 3) setUrls([...urls, ""]);
+  }
+
+  function removeField(index: number) {
+    setUrls(urls.filter((_, i) => i !== index));
+  }
+
+  function updateField(index: number, value: string) {
+    setUrls(urls.map((u, i) => (i === index ? value : u)));
   }
 
   if (!open) {
@@ -266,6 +275,8 @@ function ManualCompetitorInput({
     );
   }
 
+  const hasAnyUrl = urls.some(u => u.trim());
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -276,33 +287,44 @@ function ManualCompetitorInput({
         <Link2 className="h-3.5 w-3.5" style={{ color: "var(--brand)" }} />
         <span className="text-[12px] font-semibold">Compare with your competitors</span>
       </div>
-      <p className="text-[11px] text-foreground/35 leading-relaxed">
-        Enter competitor URLs to get a direct comparison. Leave the second field empty to compare with just one.
-      </p>
       <div className="space-y-2">
-        <input
-          type="text"
-          value={url1}
-          onChange={(e) => setUrl1(e.target.value)}
-          placeholder="https://competitor1.com"
-          className="w-full rounded-lg border px-3 py-2 text-[12px] outline-none transition-colors focus:border-foreground/20"
-          style={{ borderColor: "var(--border)", background: "var(--s2)", color: "var(--foreground)" }}
-          disabled={isLoading}
-        />
-        <input
-          type="text"
-          value={url2}
-          onChange={(e) => setUrl2(e.target.value)}
-          placeholder="https://competitor2.com (optional)"
-          className="w-full rounded-lg border px-3 py-2 text-[12px] outline-none transition-colors focus:border-foreground/20"
-          style={{ borderColor: "var(--border)", background: "var(--s2)", color: "var(--foreground)" }}
-          disabled={isLoading}
-        />
+        {urls.map((url, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <input
+              type="text"
+              value={url}
+              onChange={(e) => updateField(i, e.target.value)}
+              placeholder={`https://competitor${i + 1}.com`}
+              className="flex-1 rounded-lg border px-3 py-2 text-[12px] outline-none transition-colors focus:border-foreground/20"
+              style={{ borderColor: "var(--border)", background: "var(--s2)", color: "var(--foreground)" }}
+              disabled={isLoading}
+            />
+            {urls.length > 1 && !isLoading && (
+              <button
+                type="button"
+                onClick={() => removeField(i)}
+                className="text-foreground/25 hover:text-foreground/50 transition-colors p-1 shrink-0"
+              >
+                <Minus className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+        ))}
+        {urls.length < 3 && !isLoading && (
+          <button
+            type="button"
+            onClick={addField}
+            className="inline-flex items-center gap-1.5 text-[11px] font-medium transition-colors hover:text-foreground/50 px-1 py-1"
+            style={{ color: "var(--brand)" }}
+          >
+            <Plus className="h-3 w-3" /> Add competitor
+          </button>
+        )}
       </div>
       <div className="flex items-center gap-2 pt-1">
         <button
           type="submit"
-          disabled={isLoading || (!url1.trim() && !url2.trim())}
+          disabled={isLoading || !hasAnyUrl}
           className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-[12px] font-bold transition-all duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none"
           style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
         >
@@ -321,7 +343,7 @@ function ManualCompetitorInput({
         {!isLoading && (
           <button
             type="button"
-            onClick={() => { setOpen(false); setUrl1(""); setUrl2(""); }}
+            onClick={() => { setOpen(false); setUrls([""]); }}
             className="text-[11px] text-foreground/30 hover:text-foreground/50 transition-colors px-2 py-2"
           >
             Cancel

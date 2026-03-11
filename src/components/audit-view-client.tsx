@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/header";
 import { ResultsReport } from "@/components/results-report";
@@ -23,6 +24,12 @@ interface AuditViewClientProps {
 
 export function AuditViewClient({ audit, plan }: AuditViewClientProps) {
   const router = useRouter();
+  const [competitorAnalysis, setCompetitorAnalysis] = useState<CompetitorAnalysis | undefined>(audit.competitorAnalysis);
+  const [competitorStatus, setCompetitorStatus] = useState<"loading" | "done" | "failed" | "locked" | undefined>(
+    audit.competitorAnalysis ? "done" :
+    PLAN_FEATURES[plan].competitorAnalysis ? undefined :
+    "locked"
+  );
 
   function handleReset() {
     router.push("/dashboard");
@@ -31,6 +38,36 @@ export function AuditViewClient({ audit, plan }: AuditViewClientProps) {
   function handleHumanAuditRequested() {
     // Not applicable for saved audits
   }
+
+  const handleManualCompetitors = useCallback(async (competitorUrls: string[]) => {
+    setCompetitorStatus("loading");
+    setCompetitorAnalysis(undefined);
+    try {
+      const res = await fetch("/api/competitor-analysis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: audit.url,
+          auditId: audit.id,
+          overallScore: audit.result.overallScore,
+          categories: audit.result.categories,
+          headline: audit.result.rewrite?.beforeHeadline || "",
+          executiveSummary: audit.result.executiveSummary,
+          competitorUrls,
+        }),
+      });
+      if (!res.ok) { setCompetitorStatus("failed"); return; }
+      const result = await res.json();
+      if (result.success && result.data) {
+        setCompetitorAnalysis(result.data);
+        setCompetitorStatus("done");
+      } else {
+        setCompetitorStatus("failed");
+      }
+    } catch {
+      setCompetitorStatus("failed");
+    }
+  }, [audit.url, audit.id, audit.result]);
 
   const hasHeatmapZones = Array.isArray(audit.heatmapZones) && audit.heatmapZones.length > 0;
 
@@ -53,12 +90,9 @@ export function AuditViewClient({ audit, plan }: AuditViewClientProps) {
           viewportWidth={1280}
           visualAnalysis={audit.visualAnalysis}
           visualAnalysisStatus={audit.visualAnalysis ? "done" : undefined}
-          competitorAnalysis={audit.competitorAnalysis}
-          competitorStatus={
-            audit.competitorAnalysis ? "done" :
-            PLAN_FEATURES[plan].competitorAnalysis ? undefined :
-            "locked"
-          }
+          competitorAnalysis={competitorAnalysis}
+          competitorStatus={competitorStatus}
+          onManualCompetitors={PLAN_FEATURES[plan].competitorAnalysis ? handleManualCompetitors : undefined}
         />
       </main>
     </div>
