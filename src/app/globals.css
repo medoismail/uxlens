@@ -467,6 +467,28 @@
   box-shadow: 0 4px 12px oklch(0 0 0 / 6%), 0 1px 3px oklch(0 0 0 / 4%);
 }
 
+/* ── Loading step card animations ─────────────────────── */
+@keyframes stepCardEnter {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes stepCardExit {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(-12px) scale(0.97); }
+}
+.step-card--enter {
+  animation: stepCardEnter 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.step-card--loading {
+  opacity: 1; transform: translateY(0) scale(1);
+}
+.step-card--done {
+  opacity: 1; transform: translateY(0) scale(1);
+}
+.step-card--exit {
+  animation: stepCardExit 0.25s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+
 /* ── Hero background gradient animation ──────────────── */
 @keyframes heroGlow1 {
   0%, 100% { opacity: 0.9; transform: translateX(-50%) scale(1); }
