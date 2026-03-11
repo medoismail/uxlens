@@ -12,6 +12,7 @@ interface UrlFormProps {
 export function UrlForm({ onSubmit, isLoading }: UrlFormProps) {
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
+  const [focused, setFocused] = useState(false);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -34,8 +35,8 @@ export function UrlForm({ onSubmit, isLoading }: UrlFormProps) {
           <div className="w-[10px] h-[10px] rounded-full" style={{ background: "#ffbd2e" }} />
           <div className="w-[10px] h-[10px] rounded-full" style={{ background: "#28c840" }} />
           <div className="flex-1 relative ml-2">
-            {/* Fake blinking caret when input is empty and not focused */}
-            {!url && (
+            {/* Fake blinking caret — visible only when idle (not focused, no text) */}
+            {!url && !focused && (
               <span
                 className="absolute left-0 top-1/2 -translate-y-1/2 w-[1.5px] h-[14px] rounded-full pointer-events-none"
                 style={{ background: "var(--foreground)", opacity: 0.35, animation: "caretBlink 1s step-end infinite" }}
@@ -49,6 +50,8 @@ export function UrlForm({ onSubmit, isLoading }: UrlFormProps) {
                 setUrl(e.target.value);
                 if (error) setError("");
               }}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
               disabled={isLoading}
               className="w-full bg-transparent text-[12px] font-mono text-foreground/40 placeholder:text-foreground/20 focus:outline-none disabled:opacity-50"
             />
