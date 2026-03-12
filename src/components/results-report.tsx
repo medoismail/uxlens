@@ -38,6 +38,7 @@ interface ResultsReportProps {
   competitorAnalysis?: CompetitorAnalysis;
   competitorStatus?: "loading" | "done" | "failed" | "locked";
   onManualCompetitors?: (urls: string[]) => void;
+  isSharedView?: boolean;
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -273,7 +274,7 @@ export function ResultsReport({
   data, url, onReset, onHumanAuditRequested, plan,
   auditId, screenshotUrl, heatmapZones, pageHeight, viewportWidth, screenshotStatus,
   heatmapStatus, visualAnalysis, visualAnalysisStatus,
-  competitorAnalysis, competitorStatus, onManualCompetitors,
+  competitorAnalysis, competitorStatus, onManualCompetitors, isSharedView,
 }: ResultsReportProps) {
   const features = PLAN_FEATURES[plan];
   let domain = url;
@@ -306,7 +307,7 @@ export function ResultsReport({
       <div className="text-center animate-fade-in mb-6">
         <p className="text-[12px] font-mono uppercase tracking-[2px] text-foreground/50 mb-1.5">Diagnostic Engine v0.6 — UX Dashboard</p>
         <h1 className="text-lg font-semibold tracking-tight text-foreground">{domain}</h1>
-        {features.pdfExport && (
+        {!isSharedView && features.pdfExport && (
           <div className="mt-3">
             <PdfExportButton data={data} url={url} competitorAnalysis={competitorAnalysis} screenshotUrl={screenshotUrl} heatmapZones={heatmapZones} pageHeight={pageHeight} viewportWidth={viewportWidth} visualAnalysis={visualAnalysis} />
           </div>
@@ -821,28 +822,47 @@ export function ResultsReport({
       {/* ═══════════════════════════════════════════════════════
          COMPETITOR ANALYSIS
          ═══════════════════════════════════════════════════════ */}
-      <ScrollReveal>
-        <ReportDivider label="Competitive Analysis" />
-        {competitorStatus && competitorStatus !== "locked" ? (
-          <CompetitorSection data={competitorAnalysis} status={competitorStatus} onManualCompetitors={onManualCompetitors} />
-        ) : (
-          <CompetitorLockedPreview />
-        )}
-      </ScrollReveal>
+      {!isSharedView && (
+        <ScrollReveal>
+          <ReportDivider label="Competitive Analysis" />
+          {competitorStatus && competitorStatus !== "locked" ? (
+            <CompetitorSection data={competitorAnalysis} status={competitorStatus} onManualCompetitors={onManualCompetitors} />
+          ) : (
+            <CompetitorLockedPreview />
+          )}
+        </ScrollReveal>
+      )}
 
       {/* ─── Human Audit CTA ─── */}
-      <HumanAuditCTA url={url} onRequested={onHumanAuditRequested} />
+      {!isSharedView && <HumanAuditCTA url={url} onRequested={onHumanAuditRequested} />}
+
+      {/* ─── Shared View CTA ─── */}
+      {isSharedView && (
+        <div className="rounded-2xl border border-border p-6 text-center mb-6" style={{ background: "var(--s1)" }}>
+          <p className="text-sm font-medium text-foreground mb-1">Want your own UX audit?</p>
+          <p className="text-xs text-foreground/60 mb-4">Get a comprehensive 10-layer diagnostic for any landing page</p>
+          <a
+            href="/"
+            className="inline-flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-medium text-white transition-all hover:opacity-90"
+            style={{ background: "var(--brand-primary)" }}
+          >
+            <Sparkles className="h-3.5 w-3.5" /> Try UXLens Free
+          </a>
+        </div>
+      )}
 
       {/* ─── Bottom CTA ─── */}
-      <div className="flex flex-col items-center pt-5 pb-6 text-center animate-fade-in">
-        <button onClick={onReset} className="inline-flex items-center gap-2 rounded-lg shadow-elevation-1 px-6 py-2.5 text-[14px] font-medium text-foreground transition-all duration-150 hover:opacity-90 active:scale-[0.98]" style={{ background: "var(--s1)" }}>
-          <RotateCcw className="h-3.5 w-3.5" /> Analyze another page
-        </button>
-      </div>
+      {!isSharedView && (
+        <div className="flex flex-col items-center pt-5 pb-6 text-center animate-fade-in">
+          <button onClick={onReset} className="inline-flex items-center gap-2 rounded-lg shadow-elevation-1 px-6 py-2.5 text-[14px] font-medium text-foreground transition-all duration-150 hover:opacity-90 active:scale-[0.98]" style={{ background: "var(--s1)" }}>
+            <RotateCcw className="h-3.5 w-3.5" /> Analyze another page
+          </button>
+        </div>
+      )}
 
       <Footer />
 
-      {features.aiChat && auditId && <ChatWidget auditId={auditId} plan={plan} />}
+      {!isSharedView && features.aiChat && auditId && <ChatWidget auditId={auditId} plan={plan} />}
     </div>
   );
 }

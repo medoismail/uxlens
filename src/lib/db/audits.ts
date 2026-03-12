@@ -10,6 +10,7 @@ export interface DbAudit {
   visual_analysis: VisualAnalysis | null;
   result: UXAuditResult;
   competitor_analysis: CompetitorAnalysis | null;
+  share_token: string | null;
   created_at: string;
 }
 
@@ -147,6 +148,50 @@ export async function updateCompetitorAnalysis(
 
   if (error) {
     console.error("updateCompetitorAnalysis error:", error);
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Get a single audit by its public share token (no ownership check).
+ */
+export async function getAuditByShareToken(
+  token: string
+): Promise<DbAudit | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+
+  const { data, error } = await sb
+    .from("audits")
+    .select("*")
+    .eq("share_token", token)
+    .single();
+
+  if (error) return null;
+  return data as DbAudit;
+}
+
+/**
+ * Set or clear the share token for an audit. Verifies ownership.
+ */
+export async function setShareToken(
+  auditId: string,
+  userId: string,
+  token: string | null
+): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+
+  const { error } = await sb
+    .from("audits")
+    .update({ share_token: token })
+    .eq("id", auditId)
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("setShareToken error:", error);
     return false;
   }
 

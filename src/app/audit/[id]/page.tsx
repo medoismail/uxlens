@@ -47,6 +47,7 @@ export default async function AuditPage({ params }: AuditPageProps) {
         createdAt: audit.created_at,
       }}
       plan={dbUser.plan}
+      shareToken={audit.share_token}
     />
   );
 }

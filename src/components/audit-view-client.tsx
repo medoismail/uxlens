@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { Share2, Link2, Link2Off, Check, Loader2 } from "lucide-react";
 import { Header } from "@/components/header";
 import { ResultsReport } from "@/components/results-report";
 import { PLAN_FEATURES } from "@/lib/types";
@@ -20,9 +21,11 @@ interface AuditViewClientProps {
     createdAt: string;
   };
   plan: PlanTier;
+  shareToken?: string | null;
+  isSharedView?: boolean;
 }
 
-export function AuditViewClient({ audit, plan }: AuditViewClientProps) {
+export function AuditViewClient({ audit, plan, shareToken: initialShareToken, isSharedView }: AuditViewClientProps) {
   const router = useRouter();
   const [competitorAnalysis, setCompetitorAnalysis] = useState<CompetitorAnalysis | undefined>(audit.competitorAnalysis);
   const [competitorStatus, setCompetitorStatus] = useState<"loading" | "done" | "failed" | "locked" | undefined>(
@@ -30,6 +33,10 @@ export function AuditViewClient({ audit, plan }: AuditViewClientProps) {
     PLAN_FEATURES[plan].competitorAnalysis ? undefined :
     "locked"
   );
+
+  const [shareToken, setShareToken] = useState<string | null>(initialShareToken ?? null);
+  const [shareLoading, setShareLoading] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
 
   function handleReset() {
     router.push("/dashboard");
@@ -69,12 +76,81 @@ export function AuditViewClient({ audit, plan }: AuditViewClientProps) {
     }
   }, [audit.url, audit.id, audit.result]);
 
+  async function handleToggleShare() {
+    setShareLoading(true);
+    try {
+      const res = await fetch("/api/audits/share", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ auditId: audit.id }),
+      });
+      if (!res.ok) { setShareLoading(false); return; }
+      const { shareToken: newToken } = await res.json();
+      setShareToken(newToken);
+
+      if (newToken) {
+        const url = `${window.location.origin}/share/${newToken}`;
+        await navigator.clipboard.writeText(url);
+        setShareCopied(true);
+        setTimeout(() => setShareCopied(false), 2000);
+      }
+    } catch {
+      // silently fail
+    }
+    setShareLoading(false);
+  }
+
+  async function handleCopyShareLink() {
+    if (!shareToken) return;
+    const url = `${window.location.origin}/share/${shareToken}`;
+    await navigator.clipboard.writeText(url);
+    setShareCopied(true);
+    setTimeout(() => setShareCopied(false), 2000);
+  }
+
   const hasHeatmapZones = Array.isArray(audit.heatmapZones) && audit.heatmapZones.length > 0;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
       <main className="flex-1 mx-auto w-full max-w-[960px]">
+        {/* Share controls (only for owner, not shared view) */}
+        {!isSharedView && (
+          <div className="flex items-center justify-end gap-2 px-4 pt-4">
+            {shareToken ? (
+              <>
+                <button
+                  onClick={handleCopyShareLink}
+                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+                  style={{ background: "var(--s2)", color: "var(--foreground)" }}
+                >
+                  {shareCopied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Link2 className="h-3.5 w-3.5" />}
+                  {shareCopied ? "Copied!" : "Copy Link"}
+                </button>
+                <button
+                  onClick={handleToggleShare}
+                  disabled={shareLoading}
+                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+                  style={{ background: "var(--s2)" }}
+                >
+                  {shareLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Link2Off className="h-3.5 w-3.5" />}
+                  Unshare
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleToggleShare}
+                disabled={shareLoading}
+                className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors hover:opacity-80"
+                style={{ background: "var(--brand-primary)", color: "white" }}
+              >
+                {shareLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Share2 className="h-3.5 w-3.5" />}
+                Share Report
+              </button>
+            )}
+          </div>
+        )}
+
         <ResultsReport
           data={audit.result}
           url={audit.url}
@@ -92,7 +168,8 @@ export function AuditViewClient({ audit, plan }: AuditViewClientProps) {
           visualAnalysisStatus={audit.visualAnalysis ? "done" : undefined}
           competitorAnalysis={competitorAnalysis}
           competitorStatus={competitorStatus}
-          onManualCompetitors={PLAN_FEATURES[plan].competitorAnalysis ? handleManualCompetitors : undefined}
+          onManualCompetitors={!isSharedView && PLAN_FEATURES[plan].competitorAnalysis ? handleManualCompetitors : undefined}
+          isSharedView={isSharedView}
         />
       </main>
     </div>
