@@ -860,7 +860,15 @@ export function ResultsReport({
       {/* ═══════════════════════════════════════════════════════
          COMPETITOR ANALYSIS
          ═══════════════════════════════════════════════════════ */}
-      {!isSharedView && (
+      {/* Show competitor analysis: in shared view only if data exists, in normal view always */}
+      {isSharedView ? (
+        competitorAnalysis && (
+          <ScrollReveal>
+            <ReportDivider label="Competitive Analysis" />
+            <CompetitorSection data={competitorAnalysis} status="done" />
+          </ScrollReveal>
+        )
+      ) : (
         <ScrollReveal>
           <ReportDivider label="Competitive Analysis" />
           {competitorStatus && competitorStatus !== "locked" ? (
@@ -882,7 +890,7 @@ export function ResultsReport({
           <a
             href="/"
             className="inline-flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-medium text-white transition-all hover:opacity-90"
-            style={{ background: "var(--brand-primary)" }}
+            style={{ background: "var(--brand)" }}
           >
             <Sparkles className="h-3.5 w-3.5" /> Try UXLens Free
           </a>
