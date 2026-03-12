@@ -41,6 +41,65 @@ export function extractPageContent(html: string, url: string): ExtractedContent 
   // Remove scripts, styles, and hidden elements to clean the DOM
   $("script, style, noscript, svg, iframe, [hidden], [aria-hidden='true']").remove();
 
+  // Remove common popup/modal/overlay elements so extracted text reflects
+  // the actual landing page content rather than cookie banners, chat widgets,
+  // newsletter modals, etc.
+  $([
+    // Cookie consent banners
+    "#CybotCookiebotDialog",
+    "#onetrust-consent-sdk",
+    '[class*="qc-cmp2"]',
+    ".osano-cm-window",
+    "#cmplz-cookiebanner-container",
+    "#cookie-notice",
+    "#cookie-law-info-bar",
+    '[id*="cookie-banner"]',
+    '[class*="cookie-banner"]',
+    '[class*="cookie-consent"]',
+    '[class*="cookieConsent"]',
+    '[class*="cookie-notice"]',
+    '[class*="gdpr-banner"]',
+    '[class*="cc-window"]', // Cookie Consent by Osano (old)
+    // Chat widgets
+    "#intercom-container",
+    ".intercom-lightweight-app",
+    "#launcher", // Zendesk
+    "#webWidget",
+    '[class*="zEWidget"]',
+    "#drift-widget",
+    "#drift-frame-chat",
+    "#drift-frame-controller",
+    '[class*="crisp-client"]',
+    "#crisp-chatbox",
+    "#hubspot-messages-iframe-container",
+    "#tidio-chat",
+    "#chat-widget-container",
+    "#fc_frame",
+    "#freshworks-container",
+    "#olark-box-wrapper",
+    '[class*="tawk-"]',
+    "#tawk-bubble-container",
+    '[id*="chat-widget"]',
+    '[class*="chat-widget"]',
+    '[class*="chatWidget"]',
+    // Modal overlays
+    '[class*="modal-overlay"]',
+    '[class*="modalOverlay"]',
+    '[class*="popup-overlay"]',
+    '[class*="popupOverlay"]',
+    '[class*="newsletter-popup"]',
+    '[class*="newsletterPopup"]',
+    '[class*="email-popup"]',
+    '[class*="emailPopup"]',
+    '[class*="signup-modal"]',
+    '[class*="signupModal"]',
+    '[class*="subscribe-modal"]',
+    '[class*="exit-intent"]',
+    '[class*="exitIntent"]',
+    '[role="dialog"]',
+    '[role="alertdialog"]',
+  ].join(", ")).remove();
+
   const title = $("title").first().text().trim();
   const metaDescription =
     $('meta[name="description"]').attr("content")?.trim() ||

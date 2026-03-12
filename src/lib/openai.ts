@@ -127,6 +127,9 @@ Assume the visitor is:
 - Judge the page by real-world UX and conversion standards, not by whether it simply "looks modern"
 - Return STRICT JSON only — no markdown, no code fences, no explanations outside the JSON
 
+═══ POPUP / OVERLAY CONTENT ═══
+The page content provided has been pre-processed to remove common popups, cookie banners, chat widgets, and modal overlays. However, some residual popup text may still appear (e.g., "Accept cookies", "Subscribe to our newsletter", chat widget greetings, GDPR notices). IGNORE any such popup/overlay content entirely — do NOT treat it as part of the landing page's value proposition, messaging, or UX structure. Focus exclusively on the actual page content: headings, body copy, CTAs, forms, trust signals, and navigation.
+
 ═══ SELF-CHECK ═══
 Before finalizing, verify: Does each finding cite specific page evidence? Does it explain the psychological mechanism? Does it trace the cascade? Are recommendations implementable without follow-up? What would confuse, hesitate, or bounce a first-time visitor?
 

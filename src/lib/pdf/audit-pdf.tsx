@@ -164,18 +164,48 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
           <Text style={styles.grade}>Grade: {data.grade}</Text>
         </View>
 
+        {/* Executive Summary Metric Cards */}
+        <View style={{ flexDirection: "row", gap: 8, marginBottom: 16 }}>
+          {(() => {
+            const conversionRisk = Math.round(100 - (data.categories.conversionArch.score + data.categories.firstScreen.score) / 2);
+            const readability = Math.round(100 - data.confusionMap.densityScore);
+            const trustScore = data.categories.trustSignals.score;
+            const complexityAvg = (data.confusionMap.jargonScore + data.confusionMap.frictionWords + data.confusionMap.decisionParalysis) / 3;
+            const complexityLabel = complexityAvg >= 70 ? "Critical" : complexityAvg >= 50 ? "High" : complexityAvg >= 30 ? "Medium" : "Low";
+            const complexityColor = complexityAvg >= 50 ? "#ef4444" : complexityAvg >= 30 ? "#eab308" : "#22c55e";
+
+            const metrics = [
+              { label: "Conversion Risk", value: `${conversionRisk}%`, color: scoreColorStr(100 - conversionRisk) },
+              { label: "Readability", value: `${readability}%`, color: scoreColorStr(readability) },
+              { label: "Trust", value: `${trustScore}/100`, color: scoreColorStr(trustScore) },
+              { label: "Complexity", value: complexityLabel, color: complexityColor },
+            ];
+            return metrics.map((m) => (
+              <View key={m.label} style={{ flex: 1, padding: 8, backgroundColor: "#f9f9fb", borderRadius: 6, alignItems: "center", borderTop: `3px solid ${m.color}` }}>
+                <Text style={{ fontSize: 8, color: "#888", marginBottom: 3 }}>{m.label}</Text>
+                <Text style={{ fontSize: 14, fontFamily: font, fontWeight: 700, color: m.color }}>{m.value}</Text>
+              </View>
+            ));
+          })()}
+        </View>
+
         {/* Executive Summary */}
         <Text style={styles.sectionTitle}>Executive Summary</Text>
         <Text style={styles.text}>{data.executiveSummary}</Text>
 
-        {/* Categories */}
+        {/* Category Scores — Horizontal Bar Chart */}
         <Text style={styles.sectionTitle}>Category Scores</Text>
         {categoryEntries.map((cat) => (
-          <View key={cat.label} style={styles.categoryRow}>
-            <Text style={styles.categoryLabel}>{cat.label}</Text>
-            <Text style={[styles.categoryScore, { color: scoreColorStr(cat.score) }]}>
-              {cat.score}/100
-            </Text>
+          <View key={cat.label} style={{ marginBottom: 6 }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 2 }}>
+              <Text style={styles.categoryLabel}>{cat.label}</Text>
+              <Text style={[styles.categoryScore, { color: scoreColorStr(cat.score) }]}>
+                {cat.score}/100
+              </Text>
+            </View>
+            <View style={{ height: 6, backgroundColor: "#e5e7eb", borderRadius: 3 }}>
+              <View style={{ height: 6, backgroundColor: scoreColorStr(cat.score), borderRadius: 3, width: `${cat.score}%` }} />
+            </View>
           </View>
         ))}
 
@@ -285,6 +315,102 @@ export function AuditPDF({ data, url, competitorAnalysis, heatmapImage, visualAn
                   ))}
                 </View>
               )}
+            </View>
+          )}
+
+          <PageFooter />
+        </Page>
+      )}
+
+      {/* First Screen Analysis + Confusion Map Page */}
+      {(data.firstScreenAnalysis?.immediateUnderstanding || data.confusionMap) && (
+        <Page size="A4" style={styles.page} wrap>
+          <View style={styles.header} fixed>
+            <Text style={styles.logo}>UXLens</Text>
+            <Text style={{ fontSize: 9, color: "#888" }}>{domain} — Behavioral Insights</Text>
+          </View>
+
+          {/* First Screen Analysis */}
+          {data.firstScreenAnalysis?.immediateUnderstanding && (
+            <View>
+              <Text style={styles.sectionTitle}>First Screen Analysis</Text>
+              <Text style={[styles.text, { marginBottom: 8 }]}>
+                What visitors perceive within the first 5 seconds of landing on the page.
+              </Text>
+
+              {[
+                { label: "First Impression", value: data.firstScreenAnalysis.immediateUnderstanding },
+                { label: "Unanswered Question", value: data.firstScreenAnalysis.unansweredQuestion },
+                { label: "Dominant Emotion", value: data.firstScreenAnalysis.dominantEmotion },
+                { label: "#1 Exit Reason", value: data.firstScreenAnalysis.exitReason },
+                ...(data.firstScreenAnalysis.visitorMentalModel ? [{ label: "Visitor Mental Model", value: data.firstScreenAnalysis.visitorMentalModel }] : []),
+                ...(data.firstScreenAnalysis.decisionBarrier ? [{ label: "Decision Barrier", value: data.firstScreenAnalysis.decisionBarrier }] : []),
+              ].map((item) => (
+                <View key={item.label} style={{ marginBottom: 6, padding: 8, backgroundColor: "#f9f9fb", borderRadius: 4, borderLeft: `3px solid ${BRAND}` }}>
+                  <Text style={{ fontSize: 8, fontFamily: font, fontWeight: 700, color: BRAND, marginBottom: 2 }}>{item.label}</Text>
+                  <Text style={{ fontSize: 9, color: "#333", lineHeight: 1.4 }}>{item.value}</Text>
+                </View>
+              ))}
+
+              {/* Attention Sequence */}
+              {data.firstScreenAnalysis.attentionSequence && data.firstScreenAnalysis.attentionSequence.length > 0 && (
+                <View style={{ marginTop: 4, marginBottom: 6, padding: 8, backgroundColor: "#f9f9fb", borderRadius: 4, borderLeft: `3px solid ${BRAND}` }}>
+                  <Text style={{ fontSize: 8, fontFamily: font, fontWeight: 700, color: BRAND, marginBottom: 2 }}>Attention Sequence</Text>
+                  {data.firstScreenAnalysis.attentionSequence.map((step, i) => (
+                    <Text key={i} style={{ fontSize: 9, color: "#333", lineHeight: 1.4 }}>
+                      {i + 1}. {step}
+                    </Text>
+                  ))}
+                </View>
+              )}
+
+              {/* Clarity Confidence */}
+              <View style={{ marginTop: 4, marginBottom: 8, padding: 8, backgroundColor: BRAND_LIGHT, borderRadius: 6 }}>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                  <Text style={{ fontSize: 9, fontFamily: font, fontWeight: 700, color: "#1a1a2e" }}>Clarity Confidence</Text>
+                  <Text style={{ fontSize: 14, fontFamily: font, fontWeight: 700, color: scoreColorStr(data.firstScreenAnalysis.clarityConfidence) }}>
+                    {data.firstScreenAnalysis.clarityConfidence}%
+                  </Text>
+                </View>
+                <View style={{ height: 4, backgroundColor: "#e5e7eb", borderRadius: 2, marginTop: 4 }}>
+                  <View style={{ height: 4, backgroundColor: scoreColorStr(data.firstScreenAnalysis.clarityConfidence), borderRadius: 2, width: `${data.firstScreenAnalysis.clarityConfidence}%` }} />
+                </View>
+                <Text style={{ fontSize: 8, color: "#666", marginTop: 3 }}>
+                  {data.firstScreenAnalysis.clarityConfidence >= 70 ? "Visitors likely understand the offer" : data.firstScreenAnalysis.clarityConfidence >= 40 ? "Some visitors may struggle to understand" : "Most visitors will leave confused"}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Confusion Map */}
+          {data.confusionMap && (
+            <View>
+              <Text style={styles.sectionTitle}>Confusion Map</Text>
+              <Text style={[styles.text, { marginBottom: 8 }]}>
+                Cognitive friction analysis measuring how language and structure affect user comprehension.
+              </Text>
+
+              {[
+                { label: "Jargon Level", score: data.confusionMap.jargonScore, impact: data.confusionMap.jargonImpact },
+                { label: "Info Density", score: data.confusionMap.densityScore, impact: data.confusionMap.densityImpact },
+                { label: "Friction Language", score: data.confusionMap.frictionWords, impact: data.confusionMap.frictionImpact },
+                { label: "Decision Paralysis", score: data.confusionMap.decisionParalysis, impact: data.confusionMap.paralysisImpact },
+              ].map((item) => (
+                <View key={item.label} style={{ marginBottom: 8 }}>
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 2 }}>
+                    <Text style={{ fontSize: 10, color: "#555" }}>{item.label}</Text>
+                    <Text style={{ fontSize: 10, fontFamily: font, fontWeight: 700, color: item.score >= 70 ? "#ef4444" : item.score >= 40 ? "#eab308" : "#22c55e" }}>
+                      {item.score}/100
+                    </Text>
+                  </View>
+                  <View style={{ height: 5, backgroundColor: "#e5e7eb", borderRadius: 3 }}>
+                    <View style={{ height: 5, backgroundColor: item.score >= 70 ? "#ef4444" : item.score >= 40 ? "#eab308" : "#22c55e", borderRadius: 3, width: `${item.score}%` }} />
+                  </View>
+                  {item.impact && (
+                    <Text style={{ fontSize: 8, color: "#666", marginTop: 2, lineHeight: 1.4 }}>{item.impact}</Text>
+                  )}
+                </View>
+              ))}
             </View>
           )}
 

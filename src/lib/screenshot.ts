@@ -8,6 +8,122 @@ export interface ScreenshotResult {
 const VIEWPORT_WIDTH = 1280;
 const VIEWPORT_HEIGHT = 800;
 
+// ---------------------------------------------------------------------------
+// Popup / modal / overlay dismissal selectors
+// ---------------------------------------------------------------------------
+
+/** Common cookie consent accept/dismiss button selectors */
+const COOKIE_ACCEPT_SELECTORS = [
+  // CookieBot
+  "#CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll",
+  "#CybotCookiebotDialogBodyButtonAccept",
+  // OneTrust
+  "#onetrust-accept-btn-handler",
+  ".onetrust-close-btn-handler",
+  // Quantcast / GDPR
+  '[class*="qc-cmp2-summary-buttons"] button:first-child',
+  ".qc-cmp-button",
+  // Osano
+  ".osano-cm-accept-all",
+  // Complianz
+  "#cmplz-cookiebanner-container .cmplz-accept",
+  // Cookie Notice (generic)
+  "#cookie-notice .cn-set-cookie",
+  "#cookie-law-info-bar .cli_action_button",
+  // Generic patterns
+  '[id*="cookie"] button',
+  '[class*="cookie-banner"] button',
+  '[class*="cookie-consent"] button',
+  '[class*="cookieConsent"] button',
+  '[class*="cookie-notice"] button',
+  '[class*="gdpr"] button',
+  '[aria-label*="cookie" i] button',
+  '[aria-label*="Accept" i]',
+  '[aria-label*="accept" i]',
+  'button[class*="accept"]',
+  'button[class*="agree"]',
+  'a[class*="accept"]',
+  'a[class*="agree"]',
+];
+
+/** Chat widget container selectors to hide */
+const CHAT_WIDGET_SELECTORS = [
+  // Intercom
+  "#intercom-container",
+  "#intercom-frame",
+  ".intercom-lightweight-app",
+  // Zendesk
+  "#launcher",
+  "#webWidget",
+  '[class*="zEWidget"]',
+  // Drift
+  "#drift-widget",
+  "#drift-frame-chat",
+  "#drift-frame-controller",
+  // Crisp
+  '[class*="crisp-client"]',
+  "#crisp-chatbox",
+  // HubSpot
+  "#hubspot-messages-iframe-container",
+  // Tidio
+  "#tidio-chat",
+  "#tidio-chat-iframe",
+  // LiveChat
+  "#chat-widget-container",
+  // Freshdesk / Freshchat
+  "#fc_frame",
+  "#freshworks-container",
+  // Olark
+  "#olark-box-wrapper",
+  // Tawk.to
+  '[class*="tawk-"]',
+  "#tawk-bubble-container",
+  // Generic
+  '[id*="chat-widget"]',
+  '[class*="chat-widget"]',
+  '[class*="chatWidget"]',
+];
+
+/** Modal / overlay selectors to close or remove */
+const MODAL_OVERLAY_SELECTORS = [
+  // Generic modals
+  '[class*="modal-overlay"]',
+  '[class*="modalOverlay"]',
+  '[class*="popup-overlay"]',
+  '[class*="popupOverlay"]',
+  '[class*="newsletter-popup"]',
+  '[class*="newsletterPopup"]',
+  '[class*="email-popup"]',
+  '[class*="emailPopup"]',
+  '[class*="signup-modal"]',
+  '[class*="signupModal"]',
+  '[class*="subscribe-modal"]',
+  '[class*="exit-intent"]',
+  '[class*="exitIntent"]',
+  // Common role-based
+  '[role="dialog"]',
+  '[role="alertdialog"]',
+  // Overlay backdrops
+  '[class*="overlay"][class*="visible"]',
+  '[class*="backdrop"][class*="show"]',
+];
+
+/** Close button selectors (tried inside modals) */
+const CLOSE_BUTTON_SELECTORS = [
+  '[aria-label="Close"]',
+  '[aria-label="close"]',
+  '[aria-label="Dismiss"]',
+  '[aria-label="dismiss"]',
+  'button[class*="close"]',
+  'button[class*="dismiss"]',
+  'button[class*="Close"]',
+  ".modal-close",
+  ".popup-close",
+  '[data-dismiss="modal"]',
+  ".close-btn",
+  ".close-button",
+];
+
 /**
  * Capture a full-page screenshot using the Microlink API.
  *
@@ -108,6 +224,80 @@ async function captureWithMicrolink(url: string): Promise<ScreenshotResult> {
 }
 
 /**
+ * Dismiss common popups, modals, cookie banners, and chat widgets.
+ * Runs in the Puppeteer page context before screenshot capture so the
+ * AI analyzes the actual landing page rather than overlay content.
+ */
+async function dismissPopups(page: import("puppeteer-core").Page): Promise<void> {
+  await page.evaluate(
+    (cookieSelectors, chatSelectors, modalSelectors, closeSelectors) => {
+      // 1. Click cookie consent accept/close buttons
+      for (const sel of cookieSelectors) {
+        const btn = document.querySelector<HTMLElement>(sel);
+        if (btn && btn.offsetParent !== null) {
+          btn.click();
+          break; // one consent banner at a time
+        }
+      }
+
+      // 2. Try clicking close buttons inside modals/dialogs
+      for (const sel of modalSelectors) {
+        const modal = document.querySelector<HTMLElement>(sel);
+        if (modal && modal.offsetParent !== null) {
+          // Try to find a close button inside the modal first
+          for (const closeSel of closeSelectors) {
+            const closeBtn = modal.querySelector<HTMLElement>(closeSel);
+            if (closeBtn) {
+              closeBtn.click();
+              break;
+            }
+          }
+        }
+      }
+
+      // 3. Also try top-level close buttons for any remaining overlays
+      for (const sel of closeSelectors) {
+        document.querySelectorAll<HTMLElement>(sel).forEach((btn) => {
+          if (btn.offsetParent !== null) btn.click();
+        });
+      }
+
+      // 4. Hide chat widgets entirely
+      for (const sel of chatSelectors) {
+        document.querySelectorAll<HTMLElement>(sel).forEach((el) => {
+          el.style.display = "none";
+        });
+      }
+
+      // 5. Remove fixed/sticky overlays that block the page content.
+      //    Only target elements that cover a significant portion of the viewport.
+      document.querySelectorAll<HTMLElement>("*").forEach((el) => {
+        const style = getComputedStyle(el);
+        if (
+          (style.position === "fixed" || style.position === "sticky") &&
+          (style.zIndex === "auto" ? 0 : parseInt(style.zIndex, 10)) > 999
+        ) {
+          const rect = el.getBoundingClientRect();
+          const viewportArea = window.innerWidth * window.innerHeight;
+          const elArea = rect.width * rect.height;
+          // If the element covers >30% of viewport, it's likely an overlay
+          if (elArea / viewportArea > 0.3) {
+            el.style.display = "none";
+          }
+        }
+      });
+    },
+    COOKIE_ACCEPT_SELECTORS,
+    CHAT_WIDGET_SELECTORS,
+    MODAL_OVERLAY_SELECTORS,
+    CLOSE_BUTTON_SELECTORS
+  );
+
+  // Wait briefly for animations to settle after dismissals
+  await new Promise((r) => setTimeout(r, 800));
+}
+
+/**
  * Puppeteer fallback (local development only).
  */
 async function captureWithPuppeteer(url: string): Promise<ScreenshotResult> {
@@ -149,6 +339,10 @@ async function captureWithPuppeteer(url: string): Promise<ScreenshotResult> {
     });
 
     await new Promise((r) => setTimeout(r, 2000));
+
+    // Dismiss popups, cookie banners, chat widgets, and overlays
+    // so the screenshot captures the actual page content.
+    await dismissPopups(page);
 
     const pageHeight = await page.evaluate(() => {
       return Math.max(
