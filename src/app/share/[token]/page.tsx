@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getAuditByShareToken } from "@/lib/db/audits";
+import { getUserById } from "@/lib/db/users";
 import { AuditViewClient } from "@/components/audit-view-client";
 
 interface SharedAuditPageProps {
@@ -13,6 +14,10 @@ export default async function SharedAuditPage({ params }: SharedAuditPageProps) 
   if (!audit) {
     notFound();
   }
+
+  // Look up the audit owner's plan so shared view matches their tier
+  const owner = await getUserById(audit.user_id);
+  const ownerPlan = owner?.plan ?? "free";
 
   const zones = audit.heatmap_zones as Record<string, unknown> | unknown[] | null;
   let pageHeight: number | null = null;
@@ -30,10 +35,10 @@ export default async function SharedAuditPage({ params }: SharedAuditPageProps) 
         heatmapZones: audit.heatmap_zones as unknown[],
         pageHeight,
         visualAnalysis: audit.visual_analysis || undefined,
-        competitorAnalysis: undefined, // Hide competitor data in shared view
+        competitorAnalysis: audit.competitor_analysis || undefined,
         createdAt: audit.created_at,
       }}
-      plan="free"
+      plan={ownerPlan}
       isSharedView
     />
   );

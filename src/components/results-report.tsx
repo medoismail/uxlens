@@ -8,10 +8,10 @@ import {
   Flame, Brain, HelpCircle, Heart, LogOut, Loader2,
   X, AlertTriangle, Check, ListChecks, Sparkles,
   TrendingUp, Lightbulb, BarChart3, Activity,
+  Share2, Link2, Link2Off,
 } from "lucide-react";
 import { Footer } from "@/components/footer";
 import { ScreenshotSection } from "@/components/screenshot-section";
-import { PdfExportButton } from "@/components/pdf-export-button";
 import { ChatWidget } from "@/components/chat-widget";
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { PLAN_FEATURES } from "@/lib/types";
@@ -39,6 +39,11 @@ interface ResultsReportProps {
   competitorStatus?: "loading" | "done" | "failed" | "locked";
   onManualCompetitors?: (urls: string[]) => void;
   isSharedView?: boolean;
+  shareToken?: string | null;
+  onToggleShare?: () => void;
+  shareLoading?: boolean;
+  shareCopied?: boolean;
+  onCopyShareLink?: () => void;
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -275,6 +280,7 @@ export function ResultsReport({
   auditId, screenshotUrl, heatmapZones, pageHeight, viewportWidth, screenshotStatus,
   heatmapStatus, visualAnalysis, visualAnalysisStatus,
   competitorAnalysis, competitorStatus, onManualCompetitors, isSharedView,
+  shareToken, onToggleShare, shareLoading, shareCopied, onCopyShareLink,
 }: ResultsReportProps) {
   const features = PLAN_FEATURES[plan];
   let domain = url;
@@ -307,9 +313,41 @@ export function ResultsReport({
       <div className="text-center animate-fade-in mb-6">
         <p className="text-[12px] font-mono uppercase tracking-[2px] text-foreground/50 mb-1.5">Diagnostic Engine v0.6 — UX Dashboard</p>
         <h1 className="text-lg font-semibold tracking-tight text-foreground">{domain}</h1>
-        {!isSharedView && features.pdfExport && (
-          <div className="mt-3">
-            <PdfExportButton data={data} url={url} competitorAnalysis={competitorAnalysis} screenshotUrl={screenshotUrl} heatmapZones={heatmapZones} pageHeight={pageHeight} viewportWidth={viewportWidth} visualAnalysis={visualAnalysis} />
+        {onToggleShare && !isSharedView && (
+          <div className="mt-3 flex items-center justify-center gap-2">
+            {onToggleShare && !isSharedView && (
+              shareToken ? (
+                <>
+                  <button
+                    onClick={onCopyShareLink}
+                    className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+                    style={{ background: "var(--s2)", color: "var(--foreground)" }}
+                  >
+                    {shareCopied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Link2 className="h-3.5 w-3.5" />}
+                    {shareCopied ? "Copied!" : "Copy Link"}
+                  </button>
+                  <button
+                    onClick={onToggleShare}
+                    disabled={shareLoading}
+                    className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+                    style={{ background: "var(--s2)" }}
+                  >
+                    {shareLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Link2Off className="h-3.5 w-3.5" />}
+                    Unshare
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={onToggleShare}
+                  disabled={shareLoading}
+                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors hover:opacity-80"
+                  style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
+                >
+                  {shareLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Share2 className="h-3.5 w-3.5" />}
+                  Share
+                </button>
+              )
+            )}
           </div>
         )}
       </div>

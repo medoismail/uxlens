@@ -59,6 +59,23 @@ export async function getUserPlan(clerkId: string): Promise<PlanTier> {
 }
 
 /**
+ * Get a user by their database UUID (e.g. from audit.user_id).
+ */
+export async function getUserById(id: string): Promise<DbUser | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+
+  const { data, error } = await sb
+    .from("users")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) return null;
+  return data as DbUser;
+}
+
+/**
  * Update a user's plan (called from Gumroad webhook).
  */
 export async function updateUserPlan(email: string, plan: PlanTier): Promise<void> {

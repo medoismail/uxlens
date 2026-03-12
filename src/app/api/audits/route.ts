@@ -46,6 +46,7 @@ export async function GET(request: Request) {
         score: (a.result as { overallScore?: number })?.overallScore ?? 0,
         grade: (a.result as { grade?: string })?.grade ?? "N/A",
         screenshotPath: a.screenshot_path,
+        shareToken: a.share_token,
         createdAt: a.created_at,
       })),
       total,

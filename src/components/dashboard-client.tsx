@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import { FileText, ExternalLink, ChevronLeft, ChevronRight, BarChart3, Crown, ArrowUpRight, Key, Copy, Check, Trash2, Terminal, X, AlertTriangle, Eye, EyeOff, Loader2 } from "lucide-react";
+import { FileText, ExternalLink, ChevronLeft, ChevronRight, BarChart3, Crown, ArrowUpRight, Key, Copy, Check, Trash2, Terminal, X, AlertTriangle, Eye, EyeOff, Loader2, Share2, Link2, Link2Off } from "lucide-react";
 import type { PlanTier } from "@/lib/types";
 
 interface ApiKeyItem {
@@ -23,6 +23,7 @@ interface AuditItem {
   score: number;
   grade: string;
   screenshotPath: string | null;
+  shareToken: string | null;
   createdAt: string;
 }
 
@@ -408,6 +409,8 @@ export function DashboardClient() {
   const [planInfo, setPlanInfo] = useState<PlanInfo | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AuditItem | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [shareLoadingId, setShareLoadingId] = useState<string | null>(null);
+  const [shareCopiedId, setShareCopiedId] = useState<string | null>(null);
   const perPage = 12;
 
   useEffect(() => {
@@ -455,6 +458,42 @@ export function DashboardClient() {
     } finally {
       setDeleting(false);
     }
+  }
+
+  async function handleToggleShare(auditId: string) {
+    setShareLoadingId(auditId);
+    try {
+      const res = await fetch("/api/audits/share", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ auditId }),
+      });
+      if (res.ok) {
+        const { shareToken } = await res.json();
+        // Update local state
+        setAudits((prev) =>
+          prev.map((a) => (a.id === auditId ? { ...a, shareToken } : a))
+        );
+        // Auto-copy if newly shared
+        if (shareToken) {
+          const shareUrl = `${window.location.origin}/share/${shareToken}`;
+          await navigator.clipboard.writeText(shareUrl);
+          setShareCopiedId(auditId);
+          setTimeout(() => setShareCopiedId(null), 2000);
+        }
+      }
+    } catch {
+      // Ignore
+    } finally {
+      setShareLoadingId(null);
+    }
+  }
+
+  async function handleCopyShareLink(token: string, auditId: string) {
+    const shareUrl = `${window.location.origin}/share/${token}`;
+    await navigator.clipboard.writeText(shareUrl);
+    setShareCopiedId(auditId);
+    setTimeout(() => setShareCopiedId(null), 2000);
   }
 
   const totalPages = Math.ceil(total / perPage);
@@ -543,15 +582,62 @@ export function DashboardClient() {
                     className="group relative rounded-2xl shadow-elevation-1 p-5 transition-all duration-250 hover:shadow-elevation-2"
                     style={{ background: "var(--s1)" }}
                   >
-                    {/* Delete button (top-right, visible on hover) */}
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setDeleteTarget(audit); }}
-                      className="absolute top-4 right-4 z-10 p-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-150 hover:bg-red-50"
-                      style={{ background: "var(--s1)" }}
-                      title="Delete audit"
-                    >
-                      <Trash2 className="h-3.5 w-3.5 text-foreground/50 hover:text-red-500 transition-colors" />
-                    </button>
+                    {/* Actions (top-right, visible on hover) */}
+                    <div className="absolute top-4 right-4 z-10 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-150">
+                      {/* Share button */}
+                      {audit.shareToken ? (
+                        <>
+                          <button
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleCopyShareLink(audit.shareToken!, audit.id); }}
+                            className="p-1.5 rounded-xl transition-colors"
+                            style={{ background: "var(--s1)" }}
+                            title="Copy share link"
+                          >
+                            {shareCopiedId === audit.id ? (
+                              <Check className="h-3.5 w-3.5 text-green-600" />
+                            ) : (
+                              <Link2 className="h-3.5 w-3.5" style={{ color: "var(--brand)" }} />
+                            )}
+                          </button>
+                          <button
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleToggleShare(audit.id); }}
+                            disabled={shareLoadingId === audit.id}
+                            className="p-1.5 rounded-xl transition-colors hover:bg-red-50"
+                            style={{ background: "var(--s1)" }}
+                            title="Unshare"
+                          >
+                            {shareLoadingId === audit.id ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin text-foreground/50" />
+                            ) : (
+                              <Link2Off className="h-3.5 w-3.5 text-red-500" />
+                            )}
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleToggleShare(audit.id); }}
+                          disabled={shareLoadingId === audit.id}
+                          className="p-1.5 rounded-xl transition-colors"
+                          style={{ background: "var(--s1)" }}
+                          title="Share audit"
+                        >
+                          {shareLoadingId === audit.id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin text-foreground/50" />
+                          ) : (
+                            <Share2 className="h-3.5 w-3.5 text-foreground/50 hover:text-foreground/80 transition-colors" />
+                          )}
+                        </button>
+                      )}
+                      {/* Delete button */}
+                      <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDeleteTarget(audit); }}
+                        className="p-1.5 rounded-xl transition-colors hover:bg-red-50"
+                        style={{ background: "var(--s1)" }}
+                        title="Delete audit"
+                      >
+                        <Trash2 className="h-3.5 w-3.5 text-foreground/50 hover:text-red-500 transition-colors" />
+                      </button>
+                    </div>
 
                     <Link href={`/audit/${audit.id}`} className="block">
                       {/* Thumbnail */}
@@ -574,6 +660,12 @@ export function DashboardClient() {
                             {domain}
                           </p>
                           <p className="text-[12px] text-foreground/40 mt-1">{date}</p>
+                          {audit.shareToken && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-medium mt-1.5 px-1.5 py-0.5 rounded" style={{ background: "var(--brand-dim)", color: "var(--brand)" }}>
+                              <Link2 className="h-2.5 w-2.5" />
+                              Shared
+                            </span>
+                          )}
                         </div>
 
                         <div className="flex items-center gap-2 shrink-0">

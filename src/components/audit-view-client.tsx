@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Share2, Link2, Link2Off, Check, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Header } from "@/components/header";
 import { ResultsReport } from "@/components/results-report";
 import { PLAN_FEATURES } from "@/lib/types";
@@ -114,43 +114,6 @@ export function AuditViewClient({ audit, plan, shareToken: initialShareToken, is
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
       <main className="flex-1 mx-auto w-full max-w-[960px]">
-        {/* Share controls (only for owner, not shared view) */}
-        {!isSharedView && (
-          <div className="flex items-center justify-end gap-2 px-4 pt-4">
-            {shareToken ? (
-              <>
-                <button
-                  onClick={handleCopyShareLink}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
-                  style={{ background: "var(--s2)", color: "var(--foreground)" }}
-                >
-                  {shareCopied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Link2 className="h-3.5 w-3.5" />}
-                  {shareCopied ? "Copied!" : "Copy Link"}
-                </button>
-                <button
-                  onClick={handleToggleShare}
-                  disabled={shareLoading}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
-                  style={{ background: "var(--s2)" }}
-                >
-                  {shareLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Link2Off className="h-3.5 w-3.5" />}
-                  Unshare
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={handleToggleShare}
-                disabled={shareLoading}
-                className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors hover:opacity-80"
-                style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
-              >
-                {shareLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Share2 className="h-3.5 w-3.5" />}
-                Share Report
-              </button>
-            )}
-          </div>
-        )}
-
         <ResultsReport
           data={audit.result}
           url={audit.url}
@@ -170,6 +133,11 @@ export function AuditViewClient({ audit, plan, shareToken: initialShareToken, is
           competitorStatus={competitorStatus}
           onManualCompetitors={!isSharedView && PLAN_FEATURES[plan].competitorAnalysis ? handleManualCompetitors : undefined}
           isSharedView={isSharedView}
+          shareToken={shareToken}
+          onToggleShare={!isSharedView ? handleToggleShare : undefined}
+          shareLoading={shareLoading}
+          shareCopied={shareCopied}
+          onCopyShareLink={handleCopyShareLink}
         />
       </main>
     </div>
