@@ -19,6 +19,7 @@ import {
   CompetitorMock,
   RewriteMock,
   RadarChartMock,
+  ShareMock,
   FeatureSection,
 } from "@/components/landing-mocks";
 import { ScrollReveal } from "@/components/scroll-reveal";
@@ -305,6 +306,22 @@ export function HomeSEOContent() {
         tier="Pro+"
       >
         <CompetitorMock />
+      </FeatureSection>
+
+      {/* Feature 5: Share Reports */}
+      <FeatureSection
+        label="Share Reports"
+        headline="Share insights with your team in one click"
+        description="Generate a public link for any audit and share it with clients, teammates, or stakeholders. No login required to view — just send the link."
+        bullets={[
+          "One-click shareable link generation",
+          "Public view — no account needed",
+          "Revoke access anytime",
+          "Clean branded report view",
+        ]}
+        reversed
+      >
+        <ShareMock />
       </FeatureSection>
 
       {/* ── Before / After Rewrite ── */}
