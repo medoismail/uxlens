@@ -1,6 +1,6 @@
 "use client";
 
-import { Sparkles, Check, Link2, Share2, Copy, ExternalLink } from "lucide-react";
+import { Sparkles, Check, Link2, Share2, Copy } from "lucide-react";
 import { ScrollReveal } from "@/components/scroll-reveal";
 
 /* ── Shared ── */
@@ -766,28 +766,8 @@ export function ProductPreviewMock() {
             {/* Executive Summary Row */}
             <ExecutiveSummaryMock />
 
-            {/* Conversion Killers Bar Chart */}
-            <div
-              className="rounded-xl shadow-elevation-1 p-3.5"
-              style={{ background: "var(--s1)" }}
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <div
-                  className="w-5 h-5 rounded-md grid place-items-center shrink-0"
-                  style={{ background: "var(--s2)" }}
-                >
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-foreground/40">
-                    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-2-3.78-2-5.5a5 5 0 0 1 10 0c0 1.72-.93 3.36-2 5.5-.5 1-1 1.62-1 3a2.5 2.5 0 0 0 2.5 2.5" />
-                    <path d="M8 15h8" /><path d="M8 18h8" /><path d="M10 21h4" />
-                  </svg>
-                </div>
-                <span className="text-[12px] font-semibold text-foreground/70">Conversion Killers</span>
-              </div>
-              <BarChartMock />
-            </div>
-
-            {/* UX Metrics Grid */}
-            <MetricGridMock />
+            {/* Category Scores */}
+            <BarChartMock />
           </div>
         </div>
       </div>
@@ -879,121 +859,40 @@ export function ShareMock() {
     <MockContainer glow>
       <div className="p-5">
         {/* Header */}
-        <div className="flex items-center gap-2 mb-5">
+        <div className="flex items-center gap-2 mb-4">
+          <Share2 className="h-4 w-4" style={{ color: "var(--brand)" }} />
           <h4 className="text-[14px] font-semibold text-foreground">
             Share Report
           </h4>
-          <span
-            className="text-[10px] font-mono px-2 py-0.5 rounded font-bold"
-            style={{ background: "var(--brand-dim)", color: "var(--brand)" }}
-          >
-            1-CLICK
-          </span>
         </div>
 
-        {/* Mock share UI */}
-        <div className="space-y-4">
-          {/* Share link bar */}
+        {/* Share link bar */}
+        <div
+          className="flex items-center gap-2 rounded-xl p-3 mb-3"
+          style={{ background: "var(--s2)" }}
+        >
+          <Link2 className="h-4 w-4 shrink-0" style={{ color: "var(--brand)" }} />
+          <span className="flex-1 text-[12px] font-mono text-foreground/50 truncate">
+            uxlens.pro/share/a8x2kf9p
+          </span>
           <div
-            className="flex items-center gap-2 rounded-xl p-3"
-            style={{ background: "var(--s2)" }}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium"
+            style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
           >
-            <Link2 className="h-4 w-4 shrink-0" style={{ color: "var(--brand)" }} />
-            <span className="flex-1 text-[12px] font-mono text-foreground/50 truncate">
-              uxlens.pro/share/a8x2kf9p
-            </span>
-            <div
-              className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium animate-pulse"
-              style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
-            >
-              <Copy className="h-3 w-3" />
-              Copied!
-            </div>
+            <Copy className="h-3 w-3" />
+            Copy
           </div>
+        </div>
 
-          {/* Shared report preview card */}
-          <div
-            className="rounded-xl overflow-hidden border"
-            style={{ borderColor: "var(--border)", background: "var(--s1)" }}
-          >
-            {/* Mini report preview */}
-            <div className="p-3.5 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-6 h-6 rounded-md grid place-items-center"
-                    style={{ background: "var(--brand-dim)" }}
-                  >
-                    <ExternalLink className="h-3 w-3" style={{ color: "var(--brand)" }} />
-                  </div>
-                  <div>
-                    <p className="text-[12px] font-semibold text-foreground">demo-landing.com</p>
-                    <p className="text-[10px] text-foreground/40">Shared report • Public link</p>
-                  </div>
-                </div>
-                <div
-                  className="px-2 py-1 rounded-lg text-[11px] font-bold"
-                  style={{ background: "oklch(0.52 0.14 155 / 8%)", color: "var(--score-high)" }}
-                >
-                  82/100
-                </div>
-              </div>
-
-              {/* Mini bar chart preview */}
-              <div className="space-y-1.5">
-                {[
-                  { label: "Message Clarity", w: 88, c: "var(--brand)" },
-                  { label: "Trust Signals", w: 70, c: "oklch(0.62 0.15 160)" },
-                  { label: "Conversion", w: 79, c: "oklch(0.65 0.16 55)" },
-                ].map((bar) => (
-                  <div key={bar.label} className="flex items-center gap-2">
-                    <span className="text-[9px] text-foreground/35 w-[70px] truncate">{bar.label}</span>
-                    <div className="flex-1 h-[4px] rounded-full" style={{ background: "var(--s3)" }}>
-                      <div
-                        className="h-full rounded-full animate-bar-width"
-                        style={{ background: bar.c, width: `${bar.w}%`, "--bar-width": `${bar.w}%` } as React.CSSProperties}
-                      />
-                    </div>
-                    <span className="text-[10px] font-mono font-bold text-foreground/40 w-5 text-right">{bar.w}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* CTA banner inside the preview */}
-            <div
-              className="px-3.5 py-2.5 flex items-center justify-between border-t"
-              style={{ borderColor: "var(--border)", background: "var(--s2)" }}
-            >
-              <span className="text-[10px] text-foreground/40">
-                Anyone with the link can view this report
-              </span>
-              <span className="text-[10px] font-medium" style={{ color: "var(--brand)" }}>
-                Powered by UXLens
-              </span>
-            </div>
+        {/* Status */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 text-[10px] text-foreground/40">
+            <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+            Anyone with the link can view
           </div>
-
-          {/* Share actions row */}
-          <div className="flex items-center gap-2">
-            {[
-              { icon: <Share2 className="h-3 w-3" />, label: "Share" },
-              { icon: <Copy className="h-3 w-3" />, label: "Copy link" },
-            ].map((action) => (
-              <div
-                key={action.label}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium text-foreground/50 cursor-pointer hover:text-foreground/70 transition-colors"
-                style={{ background: "var(--s2)" }}
-              >
-                {action.icon}
-                {action.label}
-              </div>
-            ))}
-            <div className="ml-auto text-[10px] text-foreground/30 flex items-center gap-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-              Link active
-            </div>
-          </div>
+          <span className="text-[10px] font-medium" style={{ color: "var(--brand)" }}>
+            Powered by UXLens
+          </span>
         </div>
       </div>
     </MockContainer>

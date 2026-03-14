@@ -319,7 +319,6 @@ export function HomeSEOContent() {
           "Revoke access anytime",
           "Clean branded report view",
         ]}
-        reversed
       >
         <ShareMock />
       </FeatureSection>
