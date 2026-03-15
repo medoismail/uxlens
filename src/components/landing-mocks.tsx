@@ -864,11 +864,17 @@ export function ShareMock() {
           <h4 className="text-[14px] font-semibold text-foreground">
             Share Report
           </h4>
+          <span
+            className="text-[10px] font-mono px-2 py-0.5 rounded font-bold"
+            style={{ background: "var(--brand-dim)", color: "var(--brand)" }}
+          >
+            1-CLICK
+          </span>
         </div>
 
         {/* Share link bar */}
         <div
-          className="flex items-center gap-2 rounded-xl p-3 mb-3"
+          className="flex items-center gap-2 rounded-xl p-3 mb-4"
           style={{ background: "var(--s2)" }}
         >
           <Link2 className="h-4 w-4 shrink-0" style={{ color: "var(--brand)" }} />
@@ -876,23 +882,66 @@ export function ShareMock() {
             uxlens.pro/share/a8x2kf9p
           </span>
           <div
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium animate-pulse"
             style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
           >
             <Copy className="h-3 w-3" />
-            Copy
+            Copied!
           </div>
         </div>
 
-        {/* Status */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-[10px] text-foreground/40">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-            Anyone with the link can view
+        {/* Mini shared report preview */}
+        <div
+          className="rounded-xl overflow-hidden border"
+          style={{ borderColor: "var(--border)", background: "var(--s1)" }}
+        >
+          <div className="p-3.5 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[12px] font-semibold text-foreground">demo-landing.com</p>
+                <p className="text-[10px] text-foreground/40">Shared report • Public link</p>
+              </div>
+              <div
+                className="px-2 py-1 rounded-lg text-[11px] font-bold"
+                style={{ background: "oklch(0.52 0.14 155 / 8%)", color: "var(--score-high)" }}
+              >
+                82/100
+              </div>
+            </div>
+
+            {/* Mini bar chart */}
+            <div className="space-y-1.5">
+              {[
+                { label: "Clarity", w: 88, c: "var(--brand)" },
+                { label: "Trust", w: 70, c: "oklch(0.62 0.15 160)" },
+                { label: "Conversion", w: 79, c: "oklch(0.65 0.16 55)" },
+              ].map((bar) => (
+                <div key={bar.label} className="flex items-center gap-2">
+                  <span className="text-[9px] text-foreground/35 w-[60px] truncate">{bar.label}</span>
+                  <div className="flex-1 h-[4px] rounded-full" style={{ background: "var(--s3)" }}>
+                    <div
+                      className="h-full rounded-full animate-bar-width"
+                      style={{ background: bar.c, width: `${bar.w}%`, "--bar-width": `${bar.w}%` } as React.CSSProperties}
+                    />
+                  </div>
+                  <span className="text-[10px] font-mono font-bold text-foreground/40 w-5 text-right">{bar.w}</span>
+                </div>
+              ))}
+            </div>
           </div>
-          <span className="text-[10px] font-medium" style={{ color: "var(--brand)" }}>
-            Powered by UXLens
-          </span>
+
+          <div
+            className="px-3.5 py-2 flex items-center justify-between border-t"
+            style={{ borderColor: "var(--border)", background: "var(--s2)" }}
+          >
+            <div className="flex items-center gap-1.5 text-[10px] text-foreground/40">
+              <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              Anyone with the link can view
+            </div>
+            <span className="text-[10px] font-medium" style={{ color: "var(--brand)" }}>
+              Powered by UXLens
+            </span>
+          </div>
         </div>
       </div>
     </MockContainer>
