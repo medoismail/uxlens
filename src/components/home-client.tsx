@@ -391,7 +391,7 @@ export function HomeClient() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
-      <main id="main-content" className="flex-1 mx-auto w-full max-w-[960px]">
+      <main id="main-content" className={`flex-1 mx-auto w-full ${state.status === "success" ? "" : "max-w-[960px]"}`}>
         {state.status === "idle" && (
           <Hero onSubmit={handleAnalyze} onScreenshotSubmit={handleScreenshotAnalyze} isLoading={false} />
         )}
