@@ -251,6 +251,8 @@ export function HomeClient() {
       });
 
       if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        console.error("[CompetitorAnalysis] API error:", res.status, errBody);
         setState((prev) => {
           if (prev.status !== "success") return prev;
           return { ...prev, competitorStatus: "failed" };

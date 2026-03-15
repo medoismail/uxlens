@@ -144,6 +144,17 @@ function deriveScope(text: string): string {
   return "Strategic";
 }
 
+/* ── Persona icon mapper (replaces emojis with lucide icons) ── */
+function getPersonaIcon(persona: string): React.ReactNode {
+  const lower = persona.toLowerCase();
+  if (lower.includes("ux") || lower.includes("design")) return <Pen className="h-3 w-3" style={{ color: "var(--brand)" }} />;
+  if (lower.includes("market")) return <TrendingUp className="h-3 w-3" style={{ color: "var(--brand)" }} />;
+  if (lower.includes("product")) return <Layers className="h-3 w-3" style={{ color: "var(--brand)" }} />;
+  if (lower.includes("develop") || lower.includes("engineer")) return <Activity className="h-3 w-3" style={{ color: "var(--brand)" }} />;
+  if (lower.includes("visitor") || lower.includes("user") || lower.includes("first")) return <Eye className="h-3 w-3" style={{ color: "var(--brand)" }} />;
+  return <User className="h-3 w-3" style={{ color: "var(--brand)" }} />;
+}
+
 /* ── Union type helpers for backward compatibility ── */
 function getKillerText(k: ConversionKiller): string {
   return typeof k === "string" ? k : k.title;
@@ -400,40 +411,39 @@ export function ResultsReport({
         <p className="text-[12px] text-foreground/50 mb-1.5">
           Diagnostic Engine v0.7{data.pageTypeLabel ? ` — ${data.pageTypeLabel} Audit` : " — UX Dashboard"}
         </p>
-        <h1 className="text-lg font-semibold tracking-tight text-foreground">{domain}</h1>
 
-        {/* Share buttons */}
-        <div className="mt-3 flex items-center justify-center gap-2">
+        {/* Domain + Share button inline */}
+        <div className="flex items-center justify-center gap-2.5">
+          <h1 className="text-lg font-semibold tracking-tight text-foreground">{domain}</h1>
           {onToggleShare && !isSharedView && (
             shareToken ? (
-              <>
+              <div className="flex items-center gap-1.5">
                 <button
                   onClick={onCopyShareLink}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
-                  style={{ background: "var(--s2)", color: "var(--foreground)" }}
+                  className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-medium transition-colors border"
+                  style={{ borderColor: "var(--border)", color: "var(--foreground)" }}
                 >
-                  {shareCopied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Link2 className="h-3.5 w-3.5" />}
+                  {shareCopied ? <Check className="h-3 w-3 text-green-600" /> : <Link2 className="h-3 w-3" />}
                   {shareCopied ? "Copied!" : "Copy Link"}
                 </button>
                 <button
                   onClick={onToggleShare}
                   disabled={shareLoading}
-                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
-                  style={{ background: "var(--s2)" }}
+                  className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-medium text-red-500 transition-colors border border-red-200 hover:bg-red-50"
                 >
-                  {shareLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Link2Off className="h-3.5 w-3.5" />}
+                  {shareLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Link2Off className="h-3 w-3" />}
                   Unshare
                 </button>
-              </>
+              </div>
             ) : (
               <button
                 onClick={onToggleShare}
                 disabled={shareLoading}
-                className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors hover:opacity-80"
-                style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
+                className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-medium transition-colors border hover:bg-foreground/5"
+                style={{ borderColor: "var(--border)", color: "var(--foreground/70)" }}
               >
-                {shareLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Share2 className="h-3.5 w-3.5" />}
-                Share
+                {shareLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Share2 className="h-3 w-3" />}
+                Share Audit
               </button>
             )
           )}
@@ -995,7 +1005,9 @@ export function ResultsReport({
                   style={{ background: "var(--s1)", borderColor: "var(--border)" }}
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-[16px]">{p.emoji}</span>
+                    <span className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--brand-dim)" }}>
+                      {getPersonaIcon(p.persona)}
+                    </span>
                     <span className="text-[12px] font-semibold text-foreground">{p.persona}</span>
                     <span
                       className="ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded"

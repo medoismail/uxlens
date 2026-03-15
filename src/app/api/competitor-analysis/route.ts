@@ -97,7 +97,8 @@ export async function POST(request: Request) {
     try {
       const userHtml = await fetchPageHTML(url);
       userContent = extractPageContent(userHtml, url);
-    } catch {
+    } catch (e) {
+      console.error("[CompetitorAnalysis] Failed to fetch user page:", url, e);
       return err("Could not fetch your page for comparison", 500);
     }
 
@@ -156,6 +157,8 @@ export async function POST(request: Request) {
           title: userContent.title,
         }
       );
+
+      console.log("[CompetitorAnalysis] AI identified competitors:", competitorSuggestions.map(c => c.url));
 
       if (!competitorSuggestions.length) {
         return err("Could not identify competitors for this site", 422);
