@@ -413,7 +413,7 @@ export async function POST(request: Request) {
       return errorResponse("Invalid form data. Please upload an image.", "PARSE_FAILED");
     }
 
-    const imageFile = formData.get("image");
+    const imageFile = formData.get("file") || formData.get("image");
     if (!imageFile || !(imageFile instanceof File)) {
       return errorResponse("Missing image file. Please upload a PNG, JPG, or WebP image.", "PARSE_FAILED");
     }
@@ -501,6 +501,7 @@ export async function POST(request: Request) {
       const rawResult = await withRetry(async () => {
         const response = await openai.chat.completions.create({
           model: "gpt-4o",
+          response_format: { type: "json_object" },
           temperature: 0.4,
           max_tokens: 16384,
           messages: [
