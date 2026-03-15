@@ -141,6 +141,15 @@ export interface ActionItem {
 /** Backward-compatible: old audits have string[], new audits have object[] */
 export type ActionableItem = string | ActionItem;
 
+/** User persona feedback — each persona gives feedback from their professional background */
+export interface PersonaFeedback {
+  persona: string;       // e.g. "UX Designer", "Marketing Manager"
+  emoji: string;         // e.g. "🎨", "📈"
+  feedback: string;      // 2-3 sentences from their perspective
+  topConcern: string;    // Their #1 concern in one short sentence
+  priority: "high" | "medium" | "low";  // How urgent from their perspective
+}
+
 export interface UXAuditResult {
   overallScore: number;
   grade: string;
@@ -164,6 +173,7 @@ export interface UXAuditResult {
   rewrite: Rewrite;
   heuristicEvaluation?: HeuristicEvaluation;
   uxStrengths?: string[];
+  personaFeedback?: PersonaFeedback[];
 }
 
 export interface ExtractedContent {

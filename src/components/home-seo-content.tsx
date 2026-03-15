@@ -164,7 +164,7 @@ const PLANS = [
 const FAQS = [
   {
     q: "What is a UX audit and why does it matter?",
-    a: "A UX audit identifies usability issues, conversion barriers, and trust gaps on your website. UXLens automates this with a 10-layer AI diagnostic powered by UXLens AI v0.6 — including Nielsen's heuristic evaluation, delivering results in seconds instead of days.",
+    a: "A UX audit identifies usability issues, conversion barriers, and trust gaps on your website. UXLens automates this with a 10-layer AI diagnostic powered by UXLens AI v0.7 — including Nielsen's heuristic evaluation, delivering results in seconds instead of days.",
   },
   {
     q: "How does the AI analysis work?",

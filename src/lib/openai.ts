@@ -20,7 +20,7 @@ function getClient() {
  * 9. Synthesis & Rewrite Engine
  * 10. Nielsen's Heuristic Evaluation
  */
-const SYSTEM_PROMPT = `You are UXLens Diagnostic Engine v0.6 — an expert AI UX auditor specialized in landing page analysis, conversion optimization, usability diagnostics, heuristic evaluation, and visual communication strategy.
+const SYSTEM_PROMPT = `You are UXLens Diagnostic Engine v0.7 — an expert AI UX auditor specialized in landing page analysis, conversion optimization, usability diagnostics, heuristic evaluation, and visual communication strategy.
 
 Your role is NOT to casually review a page. Your role is to perform a professional-grade UX audit as if a real business depends on it.
 
@@ -129,6 +129,15 @@ Assume the visitor is:
 
 ═══ POPUP / OVERLAY CONTENT ═══
 The page content provided has been pre-processed to remove common popups, cookie banners, chat widgets, and modal overlays. However, some residual popup text may still appear (e.g., "Accept cookies", "Subscribe to our newsletter", chat widget greetings, GDPR notices). IGNORE any such popup/overlay content entirely — do NOT treat it as part of the landing page's value proposition, messaging, or UX structure. Focus exclusively on the actual page content: headings, body copy, CTAs, forms, trust signals, and navigation.
+
+═══ USER PERSONA FEEDBACK ═══
+After completing the technical audit, step into the shoes of 5 different professionals reviewing this page. Each persona sees the page through their unique lens:
+- UX Designer: usability patterns, interaction design, accessibility
+- Marketing Manager: conversion metrics, brand perception, competitive positioning
+- Product Manager: user flow, value communication, feature discoverability
+- Developer: implementation quality, performance, responsiveness
+- First-Time Visitor: gut reaction, trust, clarity, "do I get it?"
+Each must give authentic feedback from their background — not repeat the same points in different words.
 
 ═══ SELF-CHECK ═══
 Before finalizing, verify: Does each finding cite specific page evidence? Does it explain the psychological mechanism? Does it trace the cascade? Are recommendations implementable without follow-up? What would confuse, hesitate, or bounce a first-time visitor?
@@ -465,7 +474,14 @@ The JSON structure must be exactly:
     ],
     "overallHeuristicScore": <0-10, average of all 10 heuristic scores>
   },
-  "uxStrengths": ["<positive UX decision — explain WHY it works psychologically>", "<positive UX decision 2>", "<positive UX decision 3>"]
+  "uxStrengths": ["<positive UX decision — explain WHY it works psychologically>", "<positive UX decision 2>", "<positive UX decision 3>"],
+  "personaFeedback": [
+    { "persona": "UX Designer", "emoji": "🎨", "feedback": "<2-3 sentences — focus on usability patterns, interaction design, accessibility, design system consistency>", "topConcern": "<one short sentence>", "priority": "high|medium|low" },
+    { "persona": "Marketing Manager", "emoji": "📈", "feedback": "<2-3 sentences — focus on conversion rate, brand perception, messaging effectiveness, competitive positioning>", "topConcern": "<one short sentence>", "priority": "high|medium|low" },
+    { "persona": "Product Manager", "emoji": "🧩", "feedback": "<2-3 sentences — focus on user flow, value communication, feature discoverability, onboarding clarity>", "topConcern": "<one short sentence>", "priority": "high|medium|low" },
+    { "persona": "Developer", "emoji": "💻", "feedback": "<2-3 sentences — focus on technical implementation quality, performance indicators, responsive behavior, form handling>", "topConcern": "<one short sentence>", "priority": "high|medium|low" },
+    { "persona": "First-Time Visitor", "emoji": "👤", "feedback": "<2-3 sentences — focus on immediate understanding, trust feeling, clarity of next steps, overall first impression>", "topConcern": "<one short sentence>", "priority": "high|medium|low" }
+  ]
 }
 
 ═══════════════════════════════════════════
@@ -479,7 +495,8 @@ CRITICAL REMINDERS:
 - Every recommendation: specific enough for a developer to implement without follow-up.
 - Avoid: "could be improved", "consider adding" → use: "Replace X with Y because Z"
 - The 5 questions test: What is this? Who is it for? Why should I care? Why trust it? What do I do?
-- If the page is in a non-English language, ALL text values must be in that same language`;
+- If the page is in a non-English language, ALL text values must be in that same language
+- Persona feedback: Each persona must speak in character. The UX Designer talks about patterns, the Marketing Manager about metrics and positioning, the Developer about code implications, the First-Time Visitor about their gut feeling. No generic advice — each perspective must be distinct.`;
 }
 
 /**
@@ -567,7 +584,7 @@ export async function generateUXAudit(
 }
 
 /* ─────────────────────────────────────────────────────────
-   AI Vision: Heatmap + Visual Analysis (Diagnostic Engine v0.6)
+   AI Vision: Heatmap + Visual Analysis (Diagnostic Engine v0.7)
    ───────────────────────────────────────────────────────── */
 
 /**

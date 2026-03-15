@@ -133,6 +133,14 @@ const heuristicEvaluationSchema = z.object({
   overallHeuristicScore: z.number().min(0).max(10),
 });
 
+const personaFeedbackSchema = z.object({
+  persona: z.string(),
+  emoji: z.string(),
+  feedback: z.string(),
+  topConcern: z.string(),
+  priority: z.enum(["high", "medium", "low"]),
+});
+
 /** Schema for the 10-Layer Diagnostic Engine response */
 export const uxAuditSchema = z.object({
   overallScore: z.number().min(0).max(100),
@@ -204,6 +212,7 @@ export const uxAuditSchema = z.object({
   }),
   heuristicEvaluation: heuristicEvaluationSchema.optional(),
   uxStrengths: z.array(z.string()).optional(),
+  personaFeedback: z.array(personaFeedbackSchema).optional(),
 });
 
 /** API request body schema */

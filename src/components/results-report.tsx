@@ -16,7 +16,7 @@ import { ChatWidget } from "@/components/chat-widget";
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { PLAN_FEATURES } from "@/lib/types";
 import { CompetitorSection, CompetitorLockedPreview } from "@/components/competitor-section";
-import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone, CompetitorAnalysis, VisualAnalysis, SectionRewrite, HeuristicScore, FirstScreenAnalysis, ConversionKiller, ConversionKillerItem, ActionableItem, ActionItem } from "@/lib/types";
+import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone, CompetitorAnalysis, VisualAnalysis, SectionRewrite, HeuristicScore, FirstScreenAnalysis, ConversionKiller, ConversionKillerItem, ActionableItem, ActionItem, PersonaFeedback } from "@/lib/types";
 
 interface ResultsReportProps {
   data: UXAuditResult;
@@ -311,7 +311,7 @@ export function ResultsReport({
     <div className="w-full max-w-[860px] mx-auto py-8 px-5 sm:px-6 relative z-[1]">
       {/* ─── Report Header ─── */}
       <div className="text-center animate-fade-in mb-6">
-        <p className="text-[12px] font-mono uppercase tracking-[2px] text-foreground/50 mb-1.5">Diagnostic Engine v0.6 — UX Dashboard</p>
+        <p className="text-[12px] font-mono uppercase tracking-[2px] text-foreground/50 mb-1.5">Diagnostic Engine v0.7 — UX Dashboard</p>
         <h1 className="text-lg font-semibold tracking-tight text-foreground">{domain}</h1>
         {onToggleShare && !isSharedView && (
           <div className="mt-3 flex items-center justify-center gap-2">
@@ -856,6 +856,49 @@ export function ResultsReport({
           <p className="text-[12px] text-foreground/50 leading-relaxed mb-6 px-1">{data.rewrite.rewriteRationale}</p>
         )}
       </ScrollReveal>
+
+      {/* ═══════════════════════════════════════════════════════
+         PERSONA FEEDBACK
+         ═══════════════════════════════════════════════════════ */}
+      {data.personaFeedback && data.personaFeedback.length > 0 && (
+        <ScrollReveal>
+          <ReportDivider label="Persona Feedback" />
+          <DashSection
+            icon={<User className="h-4 w-4" style={{ color: "var(--brand)" }} />}
+            title="What Each Stakeholder Thinks"
+            subtitle="Your page reviewed through 5 professional lenses"
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {data.personaFeedback.map((p: PersonaFeedback, i: number) => (
+                <div
+                  key={i}
+                  className="rounded-xl p-3.5 border transition-all duration-200 hover:border-foreground/10"
+                  style={{ background: "var(--s1)", borderColor: "var(--border)" }}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[16px]">{p.emoji}</span>
+                    <span className="text-[12px] font-semibold text-foreground">{p.persona}</span>
+                    <span
+                      className="ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded"
+                      style={{
+                        background: p.priority === "high" ? "oklch(0.65 0.25 29 / 10%)" : p.priority === "medium" ? "oklch(0.72 0.19 75 / 10%)" : "oklch(0.52 0.14 155 / 8%)",
+                        color: p.priority === "high" ? "var(--score-low)" : p.priority === "medium" ? "var(--score-mid)" : "var(--score-high)",
+                      }}
+                    >
+                      {p.priority}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-foreground/55 leading-relaxed mb-2">{p.feedback}</p>
+                  <p className="text-[11px] font-medium text-foreground/70">
+                    <span className="text-foreground/40">Top concern: </span>
+                    {p.topConcern}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </DashSection>
+        </ScrollReveal>
+      )}
 
       {/* ═══════════════════════════════════════════════════════
          COMPETITOR ANALYSIS

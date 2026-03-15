@@ -242,6 +242,60 @@ export function HomeClient() {
     }
   }
 
+  async function handleScreenshotAnalyze(file: File) {
+    setState({ status: "loading" });
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      if (subscriberEmail) formData.append("email", subscriberEmail);
+
+      const res = await fetch("/api/analyze-screenshot", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        setState({
+          status: "success",
+          data: result.data,
+          url: result.url || "screenshot-upload",
+          auditId: result.auditId,
+          screenshotUrl: result.screenshotUrl,
+          screenshotStatus: result.screenshotUrl ? "done" : "failed",
+          heatmapStatus: result.screenshotUrl ? "loading" : "failed",
+          visualAnalysisStatus: result.screenshotUrl ? "loading" : "failed",
+          competitorStatus: "locked",
+        });
+
+        // If we have a screenshot URL, fire vision analysis for heatmap
+        if (result.screenshotUrl) {
+          fetchVisionAnalysis(
+            result.screenshotUrl,
+            result.auditId,
+            result.pageHeight,
+            result.viewportWidth
+          );
+        }
+      } else if (result.code === "USAGE_LIMIT" && result.usage) {
+        if (result.usage.audits_remaining === 0 && result.usage.upgrade_suggestion) {
+          setState({ status: "limit_reached", usage: result.usage });
+        } else {
+          setState({ status: "error", message: result.error });
+        }
+      } else {
+        setState({ status: "error", message: result.error });
+      }
+    } catch {
+      setState({
+        status: "error",
+        message: "Something went wrong. Please check your connection and try again.",
+      });
+    }
+  }
+
   /** Re-run competitor analysis with user-provided competitor URLs */
   async function handleManualCompetitors(competitorUrls: string[]) {
     if (state.status !== "success") return;
@@ -314,7 +368,7 @@ export function HomeClient() {
       <Header />
       <main id="main-content" className="flex-1 mx-auto w-full max-w-[960px]">
         {state.status === "idle" && (
-          <Hero onSubmit={handleAnalyze} isLoading={false} />
+          <Hero onSubmit={handleAnalyze} onScreenshotSubmit={handleScreenshotAnalyze} isLoading={false} />
         )}
         {state.status === "loading" && <LoadingState />}
         {state.status === "error" && (

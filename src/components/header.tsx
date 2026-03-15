@@ -93,7 +93,7 @@ export function Header() {
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-1.5 text-[12px] font-bold border rounded-full px-2.5 py-0.5 tracking-wider" style={{ color: "#16a34a", background: "#f0fdf4", borderColor: "#bbf7d0" }}>
               <span className="w-[5px] h-[5px] rounded-full" style={{ background: "#16a34a", animation: "blink-dot 1.8s ease-in-out infinite" }} />
-              v0.6
+              v0.7
             </div>
 
             <Show when="signed-out">

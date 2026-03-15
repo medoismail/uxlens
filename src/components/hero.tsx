@@ -55,10 +55,11 @@ function RotatingText() {
 
 interface HeroProps {
   onSubmit: (url: string) => void;
+  onScreenshotSubmit?: (file: File) => void;
   isLoading: boolean;
 }
 
-export function Hero({ onSubmit, isLoading }: HeroProps) {
+export function Hero({ onSubmit, onScreenshotSubmit, isLoading }: HeroProps) {
   return (
     <section className="relative flex flex-col items-center text-center px-6 pt-10 pb-20">
       {/* Three.js animated background */}
@@ -84,8 +85,8 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
         className="animate-slide-up mt-5 text-[14px] leading-relaxed text-foreground/40 max-w-[540px] relative z-[1]"
         style={{ animationDelay: "60ms" }}
       >
-        Paste any URL. Get a 10-layer AI audit with heuristic evaluation, attention heatmaps,
-        conversion killers, and an AI-rewritten hero — in under 30 seconds.
+        Paste any URL or drop a screenshot. Get a 10-layer AI audit with heuristic evaluation,
+        attention heatmaps, persona feedback, and conversion killers — in under 30 seconds.
       </p>
 
       {/* Form */}
@@ -93,7 +94,7 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
         className="animate-slide-up mt-12 w-full max-w-lg relative z-[1]"
         style={{ animationDelay: "120ms" }}
       >
-        <UrlForm onSubmit={onSubmit} isLoading={isLoading} />
+        <UrlForm onSubmit={onSubmit} onScreenshotSubmit={onScreenshotSubmit} isLoading={isLoading} />
       </div>
 
       {/* Algo badges */}
@@ -105,6 +106,7 @@ export function Hero({ onSubmit, isLoading }: HeroProps) {
           "10 LAYERS",
           "HEURISTIC EVAL",
           "ATTENTION HEATMAP",
+          "PERSONA FEEDBACK",
           "AI CHAT",
           "PDF EXPORT",
         ].map((badge) => (
