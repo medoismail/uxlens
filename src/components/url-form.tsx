@@ -127,12 +127,6 @@ export function UrlForm({ onSubmit, onScreenshotSubmit, isLoading }: UrlFormProp
           ) : (
             /* URL input — default state */
             <>
-              {/* Browser dots */}
-              <div className="flex items-center gap-1.5 shrink-0">
-                <div className="w-[7px] h-[7px] rounded-full" style={{ background: "#ff5f57" }} />
-                <div className="w-[7px] h-[7px] rounded-full" style={{ background: "#ffbd2e" }} />
-                <div className="w-[7px] h-[7px] rounded-full" style={{ background: "#28c840" }} />
-              </div>
               <input
                 type="text"
                 placeholder="https://your-landing-page.com"
