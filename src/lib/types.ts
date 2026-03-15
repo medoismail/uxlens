@@ -150,7 +150,11 @@ export interface PersonaFeedback {
   priority: "high" | "medium" | "low";  // How urgent from their perspective
 }
 
+export type PageType = "landing" | "app" | "signup" | "checkout" | "form" | "content" | "other";
+
 export interface UXAuditResult {
+  pageType?: PageType;
+  pageTypeLabel?: string;
   overallScore: number;
   grade: string;
   executiveSummary: string;

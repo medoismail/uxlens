@@ -327,19 +327,58 @@ export function ResultsReport({
           >
             <RotateCcw className="h-3.5 w-3.5" /> New Audit
           </button>
-          <div className="flex items-center gap-1 rounded-lg p-0.5" style={{ background: "var(--s2)" }}>
-            <button
-              onClick={() => setViewMode("report")}
-              className="text-[11px] font-medium px-3 py-1.5 rounded-md transition-all text-foreground/50 hover:text-foreground/70"
-            >
-              Report
-            </button>
-            <button
-              className="text-[11px] font-medium px-3 py-1.5 rounded-md transition-all text-white shadow-sm"
-              style={{ background: "var(--brand)" }}
-            >
-              Annotated
-            </button>
+
+          <div className="flex items-center gap-2">
+            {/* Share buttons */}
+            {onToggleShare && !isSharedView && (
+              shareToken ? (
+                <>
+                  <button
+                    onClick={onCopyShareLink}
+                    className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+                    style={{ background: "var(--s2)", color: "var(--foreground)" }}
+                  >
+                    {shareCopied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Link2 className="h-3.5 w-3.5" />}
+                    {shareCopied ? "Copied!" : "Copy Link"}
+                  </button>
+                  <button
+                    onClick={onToggleShare}
+                    disabled={shareLoading}
+                    className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+                    style={{ background: "var(--s2)" }}
+                  >
+                    {shareLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Link2Off className="h-3.5 w-3.5" />}
+                    Unshare
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={onToggleShare}
+                  disabled={shareLoading}
+                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors hover:opacity-80"
+                  style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
+                >
+                  {shareLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Share2 className="h-3.5 w-3.5" />}
+                  Share
+                </button>
+              )
+            )}
+
+            {/* View toggle */}
+            <div className="flex items-center gap-1 rounded-lg p-0.5" style={{ background: "var(--s2)" }}>
+              <button
+                onClick={() => setViewMode("report")}
+                className="text-[11px] font-medium px-3 py-1.5 rounded-md transition-all text-foreground/50 hover:text-foreground/70"
+              >
+                Report
+              </button>
+              <button
+                className="text-[11px] font-medium px-3 py-1.5 rounded-md transition-all text-white shadow-sm"
+                style={{ background: "var(--brand)" }}
+              >
+                Annotated
+              </button>
+            </div>
           </div>
         </div>
         <AnnotatedView
@@ -358,7 +397,9 @@ export function ResultsReport({
     <div className="w-full max-w-[860px] mx-auto py-8 px-5 sm:px-6 relative z-[1]">
       {/* ─── Report Header ─── */}
       <div className="text-center animate-fade-in mb-6">
-        <p className="text-[12px] text-foreground/50 mb-1.5">Diagnostic Engine v0.7 — UX Dashboard</p>
+        <p className="text-[12px] text-foreground/50 mb-1.5">
+          Diagnostic Engine v0.7{data.pageTypeLabel ? ` — ${data.pageTypeLabel} Audit` : " — UX Dashboard"}
+        </p>
         <h1 className="text-lg font-semibold tracking-tight text-foreground">{domain}</h1>
 
         {/* Share buttons */}

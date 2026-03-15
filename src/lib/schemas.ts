@@ -143,6 +143,8 @@ const personaFeedbackSchema = z.object({
 
 /** Schema for the 10-Layer Diagnostic Engine response */
 export const uxAuditSchema = z.object({
+  pageType: z.enum(["landing", "app", "signup", "checkout", "form", "content", "other"]).optional(),
+  pageTypeLabel: z.string().optional(),
   overallScore: z.number().min(0).max(100),
   grade: z.string(),
   executiveSummary: z.string(),
