@@ -755,7 +755,7 @@ export function ProductPreviewMock() {
           <div className="p-4 sm:p-5 space-y-3">
             {/* Report header */}
             <div className="text-center mb-1">
-              <p className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/45 mb-1">
+              <p className="text-[10px] text-foreground/45 mb-1">
                 Diagnostic Engine v0.7 — UX Dashboard
               </p>
               <p className="text-[14px] font-semibold text-foreground">
@@ -804,7 +804,7 @@ export function FeatureSection({
         {/* Copy side */}
         <ScrollReveal className={`space-y-4 ${reversed ? "lg:order-2" : ""}`}>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/45">
+            <span className="text-[10px] text-foreground/45">
               {label}
             </span>
             {tier && (

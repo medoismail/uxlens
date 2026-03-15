@@ -3,10 +3,10 @@ import { auth } from "@clerk/nextjs/server";
 import { getSupabase } from "@/lib/supabase";
 import { getUserByClerkId, getUserPlan } from "@/lib/db/users";
 import { getRedis } from "@/lib/server-usage";
-import { generateVisionHeatmap, generateVisualAnalysis } from "@/lib/openai";
+import { generateVisionHeatmap, generateVisualAnalysis, generateAnnotationCoordinates } from "@/lib/openai";
 import { hotspotsToZones, generateFallbackHeatmapZones } from "@/lib/heatmap";
 import type { HeatmapZone } from "@/lib/heatmap";
-import type { VisualAnalysis, PlanTier } from "@/lib/types";
+import type { VisualAnalysis, PlanTier, AnnotationCoordinate } from "@/lib/types";
 
 // Vision analysis can take a while (two parallel AI vision calls)
 export const maxDuration = 60;
@@ -23,7 +23,7 @@ export const maxDuration = 60;
  */
 export async function POST(request: Request) {
   try {
-    const { screenshotUrl, auditId, pageHeight, viewportWidth } = await request.json();
+    const { screenshotUrl, auditId, pageHeight, viewportWidth, findingTitles } = await request.json();
 
     if (!screenshotUrl || typeof screenshotUrl !== "string") {
       return NextResponse.json({ error: "Missing screenshotUrl" }, { status: 400 });
@@ -83,6 +83,7 @@ export async function POST(request: Request) {
 
     let heatmapZones: HeatmapZone[];
     let visualAnalysis: VisualAnalysis | undefined;
+    let annotationCoordinates: AnnotationCoordinate[] | undefined;
 
     if (useAiVision) {
       // Fetch screenshot image and convert to base64
@@ -97,15 +98,34 @@ export async function POST(request: Request) {
       const imgBuffer = Buffer.from(await imgRes.arrayBuffer());
       const screenshotBase64 = imgBuffer.toString("base64");
 
-      // Run both vision calls in parallel
-      const [hotspots, visAnalysis] = await Promise.all([
+      // Build parallel vision calls
+      const visionCalls: [
+        Promise<import("@/lib/types").VisionHotspot[]>,
+        Promise<VisualAnalysis>,
+        Promise<AnnotationCoordinate[]> | null,
+      ] = [
         generateVisionHeatmap(screenshotBase64),
         generateVisualAnalysis(screenshotBase64),
+        null,
+      ];
+
+      // Add annotation coordinate call if finding titles provided
+      if (findingTitles && Array.isArray(findingTitles) && findingTitles.length > 0) {
+        const findings = findingTitles.map((t: string, i: number) => ({ index: i, title: t }));
+        visionCalls[2] = generateAnnotationCoordinates(screenshotBase64, findings);
+      }
+
+      // Run all vision calls in parallel
+      const [hotspots, visAnalysis, annCoords] = await Promise.all([
+        visionCalls[0],
+        visionCalls[1],
+        visionCalls[2] ? visionCalls[2].catch((e) => { console.error("[VisionAnalysis] Annotation coords failed:", e); return undefined; }) : Promise.resolve(undefined),
       ]);
 
       // Convert normalized hotspot coordinates to pixel-based zones
       heatmapZones = hotspotsToZones(hotspots, effectViewportWidth, effectPageHeight);
       visualAnalysis = visAnalysis;
+      annotationCoordinates = annCoords || undefined;
     } else {
       // Fallback: rule-based heatmap for free users who've used their 1 free vision audit
       heatmapZones = generateFallbackHeatmapZones(effectPageHeight, 800);
@@ -140,6 +160,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       heatmapZones,
       visualAnalysis: visualAnalysis || null,
+      annotationCoordinates: annotationCoordinates || null,
       pageHeight: effectPageHeight,
       viewportWidth: effectViewportWidth,
     });

@@ -789,6 +789,99 @@ Quality rules:
 }
 
 /* ─────────────────────────────────────────────────────────
+   AI Annotation Coordinates
+   ───────────────────────────────────────────────────────── */
+
+/**
+ * Use GPT-4o vision to locate UX findings on a screenshot.
+ * Returns normalized (x, y) coordinates for each finding.
+ */
+export async function generateAnnotationCoordinates(
+  screenshotBase64: string,
+  findings: { index: number; title: string }[]
+): Promise<import("./types").AnnotationCoordinate[]> {
+  const { annotationCoordinatesResponseSchema } = await import("./schemas");
+
+  const findingsList = findings.map(f => `${f.index}. "${f.title}"`).join("\n");
+
+  const response = await withRetry(() =>
+    getClient().chat.completions.create({
+      model: "gpt-4o",
+      response_format: { type: "json_object" },
+      temperature: 0.2,
+      max_tokens: 2048,
+      messages: [
+        {
+          role: "system",
+          content: `You are a UI element locator. Given a full-page screenshot of a website and a list of UX findings, you must identify the EXACT location on the screenshot where each finding is most relevant.
+
+Rules:
+- Return normalized coordinates where x=0 is left edge, x=1 is right edge, y=0 is top, y=1 is bottom of the full page
+- Place each dot precisely on the UI element the finding refers to (e.g. a CTA button, a heading, a form, a trust badge area)
+- If a finding refers to "hero section", place it on the actual hero content
+- If a finding refers to "CTA", place it on the actual call-to-action button
+- If a finding refers to "navigation", place it on the nav bar
+- If a finding is about "trust signals", place it where trust elements should be or are
+- If a finding is about "cognitive load" or "information density", place it on the densest content area
+- Be precise — don't cluster everything at the top or center
+- Spread findings across the actual locations on the page they reference
+- Return valid JSON only`,
+        },
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: `Look at this full-page website screenshot. For each UX finding below, identify the exact (x, y) location on the page where the issue occurs.
+
+Findings to locate:
+${findingsList}
+
+Return JSON: {"annotations": [{"findingIndex": 0, "title": "finding title", "x": 0.5, "y": 0.1}, ...]}
+
+Each annotation must have:
+- findingIndex: the number from the list (0-indexed)
+- title: the finding title (for verification)
+- x: 0-1 horizontal position on the screenshot
+- y: 0-1 vertical position on the screenshot`,
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:image/jpeg;base64,${screenshotBase64}`,
+                detail: "high",
+              },
+            },
+          ],
+        },
+      ],
+    })
+  );
+
+  const raw = response.choices[0]?.message?.content;
+  if (!raw) throw new Error("No response from OpenAI vision (annotation coordinates)");
+
+  const parsed = JSON.parse(raw);
+  const result = annotationCoordinatesResponseSchema.safeParse(parsed);
+
+  if (result.success) {
+    return result.data.annotations;
+  }
+
+  // Fallback: try to extract annotations array directly
+  if (parsed.annotations && Array.isArray(parsed.annotations)) {
+    return parsed.annotations.map((a: Record<string, unknown>) => ({
+      findingIndex: Number(a.findingIndex) || 0,
+      title: String(a.title || ""),
+      x: Math.min(1, Math.max(0, Number(a.x) || 0.5)),
+      y: Math.min(1, Math.max(0, Number(a.y) || 0.5)),
+    }));
+  }
+
+  throw new Error("Failed to parse annotation coordinates");
+}
+
+/* ─────────────────────────────────────────────────────────
    Competitor Analysis (Pro+)
    ───────────────────────────────────────────────────────── */
 

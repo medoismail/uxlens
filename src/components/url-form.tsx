@@ -60,10 +60,27 @@ export function UrlForm({ onSubmit, onScreenshotSubmit, isLoading }: UrlFormProp
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of Array.from(items)) {
+      if (item.type.startsWith("image/")) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (file) {
+          setSelectedFile(file);
+          setUrl("");
+          setError("");
+        }
+        return;
+      }
+    }
+  }, []);
+
   const canSubmit = selectedFile || url.trim();
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
+    <form onSubmit={handleSubmit} className="w-full" onPaste={handlePaste}>
       {/* Unified input bar — drag an image or type a URL */}
       <div
         className="relative overflow-hidden rounded-2xl border transition-all duration-300 shadow-elevation-1"

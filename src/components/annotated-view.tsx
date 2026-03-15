@@ -2,44 +2,14 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import {
-  Target, Zap, Shield, Eye, Search, Layers, Pen,
   ChevronRight, Flame, Maximize2, Minimize2,
 } from "lucide-react";
-import type { UXAuditResult, AuditSection, Finding, HeatmapZone } from "@/lib/types";
+import type { UXAuditResult, AuditSection, Finding, HeatmapZone, AnnotationCoordinate } from "@/lib/types";
 
 /* ═══════════════════════════════════════════════════════
-   Annotated View v2 — Margin annotations + highlight bands
-   Like PDF review tools: markers on the edge, bands on hover
+   Annotated View v3 — AI-powered coordinate placement
+   Dots placed precisely using GPT-4o vision coordinates
    ═══════════════════════════════════════════════════════ */
-
-/**
- * Map each audit section to its approximate vertical region on the page.
- * These are ordered top-to-bottom as they typically appear on a landing page.
- * Y values are 0-1 normalized percentages of total page height.
- */
-const SECTION_REGIONS: { id: string; yCenter: number }[] = [
-  { id: "hero",           yCenter: 0.06 },
-  { id: "firstscreen",    yCenter: 0.10 },
-  { id: "messaging",      yCenter: 0.22 },
-  { id: "cta",            yCenter: 0.15 },
-  { id: "trust",          yCenter: 0.45 },
-  { id: "structure",      yCenter: 0.60 },
-  { id: "contradictions",  yCenter: 0.35 },
-];
-
-function getSectionY(sectionId: string): number {
-  return SECTION_REGIONS.find(s => s.id === sectionId)?.yCenter ?? 0.5;
-}
-
-const SECTION_ICONS: Record<string, React.ReactNode> = {
-  hero: <Target className="h-3 w-3" />,
-  messaging: <Pen className="h-3 w-3" />,
-  cta: <Zap className="h-3 w-3" />,
-  trust: <Shield className="h-3 w-3" />,
-  structure: <Layers className="h-3 w-3" />,
-  contradictions: <Search className="h-3 w-3" />,
-  firstscreen: <Eye className="h-3 w-3" />,
-};
 
 const SEVERITY_COLORS: Record<string, string> = {
   critical: "#dc2626",
@@ -64,6 +34,7 @@ function scoreColor(s: number) {
 interface Annotation {
   id: string;
   index: number;       // global numbering (1, 2, 3...)
+  x: number;           // 0-1 normalized X on screenshot
   y: number;           // 0-1 normalized Y on screenshot
   severity: string;
   finding: Finding;
@@ -71,38 +42,68 @@ interface Annotation {
   sectionId: string;
 }
 
-/** Generate annotations sorted top-to-bottom */
-function generateAnnotations(sections: AuditSection[]): Annotation[] {
-  const raw: Annotation[] = [];
+/** Generate annotations using AI coordinates, falling back to sequential positioning */
+function generateAnnotations(
+  sections: AuditSection[],
+  aiCoordinates?: AnnotationCoordinate[]
+): Annotation[] {
+  // Collect all issue/warning findings in order
+  const allFindings: { finding: Finding; sectionName: string; sectionId: string; globalIndex: number }[] = [];
   let idx = 0;
 
   for (const section of sections) {
-    const baseY = getSectionY(section.id);
-    const issues = section.findings.filter(f => f.type === "issue" || f.type === "warning");
-
-    issues.forEach((finding, i) => {
-      const severity = finding.severity || (finding.impact === "high" ? "high" : finding.impact === "medium" ? "medium" : "low");
-      // Spread findings within section: offset each by ~2% so they don't overlap
-      const y = Math.min(0.95, Math.max(0.02, baseY + (i - issues.length / 2) * 0.025));
-
-      raw.push({
-        id: `${section.id}-${i}`,
-        index: idx + 1,
-        y,
-        severity,
-        finding,
-        sectionName: section.name,
-        sectionId: section.id,
-      });
-      idx++;
-    });
+    for (const finding of section.findings) {
+      if (finding.type === "issue" || finding.type === "warning") {
+        allFindings.push({
+          finding,
+          sectionName: section.name,
+          sectionId: section.id,
+          globalIndex: idx,
+        });
+        idx++;
+      }
+    }
   }
 
-  // Sort by Y position and re-number
-  raw.sort((a, b) => a.y - b.y);
-  raw.forEach((a, i) => { a.index = i + 1; });
+  const annotations: Annotation[] = allFindings.map((f, i) => {
+    // Try to find matching AI coordinate
+    let x = 0.5;
+    let y = (i + 1) / (allFindings.length + 1); // fallback: evenly spaced
 
-  return raw;
+    if (aiCoordinates) {
+      // Match by index first
+      const byIndex = aiCoordinates.find(c => c.findingIndex === f.globalIndex);
+      if (byIndex) {
+        x = byIndex.x;
+        y = byIndex.y;
+      } else {
+        // Fallback: match by title similarity
+        const byTitle = aiCoordinates.find(
+          c => c.title.toLowerCase().includes(f.finding.title.toLowerCase().slice(0, 20)) ||
+               f.finding.title.toLowerCase().includes(c.title.toLowerCase().slice(0, 20))
+        );
+        if (byTitle) {
+          x = byTitle.x;
+          y = byTitle.y;
+        }
+      }
+    }
+
+    const severity = f.finding.severity || (f.finding.impact === "high" ? "high" : f.finding.impact === "medium" ? "medium" : "low");
+
+    return {
+      id: `${f.sectionId}-${i}`,
+      index: i + 1,
+      x: Math.min(0.95, Math.max(0.05, x)),
+      y: Math.min(0.98, Math.max(0.02, y)),
+      severity,
+      finding: f.finding,
+      sectionName: f.sectionName,
+      sectionId: f.sectionId,
+    };
+  });
+
+  return annotations;
 }
 
 /* ── Finding Card in right panel ── */
@@ -154,8 +155,7 @@ function FindingCard({
             >
               {ann.severity}
             </span>
-            <span className="text-[10px] text-foreground/35 flex items-center gap-1">
-              {SECTION_ICONS[ann.sectionId]}
+            <span className="text-[10px] text-foreground/35">
               {ann.sectionName}
             </span>
           </div>
@@ -172,14 +172,9 @@ function FindingCard({
               {ann.finding.recommendedFix && (
                 <div className="rounded-lg p-2.5" style={{ background: `${color}0a` }}>
                   <p className="text-[11px] leading-relaxed font-medium" style={{ color }}>
-                    ✦ {ann.finding.recommendedFix}
+                    Fix: {ann.finding.recommendedFix}
                   </p>
                 </div>
-              )}
-              {ann.finding.behavioralMechanism && (
-                <p className="text-[10px] text-foreground/40 leading-relaxed italic">
-                  ↳ {ann.finding.behavioralMechanism}
-                </p>
               )}
             </div>
           )}
@@ -195,17 +190,15 @@ function FindingCard({
   );
 }
 
-/* ── Margin marker on the screenshot edge ── */
-function MarginMarker({
+/* ── Dot marker on the screenshot ── */
+function DotMarker({
   ann,
   isActive,
   onClick,
-  side,
 }: {
   ann: Annotation;
   isActive: boolean;
   onClick: () => void;
-  side: "left" | "right";
 }) {
   const color = SEVERITY_COLORS[ann.severity] || SEVERITY_COLORS.medium;
 
@@ -214,54 +207,45 @@ function MarginMarker({
       onClick={onClick}
       className="absolute z-10 transition-all duration-200 group"
       style={{
+        left: `${ann.x * 100}%`,
         top: `${ann.y * 100}%`,
-        [side]: 0,
-        transform: "translateY(-50%)",
+        transform: "translate(-50%, -50%)",
       }}
       title={`#${ann.index}: ${ann.finding.title}`}
     >
-      {/* The tab/marker */}
-      <div
-        className={`flex items-center gap-1 transition-all duration-200 ${
-          side === "right" ? "rounded-l-lg pl-2 pr-1.5" : "rounded-r-lg pr-2 pl-1.5"
-        } ${isActive ? "py-1.5 shadow-lg" : "py-1 group-hover:py-1.5"}`}
+      {/* Pulse ring when active */}
+      {isActive && (
+        <span
+          className="absolute inset-[-8px] rounded-full animate-ping"
+          style={{ background: `${color}20` }}
+        />
+      )}
+
+      {/* The dot */}
+      <span
+        className={`relative flex items-center justify-center rounded-full text-white font-bold transition-all duration-200 ${
+          isActive ? "w-7 h-7 text-[11px] shadow-lg" : "w-5 h-5 text-[9px] group-hover:w-6 group-hover:h-6 shadow-md"
+        }`}
         style={{
-          background: isActive ? color : `${color}dd`,
-          boxShadow: isActive ? `0 0 16px ${color}44` : undefined,
+          background: color,
+          boxShadow: isActive
+            ? `0 0 0 3px white, 0 0 20px ${color}66`
+            : `0 0 0 2px white, 0 2px 4px rgba(0,0,0,0.2)`,
         }}
       >
-        <span className="text-[10px] font-bold text-white leading-none">
-          {ann.index}
-        </span>
-      </div>
+        {ann.index}
+      </span>
+
+      {/* Tooltip on hover */}
+      <span
+        className={`absolute left-full ml-2 top-1/2 -translate-y-1/2 whitespace-nowrap text-[10px] font-medium px-2 py-1 rounded-md shadow-lg pointer-events-none transition-opacity duration-150 ${
+          isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+        }`}
+        style={{ background: color, color: "white" }}
+      >
+        {ann.finding.title.length > 40 ? ann.finding.title.slice(0, 40) + "..." : ann.finding.title}
+      </span>
     </button>
-  );
-}
-
-/* ── Highlight band across screenshot ── */
-function HighlightBand({
-  y,
-  color,
-  isActive,
-}: {
-  y: number;
-  color: string;
-  isActive: boolean;
-}) {
-  if (!isActive) return null;
-
-  return (
-    <div
-      className="absolute left-0 right-0 z-[5] pointer-events-none transition-all duration-300"
-      style={{
-        top: `${y * 100}%`,
-        transform: "translateY(-50%)",
-        height: "48px",
-        background: `linear-gradient(180deg, transparent 0%, ${color}15 30%, ${color}20 50%, ${color}15 70%, transparent 100%)`,
-        borderTop: `1.5px solid ${color}40`,
-        borderBottom: `1.5px solid ${color}40`,
-      }}
-    />
   );
 }
 
@@ -324,6 +308,7 @@ interface AnnotatedViewProps {
   heatmapZones?: HeatmapZone[];
   pageHeight?: number;
   viewportWidth?: number;
+  annotationCoordinates?: AnnotationCoordinate[];
 }
 
 export function AnnotatedView({
@@ -332,6 +317,7 @@ export function AnnotatedView({
   heatmapZones,
   pageHeight = 3000,
   viewportWidth = 1280,
+  annotationCoordinates,
 }: AnnotatedViewProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("all");
@@ -339,18 +325,15 @@ export function AnnotatedView({
   const [panelOpen, setPanelOpen] = useState(true);
 
   const screenshotRef = useRef<HTMLDivElement>(null);
-  const findingsRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const allAnnotations = generateAnnotations(data.sections);
+  const allAnnotations = generateAnnotations(data.sections, annotationCoordinates);
   const filtered = filter === "all"
     ? allAnnotations
     : allAnnotations.filter(a => a.severity === filter);
 
-  const activeAnn = allAnnotations.find(a => a.id === activeId) || null;
-
-  // Click marker → scroll finding into view
-  const handleMarkerClick = useCallback((id: string) => {
+  // Click dot → scroll finding into view
+  const handleDotClick = useCallback((id: string) => {
     setActiveId(prev => prev === id ? null : id);
     const el = cardRefs.current[id];
     if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -371,7 +354,7 @@ export function AnnotatedView({
   }, [activeId, allAnnotations]);
 
   return (
-    <div className="w-full flex flex-col" style={{ height: "calc(100vh - 56px)" }}>
+    <div className="w-full flex flex-col" style={{ height: "calc(100vh - 100px)" }}>
       {/* ── Top toolbar ── */}
       <div
         className="shrink-0 flex items-center justify-between px-4 py-2 border-b"
@@ -413,7 +396,7 @@ export function AnnotatedView({
               }`}
               style={{ background: showHeatmap ? "#ef4444" : "transparent" }}
             >
-              🔥
+              Heatmap
             </button>
           )}
 
@@ -430,18 +413,17 @@ export function AnnotatedView({
       {/* ── Main split ── */}
       <div className="flex-1 flex min-h-0 overflow-hidden">
 
-        {/* LEFT: Screenshot + margin markers + highlight bands */}
+        {/* LEFT: Screenshot + dot markers */}
         <div
           ref={screenshotRef}
           className={`relative overflow-y-auto overflow-x-hidden transition-all duration-300 ${
             panelOpen ? "flex-[3]" : "flex-1"
           }`}
-          style={{ background: "var(--s2)" }}
+          style={{ background: "#f1f1f1" }}
         >
           <ScoreBadge score={data.overallScore} grade={data.grade} />
 
           <div className="relative mx-auto" style={{ maxWidth: "720px" }}>
-            {/* The screenshot image with shadow */}
             <div className="relative mx-4 mb-6 rounded-lg overflow-hidden shadow-xl border" style={{ borderColor: "var(--border)" }}>
               <img
                 src={screenshotUrl}
@@ -455,23 +437,13 @@ export function AnnotatedView({
                 <HeatmapCanvas zones={heatmapZones} pageHeight={pageHeight} viewportWidth={viewportWidth} />
               )}
 
-              {/* Highlight band for active annotation */}
-              {activeAnn && (
-                <HighlightBand
-                  y={activeAnn.y}
-                  color={SEVERITY_COLORS[activeAnn.severity] || SEVERITY_COLORS.medium}
-                  isActive={true}
-                />
-              )}
-
-              {/* Margin markers on the RIGHT edge */}
-              {filtered.map(ann => (
-                <MarginMarker
+              {/* AI-positioned dot markers */}
+              {!showHeatmap && filtered.map(ann => (
+                <DotMarker
                   key={ann.id}
                   ann={ann}
                   isActive={activeId === ann.id}
-                  onClick={() => handleMarkerClick(ann.id)}
-                  side="right"
+                  onClick={() => handleDotClick(ann.id)}
                 />
               ))}
             </div>
@@ -481,7 +453,6 @@ export function AnnotatedView({
         {/* RIGHT: Findings panel */}
         {panelOpen && (
           <div
-            ref={findingsRef}
             className="flex-[2] max-w-[420px] min-w-[300px] overflow-y-auto border-l flex flex-col"
             style={{ borderColor: "var(--border)", background: "var(--background)" }}
           >

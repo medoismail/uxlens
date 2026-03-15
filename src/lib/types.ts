@@ -286,6 +286,14 @@ export interface VisualAnalysis {
   summary: string;
 }
 
+/** AI-generated annotation coordinate for placing finding markers on screenshots */
+export interface AnnotationCoordinate {
+  findingIndex: number;  // matches the order sent to the AI
+  title: string;         // finding title for fallback matching
+  x: number;             // 0-1 normalized horizontal position
+  y: number;             // 0-1 normalized vertical position
+}
+
 /* ── Competitor Analysis (Pro+) ────────────────────────── */
 
 export interface CompetitorProfile {

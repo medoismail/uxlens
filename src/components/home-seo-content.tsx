@@ -72,7 +72,7 @@ function SocialProofBar() {
 function Divider({ label }: { label: string }) {
   return (
     <ScrollReveal className="max-w-[960px] mx-auto px-7">
-      <div className="flex items-center gap-4 text-foreground/50 text-[12px] uppercase tracking-[2.5px] font-medium">
+      <div className="flex items-center gap-4 text-foreground/50 text-[12px] font-medium">
         <div className="flex-1 h-px" style={{ background: "rgba(0,0,0,0.08)" }} />
         {label}
         <div className="flex-1 h-px" style={{ background: "rgba(0,0,0,0.08)" }} />
@@ -201,7 +201,7 @@ export function HomeSEOContent() {
       {/* ── Product Preview (the big visual hero) ── */}
       <section className="max-w-[960px] mx-auto px-7 pt-14 pb-20">
         <ScrollReveal className="text-center mb-8">
-          <p className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/45 mb-2">
+          <p className="text-[10px] text-foreground/45 mb-2">
             Sample Audit Report
           </p>
           <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">

@@ -13,7 +13,7 @@ import { HomeSEOContent } from "@/components/home-seo-content";
 import { normalizeUrl } from "@/lib/validate-url";
 import { useSubscription } from "@/hooks/use-subscription";
 import { PLAN_FEATURES } from "@/lib/types";
-import type { AnalysisResult, UXAuditResult, UsageCheck, HeatmapZone, CompetitorAnalysis, VisualAnalysis } from "@/lib/types";
+import type { AnalysisResult, UXAuditResult, UsageCheck, HeatmapZone, CompetitorAnalysis, VisualAnalysis, AnnotationCoordinate } from "@/lib/types";
 
 type AppState =
   | { status: "idle" }
@@ -33,6 +33,8 @@ type AppState =
       heatmapStatus?: "loading" | "done" | "failed";
       visualAnalysis?: VisualAnalysis;
       visualAnalysisStatus?: "loading" | "done" | "failed";
+      annotationCoordinates?: AnnotationCoordinate[];
+      annotationStatus?: "loading" | "done" | "failed";
       competitorAnalysis?: CompetitorAnalysis;
       competitorStatus?: "loading" | "done" | "failed" | "locked";
     }
@@ -77,7 +79,7 @@ export function HomeClient() {
         });
 
         // Step 2: Capture screenshot in the background
-        fetchScreenshot(result.url, result.auditId);
+        fetchScreenshot(result.url, result.data, result.auditId);
 
         // Step 3: Run competitor analysis in background (Pro+ only)
         if (features.competitorAnalysis) {
@@ -114,11 +116,24 @@ export function HomeClient() {
     }
   }
 
+  /** Extract all finding titles from audit data for AI annotation */
+  function extractFindingTitles(auditData: UXAuditResult): string[] {
+    const titles: string[] = [];
+    for (const section of auditData.sections) {
+      for (const finding of section.findings) {
+        if (finding.type === "issue" || finding.type === "warning") {
+          titles.push(finding.title);
+        }
+      }
+    }
+    return titles;
+  }
+
   /**
    * Step 2: Capture screenshot via Puppeteer, then chain to vision analysis.
    * Screenshot → show image immediately → fire vision analysis in background.
    */
-  async function fetchScreenshot(url: string, auditId?: string) {
+  async function fetchScreenshot(url: string, auditData: UXAuditResult, auditId?: string) {
     try {
       const res = await fetch("/api/screenshot", {
         method: "POST",
@@ -148,11 +163,15 @@ export function HomeClient() {
             screenshotStatus: "done",
             heatmapStatus: "loading",
             visualAnalysisStatus: "loading",
+            annotationStatus: "loading",
           };
         });
 
+        // Extract finding titles for AI annotation coordinates
+        const findingTitles = extractFindingTitles(auditData);
+
         // Chain: fire vision analysis now that we have the screenshot
-        fetchVisionAnalysis(data.screenshotUrl, auditId, data.pageHeight, data.viewportWidth);
+        fetchVisionAnalysis(data.screenshotUrl, auditId, data.pageHeight, data.viewportWidth, findingTitles);
       } else {
         setState((prev) => {
           if (prev.status !== "success") return prev;
@@ -175,19 +194,20 @@ export function HomeClient() {
     screenshotUrl: string,
     auditId?: string,
     pageHeight?: number,
-    viewportWidth?: number
+    viewportWidth?: number,
+    findingTitles?: string[]
   ) {
     try {
       const res = await fetch("/api/vision-analysis", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ screenshotUrl, auditId, pageHeight, viewportWidth }),
+        body: JSON.stringify({ screenshotUrl, auditId, pageHeight, viewportWidth, findingTitles }),
       });
 
       if (!res.ok) {
         setState((prev) => {
           if (prev.status !== "success") return prev;
-          return { ...prev, heatmapStatus: "failed", visualAnalysisStatus: "failed" };
+          return { ...prev, heatmapStatus: "failed", visualAnalysisStatus: "failed", annotationStatus: "failed" };
         });
         return;
       }
@@ -200,14 +220,16 @@ export function HomeClient() {
           ...prev,
           heatmapZones: data.heatmapZones,
           visualAnalysis: data.visualAnalysis || undefined,
+          annotationCoordinates: data.annotationCoordinates || undefined,
           heatmapStatus: "done",
           visualAnalysisStatus: data.visualAnalysis ? "done" : "failed",
+          annotationStatus: data.annotationCoordinates ? "done" : "failed",
         };
       });
     } catch {
       setState((prev) => {
         if (prev.status !== "success") return prev;
-        return { ...prev, heatmapStatus: "failed", visualAnalysisStatus: "failed" };
+        return { ...prev, heatmapStatus: "failed", visualAnalysisStatus: "failed", annotationStatus: "failed" };
       });
     }
   }
@@ -423,6 +445,8 @@ export function HomeClient() {
             heatmapStatus={state.heatmapStatus}
             visualAnalysis={state.visualAnalysis}
             visualAnalysisStatus={state.visualAnalysisStatus}
+            annotationCoordinates={state.annotationCoordinates}
+            annotationStatus={state.annotationStatus}
             competitorAnalysis={state.competitorAnalysis}
             competitorStatus={state.competitorStatus}
             onManualCompetitors={handleManualCompetitors}

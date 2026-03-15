@@ -245,6 +245,19 @@ export const visualAnalysisSchema = z.object({
   summary: z.string(),
 });
 
+/* ── Annotation Coordinate Schemas ────────────────────── */
+
+export const annotationCoordinateSchema = z.object({
+  findingIndex: z.number().int().min(0),
+  title: z.string(),
+  x: z.number().min(0).max(1),
+  y: z.number().min(0).max(1),
+});
+
+export const annotationCoordinatesResponseSchema = z.object({
+  annotations: z.array(annotationCoordinateSchema).min(1).max(50),
+});
+
 /* ── Competitor Analysis Schemas ───────────────────────── */
 
 const competitorCategoryScoresSchema = z.object({

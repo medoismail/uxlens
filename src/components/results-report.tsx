@@ -14,9 +14,10 @@ import { Footer } from "@/components/footer";
 import { ScreenshotSection } from "@/components/screenshot-section";
 import { ChatWidget } from "@/components/chat-widget";
 import { ScrollReveal } from "@/components/scroll-reveal";
+import { AnnotatedView } from "@/components/annotated-view";
 import { PLAN_FEATURES } from "@/lib/types";
 import { CompetitorSection, CompetitorLockedPreview } from "@/components/competitor-section";
-import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone, CompetitorAnalysis, VisualAnalysis, SectionRewrite, HeuristicScore, FirstScreenAnalysis, ConversionKiller, ConversionKillerItem, ActionableItem, ActionItem, PersonaFeedback } from "@/lib/types";
+import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone, CompetitorAnalysis, VisualAnalysis, SectionRewrite, HeuristicScore, FirstScreenAnalysis, ConversionKiller, ConversionKillerItem, ActionableItem, ActionItem, PersonaFeedback, AnnotationCoordinate } from "@/lib/types";
 
 interface ResultsReportProps {
   data: UXAuditResult;
@@ -35,6 +36,8 @@ interface ResultsReportProps {
   heatmapStatus?: "loading" | "done" | "failed";
   visualAnalysis?: VisualAnalysis;
   visualAnalysisStatus?: "loading" | "done" | "failed";
+  annotationCoordinates?: AnnotationCoordinate[];
+  annotationStatus?: "loading" | "done" | "failed";
   competitorAnalysis?: CompetitorAnalysis;
   competitorStatus?: "loading" | "done" | "failed" | "locked";
   onManualCompetitors?: (urls: string[]) => void;
@@ -279,6 +282,7 @@ export function ResultsReport({
   data, url, onReset, onHumanAuditRequested, plan,
   auditId, screenshotUrl, heatmapZones, pageHeight, viewportWidth, screenshotStatus,
   heatmapStatus, visualAnalysis, visualAnalysisStatus,
+  annotationCoordinates, annotationStatus,
   competitorAnalysis, competitorStatus, onManualCompetitors, isSharedView,
   shareToken, onToggleShare, shareLoading, shareCopied, onCopyShareLink,
 }: ResultsReportProps) {
@@ -287,6 +291,10 @@ export function ResultsReport({
   try { domain = new URL(url).hostname.replace("www.", ""); } catch {}
 
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"report" | "annotated">("report");
+
+  // Can show annotated view when we have a screenshot (AI coords optional — falls back to spread positioning)
+  const canShowAnnotated = screenshotStatus === "done" && !!screenshotUrl;
 
   /* ── Derived metrics ── */
   const conversionRisk = deriveConversionRisk(data.categories);
@@ -307,11 +315,50 @@ export function ResultsReport({
     data: data.categories[cat.key as keyof typeof data.categories],
   })).sort((a, b) => a.data.score - b.data.score);
 
+  /* ── Annotated view mode ── */
+  if (viewMode === "annotated" && canShowAnnotated) {
+    return (
+      <div className="w-full">
+        {/* View toggle bar */}
+        <div className="w-full max-w-[860px] mx-auto px-5 sm:px-6 pt-6 pb-3 flex items-center justify-between">
+          <button
+            onClick={onReset}
+            className="inline-flex items-center gap-1.5 text-xs text-foreground/50 hover:text-foreground transition-colors"
+          >
+            <RotateCcw className="h-3.5 w-3.5" /> New Audit
+          </button>
+          <div className="flex items-center gap-1 rounded-lg p-0.5" style={{ background: "var(--s2)" }}>
+            <button
+              onClick={() => setViewMode("report")}
+              className="text-[11px] font-medium px-3 py-1.5 rounded-md transition-all text-foreground/50 hover:text-foreground/70"
+            >
+              Report
+            </button>
+            <button
+              className="text-[11px] font-medium px-3 py-1.5 rounded-md transition-all text-white shadow-sm"
+              style={{ background: "var(--brand)" }}
+            >
+              Annotated
+            </button>
+          </div>
+        </div>
+        <AnnotatedView
+          data={data}
+          screenshotUrl={screenshotUrl!}
+          heatmapZones={heatmapZones}
+          pageHeight={pageHeight}
+          viewportWidth={viewportWidth}
+          annotationCoordinates={annotationCoordinates}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-[860px] mx-auto py-8 px-5 sm:px-6 relative z-[1]">
       {/* ─── Report Header ─── */}
       <div className="text-center animate-fade-in mb-6">
-        <p className="text-[12px] font-mono uppercase tracking-[2px] text-foreground/50 mb-1.5">Diagnostic Engine v0.7 — UX Dashboard</p>
+        <p className="text-[12px] text-foreground/50 mb-1.5">Diagnostic Engine v0.7 — UX Dashboard</p>
         <h1 className="text-lg font-semibold tracking-tight text-foreground">{domain}</h1>
 
         {/* Share buttons */}
@@ -350,6 +397,37 @@ export function ResultsReport({
             )
           )}
         </div>
+
+        {/* View toggle: Report / Annotated */}
+        {(canShowAnnotated || screenshotStatus === "loading" || annotationStatus === "loading") && (
+          <div className="mt-3 flex items-center justify-center">
+            <div className="flex items-center gap-1 rounded-lg p-0.5" style={{ background: "var(--s2)" }}>
+              <button
+                className="text-[11px] font-medium px-3 py-1.5 rounded-md transition-all text-white shadow-sm"
+                style={{ background: "var(--brand)" }}
+              >
+                Report
+              </button>
+              <button
+                onClick={() => canShowAnnotated && setViewMode("annotated")}
+                className={`text-[11px] font-medium px-3 py-1.5 rounded-md transition-all ${
+                  canShowAnnotated
+                    ? "text-foreground/50 hover:text-foreground/70 cursor-pointer"
+                    : "text-foreground/30 cursor-wait"
+                }`}
+              >
+                {(!canShowAnnotated && (screenshotStatus === "loading" || annotationStatus === "loading")) ? (
+                  <span className="flex items-center gap-1.5">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    Annotated
+                  </span>
+                ) : (
+                  "Annotated"
+                )}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ═══════════════════════════════════════════════════════
