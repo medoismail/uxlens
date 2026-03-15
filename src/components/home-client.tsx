@@ -42,10 +42,11 @@ export function HomeClient() {
   const [state, setState] = useState<AppState>({ status: "idle" });
   const { isSubscribed, email: subscriberEmail, plan, verifySubscription } = useSubscription();
 
-  async function handleAnalyze(rawUrl: string) {
+  async function handleAnalyze(rawUrl: string, retryCount = 0) {
     setState({ status: "loading" });
 
     const normalizedUrl = normalizeUrl(rawUrl);
+    const MAX_RETRIES = 1;
 
     try {
       // Step 1: Run the AI audit (fast — no screenshot)
@@ -88,10 +89,24 @@ export function HomeClient() {
         } else {
           setState({ status: "error", message: result.error });
         }
+      } else if (
+        retryCount < MAX_RETRIES &&
+        result.code !== "INVALID_URL" &&
+        result.code !== "USAGE_LIMIT"
+      ) {
+        // Auto-retry once for transient failures (AI, fetch, parse errors)
+        console.warn(`[Analyze] Retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+        await new Promise((r) => setTimeout(r, 1500));
+        return handleAnalyze(rawUrl, retryCount + 1);
       } else {
         setState({ status: "error", message: result.error });
       }
     } catch {
+      if (retryCount < MAX_RETRIES) {
+        console.warn(`[Analyze] Network error, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+        await new Promise((r) => setTimeout(r, 1500));
+        return handleAnalyze(rawUrl, retryCount + 1);
+      }
       setState({
         status: "error",
         message: "Something went wrong. Please check your connection and try again.",
@@ -242,8 +257,9 @@ export function HomeClient() {
     }
   }
 
-  async function handleScreenshotAnalyze(file: File) {
+  async function handleScreenshotAnalyze(file: File, retryCount = 0) {
     setState({ status: "loading" });
+    const MAX_RETRIES = 1;
 
     try {
       const formData = new FormData();
@@ -285,10 +301,19 @@ export function HomeClient() {
         } else {
           setState({ status: "error", message: result.error });
         }
+      } else if (retryCount < MAX_RETRIES && result.code !== "USAGE_LIMIT") {
+        console.warn(`[Screenshot] Retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+        await new Promise((r) => setTimeout(r, 1500));
+        return handleScreenshotAnalyze(file, retryCount + 1);
       } else {
         setState({ status: "error", message: result.error });
       }
     } catch {
+      if (retryCount < MAX_RETRIES) {
+        console.warn(`[Screenshot] Network error, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+        await new Promise((r) => setTimeout(r, 1500));
+        return handleScreenshotAnalyze(file, retryCount + 1);
+      }
       setState({
         status: "error",
         message: "Something went wrong. Please check your connection and try again.",

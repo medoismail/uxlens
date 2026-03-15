@@ -161,11 +161,6 @@ export function UrlForm({ onSubmit, onScreenshotSubmit, isLoading }: UrlFormProp
         </div>
       </div>
 
-      {/* Helper text */}
-      <p className="mt-2 text-[10px] text-foreground/25 text-center font-mono">
-        Paste a URL or drop a screenshot — full 10-layer AI audit
-      </p>
-
       {error && (
         <p className="mt-1.5 text-[12px] text-destructive animate-fade-in pl-1 font-mono">{error}</p>
       )}

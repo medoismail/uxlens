@@ -579,8 +579,18 @@ export async function generateUXAudit(
     throw new Error(`Failed to parse AI response as JSON (finish_reason: ${finishReason})`);
   }
 
-  const validated = uxAuditSchema.parse(parsed);
-  return validated;
+  const result = uxAuditSchema.safeParse(parsed);
+  if (!result.success) {
+    console.error("[UXAudit] Schema validation failed:", JSON.stringify(result.error.issues.slice(0, 5)));
+    // Try lenient parse — strip unknown fields but keep what we can
+    const lenient = uxAuditSchema.passthrough().safeParse(parsed);
+    if (lenient.success) {
+      console.warn("[UXAudit] Passed with passthrough — some fields may be non-standard");
+      return lenient.data as UXAuditResult;
+    }
+    throw new Error(`AI response failed schema validation: ${result.error.issues[0]?.message}`);
+  }
+  return result.data;
 }
 
 /* ─────────────────────────────────────────────────────────

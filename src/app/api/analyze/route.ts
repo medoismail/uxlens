@@ -79,8 +79,19 @@ export async function POST(request: Request) {
       );
     }
 
-    // 4. Run AI audit
-    const audit = await generateUXAudit(content);
+    // 4. Run AI audit (with fallback retry on schema failures)
+    let audit: Awaited<ReturnType<typeof generateUXAudit>> | null = null;
+    try {
+      audit = await generateUXAudit(content);
+    } catch (aiErr) {
+      console.error("[Analyze] First AI attempt failed:", aiErr instanceof Error ? aiErr.message : aiErr);
+      // One more attempt on AI failure
+      try {
+        audit = await generateUXAudit(content);
+      } catch (retryErr) {
+        console.error("[Analyze] Retry also failed:", retryErr instanceof Error ? retryErr.message : retryErr);
+      }
+    }
 
     if (!audit) {
       return errorResponse(
