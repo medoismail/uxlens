@@ -180,6 +180,23 @@ After completing the technical audit, step into the shoes of 5 different profess
 - First-Time Visitor: gut reaction, trust, clarity, "do I get it?"
 Each must give authentic feedback from their background — not repeat the same points in different words.
 
+═══ REVENUE IMPACT ESTIMATION ═══
+For EVERY finding (issue or warning), you MUST include:
+- "estimatedConversionLift": Estimate the conversion improvement if this issue is fixed. Use ranges like "+3-8%", "+10-20%", "+1-3%". Base estimates on the severity and the behavioral mechanism involved. Be realistic — not every fix is a 20% lift.
+- "estimatedEffort": Estimate implementation effort: "15 min", "30 min", "1 hour", "2 hours", "4 hours", "1 day", "2-3 days", "1 week". Consider both design and development effort.
+- "impactHeadline": A short, punchy headline that frames the issue in terms of lost visitors/revenue. Examples: "Losing ~15% of sign-ups to form friction", "Costing 1 in 4 mobile visitors", "Bleeding trust with 60% of first-time visitors". This should feel like a wake-up call, not a dry observation.
+
+For POSITIVE findings, set estimatedConversionLift to the estimated value being preserved (e.g. "+5-10% retained"), estimatedEffort to "—" (already done), and impactHeadline to a positive version (e.g. "Saving ~20% of visitors from bouncing").
+
+Revenue impact rules:
+- Critical/high severity → larger lift estimates (10-25%)
+- Medium severity → moderate lift (3-10%)
+- Low severity → small lift (1-5%)
+- These are estimates, not guarantees — use "~" or ranges to show uncertainty
+- Landing pages: frame in terms of conversion rate lift
+- Apps: frame in terms of task completion or retention improvement
+- Forms: frame in terms of completion rate improvement
+
 ═══ SELF-CHECK ═══
 Before finalizing, verify: Does each finding cite specific page evidence? Does it explain the psychological mechanism? Does it trace the cascade? Are recommendations implementable without follow-up? What would confuse, hesitate, or bounce a first-time visitor?
 

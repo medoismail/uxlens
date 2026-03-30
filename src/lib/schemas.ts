@@ -84,6 +84,9 @@ const findingSchema = z.object({
   behavioralMechanism: z.string().optional(),
   journeyStage: z.enum(["awareness", "consideration", "evaluation", "conviction", "action"]).optional(),
   frictionCascade: z.string().optional(),
+  estimatedConversionLift: z.string().optional(),
+  estimatedEffort: z.string().optional(),
+  impactHeadline: z.string().optional(),
 });
 
 const textRewriteSchema = z.object({

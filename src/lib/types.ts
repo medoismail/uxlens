@@ -24,6 +24,12 @@ export interface Finding {
   journeyStage?: JourneyStage;
   /** How this issue cascades to impact subsequent decision stages */
   frictionCascade?: string;
+  /** Estimated conversion lift if this issue is fixed (e.g. "+5-12%") */
+  estimatedConversionLift?: string;
+  /** Estimated effort to fix (e.g. "30 min", "2 hours", "1 day") */
+  estimatedEffort?: string;
+  /** Short punchy headline summarizing the revenue impact (e.g. "Losing ~15% of sign-ups") */
+  impactHeadline?: string;
 }
 
 export interface AuditSection {
