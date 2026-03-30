@@ -1,14 +1,107 @@
 "use client";
 
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "motion/react";
 import { Show, UserButton, SignInButton } from "@clerk/nextjs";
 import { useSubscription } from "@/hooks/use-subscription";
 
+/* ── Theme Toggle ── */
+
+function ThemeToggle() {
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    // Dark-first: default to dark unless explicitly set to light
+    const stored = localStorage.getItem("uxlens-theme");
+    if (stored === "light") {
+      setTheme("light");
+      document.documentElement.classList.remove("dark");
+    } else {
+      // Default: dark
+      setTheme("dark");
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
+
+  const toggle = useCallback(() => {
+    const next = theme === "light" ? "dark" : "light";
+    setTheme(next);
+    document.documentElement.classList.toggle("dark", next === "dark");
+    localStorage.setItem("uxlens-theme", next);
+  }, [theme]);
+
+  return (
+    <motion.button
+      onClick={toggle}
+      className="relative w-8 h-8 rounded-lg flex items-center justify-center border transition-colors"
+      style={{
+        borderColor: "var(--border)",
+        background: "var(--s1)",
+      }}
+      whileHover={{ scale: 1.08, transition: { type: "spring", stiffness: 400, damping: 17 } }}
+      whileTap={{ scale: 0.92 }}
+      aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+      title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        {theme === "light" ? (
+          <motion.svg
+            key="sun"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-foreground/50"
+            initial={{ rotate: -30, opacity: 0, scale: 0.8 }}
+            animate={{ rotate: 0, opacity: 1, scale: 1 }}
+            exit={{ rotate: 30, opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+          >
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+          </motion.svg>
+        ) : (
+          <motion.svg
+            key="moon"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-foreground/50"
+            initial={{ rotate: 30, opacity: 0, scale: 0.8 }}
+            animate={{ rotate: 0, opacity: 1, scale: 1 }}
+            exit={{ rotate: -30, opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </motion.svg>
+        )}
+      </AnimatePresence>
+    </motion.button>
+  );
+}
+
 const PLAN_LABELS: Record<string, { label: string; color: string; bg: string; border: string }> = {
   free: { label: "Free", color: "var(--foreground)", bg: "var(--s2)", border: "var(--border)" },
-  starter: { label: "Starter", color: "#2563eb", bg: "#eff6ff", border: "#bfdbfe" },
-  pro: { label: "Pro", color: "#7c3aed", bg: "#f5f3ff", border: "#c4b5fd" },
-  agency: { label: "Agency", color: "#db2777", bg: "#fdf2f8", border: "#f9a8d4" },
+  starter: { label: "Starter", color: "var(--info)", bg: "var(--info-subtle-bg)", border: "var(--border)" },
+  pro: { label: "Pro", color: "var(--brand)", bg: "var(--brand-dim)", border: "var(--border)" },
+  agency: { label: "Agency", color: "var(--error)", bg: "var(--error-subtle-bg)", border: "var(--border)" },
 };
 
 function PlanBadge() {
@@ -19,23 +112,24 @@ function PlanBadge() {
   const config = PLAN_LABELS[plan] || PLAN_LABELS.free;
 
   return (
-    <Link
-      href={plan === "free" ? "/pricing" : "/dashboard"}
-      className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md border transition-all hover:opacity-80"
-      style={{
-        color: config.color,
-        background: config.bg,
-        borderColor: config.border,
-      }}
-    >
-      {config.label}
-    </Link>
+    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+      <Link
+        href={plan === "free" ? "/pricing" : "/dashboard"}
+        className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md border transition-all hover:opacity-80"
+        style={{
+          color: config.color,
+          background: config.bg,
+          borderColor: config.border,
+        }}
+      >
+        {config.label}
+      </Link>
+    </motion.div>
   );
 }
 
 /** Full UXLens logo: icon mark + "UXLens" wordmark */
 function Logo({ height = 26 }: { height?: number }) {
-  // Original viewBox is 2141 x 617 — aspect ratio ~3.47:1
   const width = Math.round(height * (2141 / 617));
   return (
     <svg
@@ -61,63 +155,96 @@ function Logo({ height = 26 }: { height?: number }) {
 }
 
 export function Header() {
+  const { scrollY } = useScroll();
+  const [hidden, setHidden] = useState(false);
+
+  useMotionValueEvent(scrollY, "change", (current) => {
+    const previous = scrollY.getPrevious() ?? 0;
+    if (current > previous && current > 150) {
+      setHidden(true);
+    } else {
+      setHidden(false);
+    }
+  });
 
   return (
-    <>
-      <header className="w-full border-b sticky top-0 z-50 backdrop-blur-md" style={{ borderColor: "rgba(0,0,0,0.05)", background: "oklch(1 0 0 / 88%)" }}>
-        <nav aria-label="Main navigation" className="mx-auto flex h-14 max-w-[960px] items-center justify-between px-7">
-          <div className="flex items-center gap-6">
+    <motion.header
+      animate={{ y: hidden ? "-100%" : "0%" }}
+      transition={{
+        y: { type: "spring", stiffness: 300, damping: 30 },
+      }}
+      className="w-full sticky top-0 z-50"
+      style={{ background: "var(--background)" }}
+    >
+      <nav aria-label="Main navigation" className="mx-auto flex h-14 max-w-[960px] items-center justify-between px-7">
+        <div className="flex items-center gap-6">
+          <Link
+            href="/"
+            className="flex items-center gap-2 transition-opacity hover:opacity-70"
+            aria-label="UXLens — Home"
+          >
+            <Logo height={22} />
+          </Link>
+          <Link
+            href="/pricing"
+            className="text-[12px] font-medium transition-colors duration-150"
+            style={{ color: "var(--neutral-secondary, var(--muted-foreground))" }}
+          >
+            Pricing
+          </Link>
+          <Show when="signed-in">
             <Link
-              href="/"
-              className="flex items-center gap-2 transition-opacity hover:opacity-70"
-              aria-label="UXLens — Home"
+              href="/dashboard"
+              className="text-[12px] font-medium transition-colors duration-150"
+              style={{ color: "var(--neutral-secondary, var(--muted-foreground))" }}
             >
-              <Logo height={22} />
+              Dashboard
             </Link>
-            <Link
-              href="/pricing"
-              className="text-[12px] font-medium text-foreground/40 hover:text-foreground/70 transition-colors duration-150"
-            >
-              Pricing
-            </Link>
-            <Show when="signed-in">
-              <Link
-                href="/dashboard"
-                className="text-[12px] font-medium text-foreground/40 hover:text-foreground/70 transition-colors duration-150"
+          </Show>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <div
+            className="hidden sm:flex items-center gap-1.5 text-[12px] font-bold border rounded-full px-2.5 py-0.5 tracking-wider"
+            style={{
+              color: "var(--success, #16a34a)",
+              background: "var(--success-subtle-bg, #f0fdf4)",
+              borderColor: "var(--border)",
+            }}
+          >
+            <span
+              className="w-[5px] h-[5px] rounded-full"
+              style={{ background: "var(--success, #16a34a)", animation: "blink-dot 1.8s ease-in-out infinite" }}
+            />
+            v0.7
+          </div>
+
+          <Show when="signed-out">
+            <SignInButton mode="modal">
+              <motion.button
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
+                className="text-[12px] font-medium px-3.5 py-1.5 rounded-lg border transition-colors duration-150"
+                style={{ borderColor: "var(--brand-glow)", color: "var(--brand)", background: "var(--brand-dim)" }}
               >
-                Dashboard
-              </Link>
-            </Show>
-          </div>
+                Sign In
+              </motion.button>
+            </SignInButton>
+          </Show>
 
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-1.5 text-[12px] font-bold border rounded-full px-2.5 py-0.5 tracking-wider" style={{ color: "#16a34a", background: "#f0fdf4", borderColor: "#bbf7d0" }}>
-              <span className="w-[5px] h-[5px] rounded-full" style={{ background: "#16a34a", animation: "blink-dot 1.8s ease-in-out infinite" }} />
-              v0.7
-            </div>
-
-            <Show when="signed-out">
-              <SignInButton mode="modal">
-                <button className="text-[12px] font-medium px-3.5 py-1.5 rounded-lg border transition-all duration-150 hover:opacity-80" style={{ borderColor: "var(--brand-glow)", color: "var(--brand)", background: "var(--brand-dim)" }}>
-                  Sign In
-                </button>
-              </SignInButton>
-            </Show>
-
-            <Show when="signed-in">
-              <PlanBadge />
-              <UserButton
-                appearance={{
-                  elements: {
-                    avatarBox: "w-[32px] h-[32px]",
-                  },
-                }}
-              />
-            </Show>
-          </div>
-        </nav>
-
-      </header>
-    </>
+          <Show when="signed-in">
+            <PlanBadge />
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "w-[32px] h-[32px]",
+                },
+              }}
+            />
+          </Show>
+        </div>
+      </nav>
+    </motion.header>
   );
 }

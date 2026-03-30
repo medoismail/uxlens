@@ -199,7 +199,7 @@ export function ChatWidget({ auditId, plan }: ChatWidgetProps) {
       {/* Chat panel */}
       {isOpen && (
         <div
-          className="fixed bottom-6 right-6 z-50 flex flex-col rounded-2xl border shadow-2xl overflow-hidden"
+          className="fixed bottom-6 right-6 z-50 flex flex-col rounded-xl border shadow-2xl overflow-hidden"
           style={{
             width: "min(400px, calc(100vw - 32px))",
             height: "min(560px, calc(100vh - 100px))",
@@ -275,7 +275,7 @@ export function ChatWidget({ auditId, plan }: ChatWidgetProps) {
                 className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-[12px] leading-relaxed ${
+                  className={`max-w-[85%] rounded-xl px-3.5 py-2.5 text-[12px] leading-relaxed ${
                     msg.role === "user"
                       ? "rounded-br-md"
                       : "rounded-bl-md"

@@ -45,9 +45,9 @@ function scoreColor(s: number) {
 
 const PLAN_DISPLAY: Record<string, { label: string; color: string; bg: string; border: string }> = {
   free: { label: "Free", color: "var(--foreground)", bg: "var(--s2)", border: "var(--border)" },
-  starter: { label: "Starter", color: "#2563eb", bg: "#eff6ff", border: "#bfdbfe" },
-  pro: { label: "Pro", color: "#7c3aed", bg: "#f5f3ff", border: "#c4b5fd" },
-  agency: { label: "Agency", color: "#db2777", bg: "#fdf2f8", border: "#f9a8d4" },
+  starter: { label: "Starter", color: "var(--info)", bg: "var(--info-subtle-bg)", border: "var(--border)" },
+  pro: { label: "Pro", color: "var(--brand)", bg: "var(--brand-dim)", border: "var(--border)" },
+  agency: { label: "Agency", color: "var(--error)", bg: "var(--error-subtle-bg)", border: "var(--border)" },
 };
 
 function PlanCard({ planInfo, totalAudits }: { planInfo: PlanInfo; totalAudits: number }) {
@@ -60,7 +60,7 @@ function PlanCard({ planInfo, totalAudits }: { planInfo: PlanInfo; totalAudits: 
 
   return (
     <div
-      className="rounded-2xl p-5 mb-8"
+      className="rounded-xl p-5 mb-8"
       style={{ background: config.bg }}
     >
       <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -262,15 +262,15 @@ function ApiKeysSection() {
 
   return (
     <div
-      className="rounded-2xl shadow-elevation-1 p-6 mb-8"
+      className="rounded-xl border p-6 mb-8"
       style={{ background: "var(--s1)" }}
     >
       <div className="flex items-center gap-3 mb-4">
         <div
           className="w-10 h-10 rounded-xl grid place-items-center"
-          style={{ background: "#16a34a12" }}
+          style={{ background: "var(--success-subtle-bg)" }}
         >
-          <Key className="w-4 h-4" style={{ color: "#16a34a" }} />
+          <Key className="w-4 h-4" style={{ color: "var(--success)" }} />
         </div>
         <div>
           <h3 className="text-[14px] font-bold text-foreground">UXLens Skill</h3>
@@ -378,9 +378,9 @@ function ApiKeysSection() {
           disabled={generating}
           className="inline-flex items-center gap-2 text-[12px] font-medium px-4 py-2 mt-3 rounded-lg border transition-all duration-150 hover:opacity-80 disabled:opacity-40"
           style={{
-            borderColor: "#bbf7d0",
-            color: "#16a34a",
-            background: "#f0fdf4",
+            borderColor: "var(--border)",
+            color: "var(--success)",
+            background: "var(--success-subtle-bg)",
           }}
         >
           {generating ? (
@@ -533,7 +533,7 @@ export function DashboardClient() {
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
-                className="rounded-2xl shadow-elevation-1 p-5 animate-pulse"
+                className="rounded-xl border p-5 animate-pulse"
                 style={{ background: "var(--s1)" }}
               >
                 <div className="h-4 w-3/4 rounded-lg" style={{ background: "var(--s3)" }} />
@@ -579,7 +579,7 @@ export function DashboardClient() {
                 return (
                   <div
                     key={audit.id}
-                    className="group relative rounded-2xl shadow-elevation-1 p-5 transition-all duration-250 hover:shadow-elevation-2"
+                    className="group relative rounded-xl border p-5 transition-all duration-250 hover:shadow-elevation-2"
                     style={{ background: "var(--s1)" }}
                   >
                     {/* Actions (top-right, visible on hover) */}
@@ -805,7 +805,7 @@ function DeleteConfirmModal({
         {/* Input */}
         <div
           className="rounded-lg transition-all duration-200 mb-5"
-          style={{ background: "white" }}
+          style={{ background: "var(--background)" }}
         >
           <input
             type="text"

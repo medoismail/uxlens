@@ -123,7 +123,7 @@ export function PricingClient({
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 w-full">
           {/* Free Card */}
           <div
-            className={`relative rounded-2xl p-6 transition-all duration-250 ${
+            className={`relative rounded-xl p-6 transition-all duration-250 ${
               isSignedIn && currentPlan === "free"
                 ? "shadow-elevation-1 bg-card"
                 : "shadow-elevation-1 bg-card/50"
@@ -193,7 +193,7 @@ export function PricingClient({
         </div>
 
         {/* Human Audit */}
-        <div className="max-w-xl mx-auto rounded-2xl shadow-elevation-1 p-7" style={{ background: "var(--s1)" }}>
+        <div className="max-w-xl mx-auto rounded-xl shadow-elevation-1 p-7" style={{ background: "var(--s1)" }}>
           <div className="flex items-center gap-3 mb-4">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg shrink-0" style={{ background: "var(--brand)" }}>
               <User className="h-4 w-4" style={{ color: "var(--brand-fg)" }} />

@@ -1,61 +1,64 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { motion, type Variants } from "motion/react";
 
 interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
-  delay?: number; // 0-4 for stagger
-  threshold?: number; // 0-1 for IntersectionObserver
+  delay?: number;
+  threshold?: number;
+  /** Direction the element slides from. Default: "up" */
+  direction?: "up" | "down" | "left" | "right";
 }
 
+const directionOffsets = {
+  up: { x: 0, y: 20 },
+  down: { x: 0, y: -20 },
+  left: { x: 20, y: 0 },
+  right: { x: -20, y: 0 },
+};
+
 /**
- * Lightweight scroll-reveal wrapper using IntersectionObserver.
- * Adds the `revealed` class when the element enters the viewport.
- * One-shot — once revealed, stays visible.
+ * Scroll-reveal wrapper using motion's whileInView.
+ * - Spring-based with subtle blur for polish
+ * - Respects prefers-reduced-motion via motion's built-in support
+ * - One-shot — once revealed, stays visible (viewport.once)
  */
 export function ScrollReveal({
   children,
   className = "",
-  delay,
+  delay = 0,
   threshold = 0.15,
+  direction = "up",
 }: ScrollRevealProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [revealed, setRevealed] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    // Respect prefers-reduced-motion
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) {
-      setRevealed(true);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setRevealed(true);
-          observer.unobserve(el);
-        }
-      },
-      { threshold, rootMargin: "0px 0px -40px 0px" }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [threshold]);
-
-  const delayClass = typeof delay === "number" ? `delay-${delay}` : "";
+  const offset = directionOffsets[direction];
+  const delaySeconds = delay * 0.08;
 
   return (
-    <div
-      ref={ref}
-      className={`scroll-reveal ${revealed ? "revealed" : ""} ${delayClass} ${className}`}
+    <motion.div
+      initial={{
+        opacity: 0,
+        x: offset.x,
+        y: offset.y,
+        filter: "blur(4px)",
+      }}
+      whileInView={{
+        opacity: 1,
+        x: 0,
+        y: 0,
+        filter: "blur(0px)",
+      }}
+      viewport={{ once: true, amount: threshold }}
+      transition={{
+        duration: 0.5,
+        delay: delaySeconds,
+        x: { type: "spring", stiffness: 200, damping: 24, delay: delaySeconds },
+        y: { type: "spring", stiffness: 200, damping: 24, delay: delaySeconds },
+        filter: { duration: 0.3, delay: delaySeconds },
+      }}
+      className={className}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }

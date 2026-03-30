@@ -125,7 +125,7 @@ export function InstallBanner() {
     <>
       {/* Install banner */}
       <div
-        className={`fixed left-1/2 z-50 flex items-center gap-3 rounded-2xl border px-4 py-3 shadow-lg backdrop-blur-xl transition-all duration-300 ${
+        className={`fixed left-1/2 z-50 flex items-center gap-3 rounded-xl border px-4 py-3 shadow-lg backdrop-blur-xl transition-all duration-300 ${
           exiting
             ? "translate-y-[120%] opacity-0"
             : "translate-y-0 opacity-100"
@@ -191,7 +191,7 @@ export function InstallBanner() {
 
           {/* Instructions card */}
           <div
-            className="relative mx-4 mb-8 w-full max-w-sm rounded-2xl border p-6"
+            className="relative mx-4 mb-8 w-full max-w-sm rounded-xl border p-6"
             style={{
               background: "oklch(0.15 0.01 285 / 95%)",
               borderColor: "var(--border2)",

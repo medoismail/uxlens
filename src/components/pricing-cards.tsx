@@ -82,7 +82,7 @@ export function PricingCards({ email, currentPlan }: PricingCardsProps) {
         return (
           <div
             key={plan.name}
-            className={`relative rounded-2xl p-6 transition-all duration-250 hover:shadow-elevation-2 ${
+            className={`relative rounded-xl p-6 transition-all duration-250 hover:shadow-elevation-2 ${
               isCurrent
                 ? "shadow-elevation-1 bg-card"
                 : plan.popular && !currentPlan

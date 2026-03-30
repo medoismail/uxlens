@@ -2,33 +2,31 @@
 
 import { Sparkles, Check, Link2, Share2, Copy } from "lucide-react";
 import { ScrollReveal } from "@/components/scroll-reveal";
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  useInView,
+  useSpring,
+  AnimatePresence,
+} from "motion/react";
+import { useRef, useEffect, useState } from "react";
 
 /* ── Shared ── */
 
 function MockContainer({
   children,
   className = "",
-  glow = false,
 }: {
   children: React.ReactNode;
   className?: string;
-  glow?: boolean;
+  glow?: boolean; // kept for API compat, ignored
 }) {
   return (
     <div
-      className={`relative rounded-2xl shadow-elevation-2 overflow-hidden ${className}`}
-      style={{ background: "var(--card)" }}
+      className={`relative rounded-lg overflow-hidden mock-card ${className}`}
     >
-      {glow && (
-        <div
-          className="absolute -top-16 -right-16 w-[180px] h-[180px] rounded-full pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(circle, var(--brand-glow) 0%, transparent 65%)",
-          }}
-        />
-      )}
-      <div className="relative">{children}</div>
+      {children}
     </div>
   );
 }
@@ -39,57 +37,200 @@ function scoreColor(s: number) {
   return "var(--score-low)";
 }
 
+/* ── Animated Counter Hook ── */
+
+function useAnimatedCounter(target: number, duration: number = 1200) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, amount: 0.5 });
+  const motionVal = useMotionValue(0);
+  const springVal = useSpring(motionVal, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.5,
+  });
+  const [display, setDisplay] = useState(0);
+
+  useEffect(() => {
+    if (isInView) {
+      motionVal.set(target);
+    }
+  }, [isInView, motionVal, target]);
+
+  useEffect(() => {
+    const unsub = springVal.on("change", (v) => {
+      setDisplay(Math.round(v));
+    });
+    return unsub;
+  }, [springVal]);
+
+  return { ref, display };
+}
+
+/* ── Animated Score Ring ── */
+
+function AnimatedScoreRing({
+  score,
+  size = 52,
+  strokeWidth = 8,
+}: {
+  score: number;
+  size?: number;
+  strokeWidth?: number;
+}) {
+  const r = (size / 2) - (strokeWidth / 2) - 2;
+  const circumference = 2 * Math.PI * r;
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.5 });
+  const color = scoreColor(score);
+
+  return (
+    <div ref={ref} className="relative" style={{ width: size, height: size }}>
+      <svg className="-rotate-90 w-full h-full" viewBox={`0 0 ${size} ${size}`}>
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          strokeWidth={strokeWidth}
+          style={{ stroke: "var(--s3)" }}
+        />
+        <motion.circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          initial={{ strokeDashoffset: circumference }}
+          animate={
+            isInView
+              ? { strokeDashoffset: circumference - (score / 100) * circumference }
+              : { strokeDashoffset: circumference }
+          }
+          transition={{
+            duration: 1.2,
+            ease: [0.33, 1, 0.68, 1], // easeOutCubic
+            delay: 0.2,
+          }}
+          style={{ stroke: color }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <AnimatedNumber value={score} color={color} size={16} />
+      </div>
+    </div>
+  );
+}
+
+/* ── Animated Number Display ── */
+
+function AnimatedNumber({
+  value,
+  color,
+  size = 16,
+  suffix = "",
+}: {
+  value: number;
+  color: string;
+  size?: number;
+  suffix?: string;
+}) {
+  const { ref, display } = useAnimatedCounter(value);
+
+  return (
+    <span
+      ref={ref}
+      className="font-bold tabular-nums leading-none"
+      style={{ color, fontSize: `${size}px`, fontVariantNumeric: "tabular-nums" }}
+    >
+      {display}
+      {suffix}
+    </span>
+  );
+}
+
+/* ── Animated Bar ── */
+
+function AnimatedBar({
+  width,
+  color,
+  delay = 0,
+}: {
+  width: number;
+  color: string;
+  delay?: number;
+}) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.5 });
+
+  return (
+    <div
+      ref={ref}
+      className="flex-1 h-[6px] rounded-full overflow-hidden"
+      style={{ background: "var(--s3)" }}
+    >
+      <motion.div
+        className="h-full rounded-full"
+        style={{ background: color }}
+        initial={{ width: "0%" }}
+        animate={isInView ? { width: `${width}%` } : { width: "0%" }}
+        transition={{
+          duration: 0.8,
+          ease: [0.33, 1, 0.68, 1],
+          delay: delay * 0.08 + 0.1,
+        }}
+      />
+    </div>
+  );
+}
+
 /* ════════════════════════════════════════════════════════════
-   Executive Summary Mock (replaces ScoreBannerMock)
-   — 5-card metric row matching new dashboard layout
+   Executive Summary Mock
+   — Animated 5-card metric row with spring counters
    ════════════════════════════════════════════════════════════ */
 
 const MOCK_SCORE = 82;
 const MOCK_GRADE = "B+";
 
 export function ExecutiveSummaryMock() {
-  const circumference = 2 * Math.PI * 44;
-  const dashOffset = circumference - (MOCK_SCORE / 100) * circumference;
-  const dialColor = scoreColor(MOCK_SCORE);
-
   return (
-    <div className="grid grid-cols-5 gap-2">
+    <motion.div
+      className="grid grid-cols-5 gap-2"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+      variants={{
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: { staggerChildren: 0.06, delayChildren: 0.1 },
+        },
+      }}
+    >
       {/* UX Score — large gauge card */}
-      <div
-        className="col-span-2 sm:col-span-1 dash-card rounded-xl shadow-elevation-1 p-3 flex flex-col items-center justify-center"
+      <motion.div
+        className="col-span-2 sm:col-span-1 dash-card rounded-xl border p-3 flex flex-col items-center justify-center"
         style={{ background: "var(--s1)" }}
+        variants={{
+          hidden: { opacity: 0, y: 12, scale: 0.95 },
+          visible: {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            transition: {
+              y: { type: "spring", stiffness: 300, damping: 24 },
+              scale: { type: "spring", stiffness: 300, damping: 20 },
+            },
+          },
+        }}
       >
-        <div className="relative w-[52px] h-[52px] mb-1.5">
-          <svg className="-rotate-90 w-full h-full" viewBox="0 0 100 100">
-            <circle
-              cx="50" cy="50" r="44" fill="none" strokeWidth="8"
-              style={{ stroke: "var(--s3)" }}
-            />
-            <circle
-              cx="50" cy="50" r="44" fill="none"
-              strokeWidth="8" strokeLinecap="round"
-              strokeDasharray={circumference}
-              strokeDashoffset={dashOffset}
-              className="animate-ring-fill"
-              style={{
-                stroke: dialColor,
-                "--ring-circumference": circumference,
-                "--ring-offset": dashOffset,
-              } as React.CSSProperties}
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span
-              className="text-[16px] font-bold tabular-nums leading-none"
-              style={{ color: dialColor }}
-            >
-              {MOCK_SCORE}
-            </span>
-          </div>
+        <div className="mb-1.5">
+          <AnimatedScoreRing score={MOCK_SCORE} />
         </div>
         <span className="text-[10px] text-foreground/40 font-medium">UX Score</span>
         <span className="text-[10px] text-foreground/45">{MOCK_GRADE}</span>
-      </div>
+      </motion.div>
 
       {/* Conv. Risk */}
       <MiniMetricCard label="Conv. Risk" value={22} suffix="%" color={scoreColor(78)} />
@@ -98,35 +239,70 @@ export function ExecutiveSummaryMock() {
       {/* Trust */}
       <MiniMetricCard label="Trust" value={70} suffix="/100" color={scoreColor(70)} />
       {/* Complexity */}
-      <div
-        className="dash-card rounded-xl shadow-elevation-1 p-2.5 flex flex-col items-center justify-center text-center"
+      <motion.div
+        className="dash-card rounded-xl border p-2.5 flex flex-col items-center justify-center text-center"
         style={{ background: "var(--s1)" }}
+        variants={{
+          hidden: { opacity: 0, y: 12, scale: 0.95 },
+          visible: {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            transition: {
+              y: { type: "spring", stiffness: 300, damping: 24 },
+              scale: { type: "spring", stiffness: 300, damping: 20 },
+            },
+          },
+        }}
       >
-        <span className="text-[14px] font-bold mb-0.5" style={{ color: "var(--score-mid)" }}>Medium</span>
+        <span className="text-[14px] font-bold mb-0.5" style={{ color: "var(--score-mid)" }}>
+          Medium
+        </span>
         <span className="text-[10px] text-foreground/40 font-medium">Complexity</span>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
-function MiniMetricCard({ label, value, suffix = "", color }: { label: string; value: number; suffix?: string; color: string }) {
+function MiniMetricCard({
+  label,
+  value,
+  suffix = "",
+  color,
+}: {
+  label: string;
+  value: number;
+  suffix?: string;
+  color: string;
+}) {
   return (
-    <div
-      className="dash-card rounded-xl shadow-elevation-1 p-2.5 flex flex-col items-center justify-center text-center"
+    <motion.div
+      className="dash-card rounded-xl border p-2.5 flex flex-col items-center justify-center text-center"
       style={{ background: "var(--s1)" }}
+      variants={{
+        hidden: { opacity: 0, y: 12, scale: 0.95 },
+        visible: {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          transition: {
+            y: { type: "spring", stiffness: 300, damping: 24 },
+            scale: { type: "spring", stiffness: 300, damping: 20 },
+          },
+        },
+      }}
     >
       <div className="flex items-baseline gap-0.5 mb-0.5">
-        <span className="text-[16px] font-bold tabular-nums" style={{ color }}>{value}</span>
+        <AnimatedNumber value={value} color={color} size={16} />
         {suffix && <span className="text-[10px] text-foreground/50">{suffix}</span>}
       </div>
       <span className="text-[10px] text-foreground/40 font-medium">{label}</span>
-    </div>
+    </motion.div>
   );
 }
 
 /* ════════════════════════════════════════════════════════════
-   Bar Chart Mock (replaces CategoryGridMock)
-   — Horizontal bars sorted by score ascending (worst first)
+   Bar Chart Mock — Animated horizontal bars
    ════════════════════════════════════════════════════════════ */
 
 const MOCK_CATEGORIES = [
@@ -140,39 +316,52 @@ const MOCK_CATEGORIES = [
 
 export function BarChartMock() {
   return (
-    <div className="flex flex-col gap-2">
-      {MOCK_CATEGORIES.map((cat) => (
-        <div key={cat.label} className="flex items-center gap-2">
+    <motion.div
+      className="flex flex-col gap-2"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+      variants={{
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: { staggerChildren: 0.06, delayChildren: 0.2 },
+        },
+      }}
+    >
+      {MOCK_CATEGORIES.map((cat, i) => (
+        <motion.div
+          key={cat.label}
+          className="flex items-center gap-2"
+          variants={{
+            hidden: { opacity: 0, x: -8 },
+            visible: {
+              opacity: 1,
+              x: 0,
+              transition: {
+                x: { type: "spring", stiffness: 300, damping: 24 },
+              },
+            },
+          }}
+        >
           <span className="text-[10px] text-foreground/40 w-[90px] sm:w-[110px] shrink-0 truncate">
             {cat.label}
           </span>
-          <div
-            className="flex-1 h-[6px] rounded-full overflow-hidden"
-            style={{ background: "var(--s3)" }}
-          >
-            <div
-              className="h-full rounded-full animate-bar-width"
-              style={{
-                background: cat.color,
-                width: `${cat.score}%`,
-                "--bar-width": `${cat.score}%`,
-              } as React.CSSProperties}
-            />
-          </div>
+          <AnimatedBar width={cat.score} color={cat.color} delay={i} />
           <span
-            className="text-[12px] font-bold font-mono w-6 text-right"
+            className="text-[12px] font-bold font-mono w-6 text-right tabular-nums"
             style={{ color: cat.color }}
           >
             {cat.score}
           </span>
-        </div>
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 }
 
 /* ════════════════════════════════════════════════════════════
-   Metric Grid Mock (2×3 compact cards with sparklines)
+   Metric Grid Mock (2x3 compact cards with sparklines)
    ════════════════════════════════════════════════════════════ */
 
 const MOCK_METRIC_GRID = [
@@ -185,63 +374,92 @@ const MOCK_METRIC_GRID = [
 ];
 
 const SPARK_PATTERNS = [
-  [0.25, 0.50, 1.00, 0.60, 0.80],
-  [0.80, 0.55, 0.30, 0.65, 1.00],
-  [0.40, 1.00, 0.70, 0.35, 0.55],
-  [0.60, 0.40, 0.75, 1.00, 0.50],
-  [1.00, 0.65, 0.40, 0.55, 0.30],
-  [0.35, 0.70, 0.55, 1.00, 0.75],
+  [0.25, 0.5, 1.0, 0.6, 0.8],
+  [0.8, 0.55, 0.3, 0.65, 1.0],
+  [0.4, 1.0, 0.7, 0.35, 0.55],
+  [0.6, 0.4, 0.75, 1.0, 0.5],
+  [1.0, 0.65, 0.4, 0.55, 0.3],
+  [0.35, 0.7, 0.55, 1.0, 0.75],
 ];
+
 function generateSparkData(score: number, index: number = 0): number[] {
   const s = score / 100;
   const pattern = SPARK_PATTERNS[index % SPARK_PATTERNS.length];
-  return pattern.map(m => Math.min(1, Math.max(0.08, s * m)));
+  return pattern.map((m) => Math.min(1, Math.max(0.08, s * m)));
 }
 
 export function MetricGridMock() {
   return (
-    <div className="grid grid-cols-3 gap-1.5">
+    <motion.div
+      className="grid grid-cols-3 gap-1.5"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+      variants={{
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: { staggerChildren: 0.05, delayChildren: 0.1 },
+        },
+      }}
+    >
       {MOCK_METRIC_GRID.map((cat, idx) => {
         const sparkData = generateSparkData(cat.score, idx);
         return (
-          <div
+          <motion.div
             key={cat.label}
-            className="dash-card rounded-lg shadow-elevation-1 p-2.5"
+            className="dash-card rounded-lg border p-2.5"
             style={{ background: "var(--s1)" }}
+            variants={{
+              hidden: { opacity: 0, y: 10, scale: 0.95 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                transition: {
+                  y: { type: "spring", stiffness: 300, damping: 24 },
+                },
+              },
+            }}
+            whileHover={{
+              scale: 1.02,
+              transition: { type: "spring", stiffness: 400, damping: 20 },
+            }}
           >
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[10px] text-foreground/55 truncate">{cat.label}</span>
-              <span
-                className="text-[14px] font-bold font-mono"
-                style={{ color: cat.color }}
-              >
-                {cat.score}
-              </span>
+              <AnimatedNumber value={cat.score} color={cat.color} size={14} />
             </div>
-            {/* Mini sparkline */}
+            {/* Mini sparkline — animated bars */}
             <div className="flex items-end gap-[2px] h-[14px]">
               {sparkData.map((v, i) => (
-                <div
+                <motion.div
                   key={i}
                   className="flex-1 rounded-sm"
                   style={{
                     background: cat.color,
-                    height: `${v * 100}%`,
                     opacity: 0.4 + v * 0.6,
+                  }}
+                  initial={{ height: 0 }}
+                  whileInView={{ height: `${v * 100}%` }}
+                  viewport={{ once: true }}
+                  transition={{
+                    duration: 0.5,
+                    delay: idx * 0.05 + i * 0.04 + 0.3,
+                    ease: [0.33, 1, 0.68, 1],
                   }}
                 />
               ))}
             </div>
-          </div>
+          </motion.div>
         );
       })}
-    </div>
+    </motion.div>
   );
 }
 
 /* ════════════════════════════════════════════════════════════
-   Radar Chart Mock (static SVG for Feature 2 section)
-   — 6-axis spider chart matching the dashboard RadarChart
+   Radar Chart Mock — Animated SVG with path drawing
    ════════════════════════════════════════════════════════════ */
 
 export function RadarChartMock() {
@@ -251,6 +469,8 @@ export function RadarChartMock() {
   const maxR = 72;
   const labels = ["Clarity", "Cog. Load", "Conv.", "Trust", "Contra.", "1st Screen"];
   const scores = [88, 72, 79, 70, 85, 76];
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.4 });
 
   const getPoint = (index: number, value: number) => {
     const angle = (Math.PI * 2 * index) / 6 - Math.PI / 2;
@@ -260,13 +480,14 @@ export function RadarChartMock() {
 
   const gridLevels = [25, 50, 75, 100];
 
+  const dataPoints = scores.map((s, i) => getPoint(i, s));
+  const dataPath = dataPoints.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x},${p.y}`).join(" ") + " Z";
+
   return (
     <MockContainer glow>
-      <div className="p-4 flex flex-col items-center">
+      <div ref={ref} className="p-4 flex flex-col items-center">
         <div className="flex items-center justify-between w-full mb-3">
-          <h4 className="text-[12px] font-semibold text-foreground">
-            UX Score Radar
-          </h4>
+          <h4 className="text-[12px] font-semibold text-foreground">UX Score Radar</h4>
           <span
             className="text-[10px] font-mono px-2 py-0.5 rounded"
             style={{ background: "var(--brand-dim)", color: "var(--brand)" }}
@@ -275,30 +496,29 @@ export function RadarChartMock() {
           </span>
         </div>
 
-        <svg
-          width={size}
-          height={size}
-          viewBox={`0 0 ${size} ${size}`}
-          className="animate-radar"
-        >
-          {/* Grid polygons */}
-          {gridLevels.map((level) => {
-            const pts = Array.from({ length: 6 }, (_, i) => getPoint(i, level));
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+          {/* Grid polygons — fade in */}
+          {gridLevels.map((level, i) => {
+            const pts = Array.from({ length: 6 }, (_, j) => getPoint(j, level));
             return (
-              <polygon
+              <motion.polygon
                 key={level}
                 points={pts.map((p) => `${p.x},${p.y}`).join(" ")}
                 fill="none"
                 stroke="var(--s3)"
                 strokeWidth="1"
+                initial={{ opacity: 0 }}
+                animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+                transition={{ duration: 0.3, delay: i * 0.08 }}
               />
             );
           })}
+
           {/* Axis lines */}
           {Array.from({ length: 6 }, (_, i) => {
             const p = getPoint(i, 100);
             return (
-              <line
+              <motion.line
                 key={i}
                 x1={cx}
                 y1={cy}
@@ -306,57 +526,86 @@ export function RadarChartMock() {
                 y2={p.y}
                 stroke="var(--s3)"
                 strokeWidth="1"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={isInView ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
+                transition={{ duration: 0.5, delay: i * 0.05 + 0.2 }}
               />
             );
           })}
-          {/* Data polygon */}
-          <polygon
-            points={scores
-              .map((s, i) => {
-                const p = getPoint(i, s);
-                return `${p.x},${p.y}`;
-              })
-              .join(" ")}
+
+          {/* Data polygon — draw in with spring */}
+          <motion.path
+            d={dataPath}
             fill="oklch(0.504 0.282 276.1 / 12%)"
             stroke="var(--brand)"
             strokeWidth="2"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={
+              isInView
+                ? { pathLength: 1, opacity: 1 }
+                : { pathLength: 0, opacity: 0 }
+            }
+            transition={{
+              pathLength: { duration: 1.2, ease: [0.33, 1, 0.68, 1], delay: 0.5 },
+              opacity: { duration: 0.3, delay: 0.5 },
+            }}
           />
-          {/* Data dots */}
-          {scores.map((s, i) => {
-            const p = getPoint(i, s);
-            return <circle key={i} cx={p.x} cy={p.y} r="3" fill="var(--brand)" />;
-          })}
+
+          {/* Data dots — pop in */}
+          {dataPoints.map((p, i) => (
+            <motion.circle
+              key={i}
+              cx={p.x}
+              cy={p.y}
+              r="3"
+              fill="var(--brand)"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={isInView ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
+              transition={{
+                type: "spring",
+                stiffness: 400,
+                damping: 15,
+                delay: 0.8 + i * 0.06,
+              }}
+            />
+          ))}
+
           {/* Labels */}
           {labels.map((label, i) => {
             const p = getPoint(i, 118);
             return (
-              <text
+              <motion.text
                 key={i}
                 x={p.x}
                 y={p.y}
                 textAnchor="middle"
                 dominantBaseline="central"
                 className="text-[10px] fill-foreground/35"
+                initial={{ opacity: 0 }}
+                animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+                transition={{ duration: 0.3, delay: 0.6 + i * 0.05 }}
               >
                 {label}
-              </text>
+              </motion.text>
             );
           })}
         </svg>
 
         {/* Bottom score summary */}
-        <div className="flex items-center gap-4 mt-3">
+        <motion.div
+          className="flex items-center gap-4 mt-3"
+          initial={{ opacity: 0, y: 8 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+          transition={{ duration: 0.4, delay: 1.2 }}
+        >
           <div className="flex items-center gap-1.5 text-[10px] text-foreground/55">
-            <span
-              className="w-2 h-2 rounded-full"
-              style={{ background: "var(--brand)" }}
-            />
+            <span className="w-2 h-2 rounded-full" style={{ background: "var(--brand)" }} />
             Your score
           </div>
           <span className="text-[12px] font-mono font-bold" style={{ color: scoreColor(82) }}>
             82 / 100
           </span>
-        </div>
+        </motion.div>
       </div>
     </MockContainer>
   );
@@ -365,13 +614,14 @@ export function RadarChartMock() {
 /* ── Heatmap Mock ── */
 
 export function HeatmapMock() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.3 });
+
   return (
     <MockContainer glow>
-      <div className="p-4">
+      <div ref={ref} className="p-4">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-[12px] font-semibold text-foreground">
-            Attention Heatmap
-          </h4>
+          <h4 className="text-[12px] font-semibold text-foreground">Attention Heatmap</h4>
           <span
             className="text-[10px] font-mono px-2 py-0.5 rounded"
             style={{ background: "var(--brand-dim)", color: "var(--brand)" }}
@@ -380,44 +630,59 @@ export function HeatmapMock() {
           </span>
         </div>
 
-        {/* Stylized wireframe page with gradient heatmap overlay */}
         <div
           className="relative rounded-lg overflow-hidden"
-          style={{
-            background: "var(--s2)",
-            aspectRatio: "16 / 10",
-          }}
+          style={{ background: "var(--s2)", aspectRatio: "16 / 10" }}
         >
-          {/* Wireframe content shapes */}
-          <div className="absolute inset-0 p-4 flex flex-col gap-3">
-            {/* Nav bar */}
-            <div className="flex items-center gap-2">
+          {/* Wireframe content — staggered fade in */}
+          <motion.div
+            className="absolute inset-0 p-4 flex flex-col gap-3"
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: { staggerChildren: 0.05, delayChildren: 0.1 },
+              },
+            }}
+          >
+            <motion.div
+              className="flex items-center gap-2"
+              variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
+            >
               <div className="h-2 w-10 rounded bg-foreground/8" />
               <div className="flex-1" />
               <div className="h-2 w-6 rounded bg-foreground/6" />
               <div className="h-2 w-6 rounded bg-foreground/6" />
               <div className="h-2 w-6 rounded bg-foreground/6" />
-            </div>
-            {/* Hero headline area */}
-            <div className="flex flex-col items-center gap-2 mt-4">
+            </motion.div>
+            <motion.div
+              className="flex flex-col items-center gap-2 mt-4"
+              variants={{ hidden: { opacity: 0, y: 4 }, visible: { opacity: 1, y: 0 } }}
+            >
               <div className="h-3 w-40 rounded bg-foreground/10" />
               <div className="h-5 w-56 rounded bg-foreground/12" />
               <div className="h-2.5 w-44 rounded bg-foreground/8" />
-            </div>
-            {/* CTA button */}
-            <div className="flex justify-center mt-2">
+            </motion.div>
+            <motion.div
+              className="flex justify-center mt-2"
+              variants={{ hidden: { opacity: 0, scale: 0.9 }, visible: { opacity: 1, scale: 1 } }}
+            >
               <div className="h-6 w-24 rounded-md bg-foreground/10" />
-            </div>
-            {/* Content blocks */}
-            <div className="flex gap-3 mt-4">
+            </motion.div>
+            <motion.div
+              className="flex gap-3 mt-4"
+              variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
+            >
               <div className="flex-1 h-12 rounded bg-foreground/5" />
               <div className="flex-1 h-12 rounded bg-foreground/5" />
               <div className="flex-1 h-12 rounded bg-foreground/5" />
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          {/* Heatmap gradient overlays */}
-          <div
+          {/* Heatmap gradient — fade in with pulse */}
+          <motion.div
             className="absolute inset-0 pointer-events-none"
             style={{
               background: [
@@ -426,48 +691,56 @@ export function HeatmapMock() {
                 "radial-gradient(ellipse 50% 35% at 50% 80%, oklch(0.55 0.17 155 / 18%) 0%, transparent 100%)",
               ].join(", "),
             }}
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: [0, 1, 0.85, 1] } : { opacity: 0 }}
+            transition={{ duration: 1.5, delay: 0.4, ease: "easeOut" }}
           />
         </div>
 
         {/* Legend */}
-        <div className="flex items-center justify-center gap-4 mt-3">
+        <motion.div
+          className="flex items-center justify-center gap-4 mt-3"
+          initial={{ opacity: 0, y: 6 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
+          transition={{ duration: 0.4, delay: 0.8 }}
+        >
           {[
             { color: "oklch(0.65 0.25 29)", label: "High attention" },
             { color: "oklch(0.72 0.19 75)", label: "Medium" },
             { color: "oklch(0.55 0.17 155)", label: "Low" },
           ].map((item) => (
-            <div
-              key={item.label}
-              className="flex items-center gap-1.5 text-[10px] text-foreground/55"
-            >
-              <span
-                className="w-2 h-2 rounded-full"
-                style={{ background: item.color }}
-              />
+            <div key={item.label} className="flex items-center gap-1.5 text-[10px] text-foreground/55">
+              <span className="w-2 h-2 rounded-full" style={{ background: item.color }} />
               {item.label}
             </div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </MockContainer>
   );
 }
 
-/* ── Chat Mock ── */
+/* ── Chat Mock — Typing animation ── */
 
 export function ChatMock() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.3 });
+
   return (
     <MockContainer glow>
-      <div className="flex flex-col" style={{ maxHeight: "360px" }}>
+      <div ref={ref} className="flex flex-col" style={{ maxHeight: "360px" }}>
         {/* Header */}
         <div
           className="flex items-center gap-2 px-4 py-3 border-b"
           style={{ borderColor: "var(--border)" }}
         >
-          <Sparkles className="h-4 w-4" style={{ color: "var(--brand)" }} />
-          <span className="text-[14px] font-semibold text-foreground">
-            UXLens AI
-          </span>
+          <motion.div
+            animate={isInView ? { rotate: [0, 15, -15, 0] } : {}}
+            transition={{ duration: 0.6, delay: 0.3, ease: "easeInOut" }}
+          >
+            <Sparkles className="h-4 w-4" style={{ color: "var(--brand)" }} />
+          </motion.div>
+          <span className="text-[14px] font-semibold text-foreground">UXLens AI</span>
           <span
             className="ml-auto text-[10px] font-mono px-2 py-0.5 rounded"
             style={{ background: "var(--brand-dim)", color: "var(--brand)" }}
@@ -476,65 +749,121 @@ export function ChatMock() {
           </span>
         </div>
 
-        {/* Messages */}
-        <div className="flex-1 px-4 py-3 flex flex-col gap-3 overflow-hidden">
+        {/* Messages — staggered entrance */}
+        <motion.div
+          className="flex-1 px-4 py-3 flex flex-col gap-3 overflow-hidden"
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: { staggerChildren: 0.15, delayChildren: 0.2 },
+            },
+          }}
+        >
           {/* User message */}
-          <div className="flex justify-end">
+          <motion.div
+            className="flex justify-end"
+            variants={{
+              hidden: { opacity: 0, x: 20, scale: 0.95 },
+              visible: {
+                opacity: 1,
+                x: 0,
+                scale: 1,
+                transition: { type: "spring", stiffness: 300, damping: 24 },
+              },
+            }}
+          >
             <div
               className="rounded-xl rounded-tr-sm px-3.5 py-2 text-[12px] max-w-[75%]"
-              style={{
-                background: "var(--brand)",
-                color: "var(--brand-fg)",
-              }}
+              style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
             >
               What should I fix first?
             </div>
-          </div>
+          </motion.div>
 
           {/* AI message */}
-          <div className="flex justify-start">
+          <motion.div
+            className="flex justify-start"
+            variants={{
+              hidden: { opacity: 0, x: -20, scale: 0.95 },
+              visible: {
+                opacity: 1,
+                x: 0,
+                scale: 1,
+                transition: { type: "spring", stiffness: 300, damping: 24 },
+              },
+            }}
+          >
             <div
               className="rounded-xl rounded-tl-sm px-3.5 py-2 text-[12px] max-w-[85%] leading-relaxed text-foreground/70"
               style={{ background: "var(--s2)" }}
             >
               Based on your audit, the highest-impact fix is{" "}
-              <strong className="text-foreground/90">
-                adding social proof above the fold
-              </strong>
-              . Your trust signals score is 70 — adding 2-3 testimonials near
-              the CTA could lift conversions by 15-20%.
+              <strong className="text-foreground/90">adding social proof above the fold</strong>.
+              Your trust signals score is 70 — adding 2-3 testimonials near the CTA could lift
+              conversions by 15-20%.
             </div>
-          </div>
+          </motion.div>
 
-          {/* User message */}
-          <div className="flex justify-end">
+          {/* User message 2 */}
+          <motion.div
+            className="flex justify-end"
+            variants={{
+              hidden: { opacity: 0, x: 20, scale: 0.95 },
+              visible: {
+                opacity: 1,
+                x: 0,
+                scale: 1,
+                transition: { type: "spring", stiffness: 300, damping: 24 },
+              },
+            }}
+          >
             <div
               className="rounded-xl rounded-tr-sm px-3.5 py-2 text-[12px] max-w-[75%]"
-              style={{
-                background: "var(--brand)",
-                color: "var(--brand-fg)",
-              }}
+              style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
             >
               Can you rewrite my CTA?
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        {/* Suggested questions */}
-        <div
+        {/* Suggested questions — spring pop */}
+        <motion.div
           className="px-4 py-2.5 border-t flex flex-wrap gap-1.5"
           style={{ borderColor: "var(--border)" }}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: { staggerChildren: 0.06, delayChildren: 0.7 },
+            },
+          }}
         >
           {["Explain my trust score", "Rewrite my headline"].map((q) => (
-            <span
+            <motion.span
               key={q}
               className="text-[10px] px-2.5 py-1 rounded-full border text-foreground/55 cursor-pointer hover:text-foreground/70 hover:border-foreground/20 transition-colors"
               style={{ borderColor: "var(--border)" }}
+              variants={{
+                hidden: { opacity: 0, y: 6, scale: 0.9 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  scale: 1,
+                  transition: { type: "spring", stiffness: 400, damping: 20 },
+                },
+              }}
+              whileHover={{ scale: 1.04, transition: { type: "spring", stiffness: 400, damping: 17 } }}
+              whileTap={{ scale: 0.97 }}
             >
               {q}
-            </span>
+            </motion.span>
           ))}
-        </div>
+        </motion.div>
 
         {/* Input bar */}
         <div
@@ -547,9 +876,11 @@ export function ChatMock() {
           >
             Ask about your audit...
           </div>
-          <div
-            className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+          <motion.div
+            className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 cursor-pointer"
             style={{ background: "var(--brand)" }}
+            whileHover={{ scale: 1.1, transition: { type: "spring", stiffness: 400, damping: 17 } }}
+            whileTap={{ scale: 0.92 }}
           >
             <svg
               width="12"
@@ -564,14 +895,14 @@ export function ChatMock() {
               <path d="M22 2 11 13" />
               <path d="m22 2-7 20-4-9-9-4 20-7z" />
             </svg>
-          </div>
+          </motion.div>
         </div>
       </div>
     </MockContainer>
   );
 }
 
-/* ── Competitor Mock ── */
+/* ── Competitor Mock — Animated bars ── */
 
 const COMP_DATA = [
   { name: "Your site", score: 82, highlight: true },
@@ -587,49 +918,60 @@ export function CompetitorMock() {
           Overall Score Comparison
         </p>
 
-        <div className="flex flex-col gap-3">
-          {COMP_DATA.map((c) => {
+        <motion.div
+          className="flex flex-col gap-3"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: { staggerChildren: 0.12, delayChildren: 0.15 },
+            },
+          }}
+        >
+          {COMP_DATA.map((c, i) => {
             const color = scoreColor(c.score);
             return (
-              <div key={c.name}>
+              <motion.div
+                key={c.name}
+                variants={{
+                  hidden: { opacity: 0, x: -10 },
+                  visible: {
+                    opacity: 1,
+                    x: 0,
+                    transition: { type: "spring", stiffness: 300, damping: 24 },
+                  },
+                }}
+              >
                 <div className="flex items-center justify-between mb-1.5">
                   <span
                     className={`text-[12px] ${c.highlight ? "font-semibold text-foreground" : "text-foreground/50"}`}
                   >
                     {c.name}
                   </span>
-                  <span
-                    className="text-[14px] font-bold font-mono"
-                    style={{ color }}
-                  >
-                    {c.score}
-                  </span>
+                  <AnimatedNumber value={c.score} color={color} size={14} />
                 </div>
-                <div
-                  className="h-2 rounded-full overflow-hidden"
-                  style={{ background: "var(--s3)" }}
-                >
-                  <div
-                    className="h-full rounded-full animate-bar-width"
-                    style={{
-                      background: color,
-                      width: `${c.score}%`,
-                      "--bar-width": `${c.score}%`,
-                    } as React.CSSProperties}
-                  />
+                <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
+                  <AnimatedBar width={c.score} color={color} delay={i} />
                 </div>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
-        <div
+        <motion.div
           className="mt-4 pt-3 border-t text-[12px] text-foreground/55"
           style={{ borderColor: "var(--border)" }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.6 }}
         >
           Average competitor score:{" "}
-          <span className="font-mono font-medium text-foreground/50">68</span>
-        </div>
+          <span className="font-mono font-medium text-foreground/50 tabular-nums">68</span>
+        </motion.div>
       </div>
     </MockContainer>
   );
@@ -638,27 +980,34 @@ export function CompetitorMock() {
 /* ── Rewrite Mock (Before / After) ── */
 
 export function RewriteMock() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.3 });
+
   return (
     <MockContainer glow className="max-w-2xl mx-auto">
-      <div className="p-5">
+      <div ref={ref} className="p-5">
         {/* Header */}
         <div className="flex items-center gap-2 mb-5">
-          <h4 className="text-[14px] font-semibold text-foreground">
-            Hero Rewrite
-          </h4>
-          <span
+          <h4 className="text-[14px] font-semibold text-foreground">Hero Rewrite</h4>
+          <motion.span
             className="text-[10px] font-mono px-2 py-0.5 rounded font-bold"
             style={{ background: "var(--brand-dim)", color: "var(--brand)" }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+            transition={{ type: "spring", stiffness: 400, damping: 20, delay: 0.2 }}
           >
             AI OPTIMIZED
-          </span>
+          </motion.span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Before */}
-          <div
-            className="rounded-xl shadow-elevation-1 p-4"
+          <motion.div
+            className="rounded-xl border p-4"
             style={{ background: "var(--s2)" }}
+            initial={{ opacity: 0, x: -16 }}
+            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -16 }}
+            transition={{ type: "spring", stiffness: 200, damping: 24, delay: 0.1 }}
           >
             <p className="text-[10px] font-mono uppercase tracking-[2px] text-foreground/45 mb-3">
               Before
@@ -672,35 +1021,37 @@ export function RewriteMock() {
             <span className="inline-block text-[12px] px-3 py-1.5 rounded-md border text-foreground/40 line-through border-foreground/10 cursor-pointer">
               Learn More
             </span>
-          </div>
+          </motion.div>
 
           {/* After */}
-          <div
-            className="rounded-xl shadow-elevation-1 p-4"
-            style={{
-              background: "var(--s1)",
-            }}
+          <motion.div
+            className="rounded-xl border p-4"
+            style={{ background: "var(--s1)" }}
+            initial={{ opacity: 0, x: 16 }}
+            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 16 }}
+            transition={{ type: "spring", stiffness: 200, damping: 24, delay: 0.25 }}
           >
-            <p className="text-[10px] font-mono uppercase tracking-[2px] mb-3" style={{ color: "var(--brand)" }}>
+            <p
+              className="text-[10px] font-mono uppercase tracking-[2px] mb-3"
+              style={{ color: "var(--brand)" }}
+            >
               After
             </p>
             <p className="text-[15px] font-semibold text-foreground leading-snug mb-2">
               Ship Faster With AI-Powered Design Reviews
             </p>
             <p className="text-[12px] text-foreground/55 leading-relaxed mb-3">
-              Get instant UX feedback on any page in 30 seconds. No manual
-              audits, no waiting.
+              Get instant UX feedback on any page in 30 seconds. No manual audits, no waiting.
             </p>
-            <span
-              className="inline-block text-[12px] font-bold px-3 py-1.5 rounded-md cursor-pointer hover:opacity-90 transition-opacity"
-              style={{
-                background: "var(--brand)",
-                color: "var(--brand-fg)",
-              }}
+            <motion.span
+              className="inline-block text-[12px] font-bold px-3 py-1.5 rounded-md cursor-pointer"
+              style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
+              whileHover={{ scale: 1.04, transition: { type: "spring", stiffness: 400, damping: 17 } }}
+              whileTap={{ scale: 0.97 }}
             >
               Start Free Audit
-            </span>
-          </div>
+            </motion.span>
+          </motion.div>
         </div>
       </div>
     </MockContainer>
@@ -709,69 +1060,44 @@ export function RewriteMock() {
 
 /* ════════════════════════════════════════════════════════════
    Product Preview Mock (Composite Hero Visual)
-   — Updated to show new analytics dashboard layout
    ════════════════════════════════════════════════════════════ */
 
 export function ProductPreviewMock() {
   return (
-    <div className="relative">
-      {/* Purple glow behind */}
+    <motion.div
+      className="relative"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.6, y: { type: "spring", stiffness: 150, damping: 20 } }}
+    >
       <div
-        className="absolute -inset-8 rounded-full pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 50% at 50% 40%, var(--brand-glow) 0%, transparent 70%)",
-        }}
-      />
-
-      <div className="relative perspective-tilt">
+        className="rounded-lg overflow-hidden mock-card"
+      >
+        {/* Top bar — minimal, no browser dots */}
         <div
-          className="rounded-2xl shadow-elevation-2 overflow-hidden"
-          style={{ background: "var(--card)" }}
+          className="flex items-center gap-2 px-4 py-2 border-b"
+          style={{ borderColor: "var(--border)" }}
         >
-          {/* Browser chrome */}
-          <div
-            className="flex items-center gap-2 px-4 py-2.5"
-            style={{ background: "var(--s1)" }}
-          >
-            <div
-              className="w-[9px] h-[9px] rounded-full"
-              style={{ background: "#ff5f57" }}
-            />
-            <div
-              className="w-[9px] h-[9px] rounded-full"
-              style={{ background: "#ffbd2e" }}
-            />
-            <div
-              className="w-[9px] h-[9px] rounded-full"
-              style={{ background: "#28c840" }}
-            />
-            <span className="ml-2 text-[10px] font-mono text-foreground/45">
-              uxlens.pro/audit/demo-landing-page
-            </span>
-          </div>
+          <span className="text-[10px] font-mono text-foreground/30">
+            uxlens.pro/audit/demo-landing-page
+          </span>
+        </div>
 
           {/* Dashboard Content */}
           <div className="p-4 sm:p-5 space-y-3">
-            {/* Report header */}
             <div className="text-center mb-1">
               <p className="text-[10px] text-foreground/45 mb-1">
                 Diagnostic Engine v0.7 — UX Dashboard
               </p>
-              <p className="text-[14px] font-semibold text-foreground">
-                demo-landing-page.com
-              </p>
+              <p className="text-[14px] font-semibold text-foreground">demo-landing-page.com</p>
             </div>
 
-            {/* Executive Summary Row */}
             <ExecutiveSummaryMock />
-
-            {/* Category Scores */}
             <BarChartMock />
           </div>
-        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -782,7 +1108,7 @@ interface FeatureSectionProps {
   headline: string;
   description: string;
   bullets: string[];
-  children: React.ReactNode; // mock component
+  children: React.ReactNode;
   reversed?: boolean;
   tier?: string;
 }
@@ -798,22 +1124,15 @@ export function FeatureSection({
 }: FeatureSectionProps) {
   return (
     <section className="max-w-[960px] mx-auto px-7 py-12 sm:py-16">
-      <div
-        className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center`}
-      >
+      <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center`}>
         {/* Copy side */}
         <ScrollReveal className={`space-y-4 ${reversed ? "lg:order-2" : ""}`}>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-foreground/45">
-              {label}
-            </span>
+            <span className="text-[10px] text-foreground/45">{label}</span>
             {tier && (
               <span
                 className="text-[10px] font-mono px-1.5 py-0.5 rounded font-bold"
-                style={{
-                  background: "var(--brand-dim)",
-                  color: "var(--brand)",
-                }}
+                style={{ background: "var(--brand-dim)", color: "var(--brand)" }}
               >
                 {tier}
               </span>
@@ -822,23 +1141,38 @@ export function FeatureSection({
           <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground leading-tight">
             {headline}
           </h2>
-          <p className="text-[14px] text-foreground/45 leading-relaxed max-w-md">
-            {description}
-          </p>
-          <ul className="space-y-2 pt-1">
+          <p className="text-[14px] text-foreground/45 leading-relaxed max-w-md">{description}</p>
+          <motion.ul
+            className="space-y-2 pt-1"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: { staggerChildren: 0.08, delayChildren: 0.15 },
+              },
+            }}
+          >
             {bullets.map((b) => (
-              <li
+              <motion.li
                 key={b}
                 className="flex items-center gap-2 text-[12px] text-foreground/40"
+                variants={{
+                  hidden: { opacity: 0, x: -8 },
+                  visible: {
+                    opacity: 1,
+                    x: 0,
+                    transition: { type: "spring", stiffness: 300, damping: 24 },
+                  },
+                }}
               >
-                <Check
-                  className="h-3.5 w-3.5 shrink-0"
-                  style={{ color: "var(--brand)" }}
-                />
+                <Check className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--brand)" }} />
                 {b}
-              </li>
+              </motion.li>
             ))}
-          </ul>
+          </motion.ul>
         </ScrollReveal>
 
         {/* Mock side */}
@@ -851,19 +1185,25 @@ export function FeatureSection({
 }
 
 /* ════════════════════════════════════════════════════════════
-   Share Report Mock — Interactive share link animation
+   Share Report Mock — Animated share link
    ════════════════════════════════════════════════════════════ */
 
 export function ShareMock() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.3 });
+
   return (
     <MockContainer glow>
-      <div className="p-5">
+      <div ref={ref} className="p-5">
         {/* Header */}
         <div className="flex items-center gap-2 mb-4">
-          <Share2 className="h-4 w-4" style={{ color: "var(--brand)" }} />
-          <h4 className="text-[14px] font-semibold text-foreground">
-            Share Report
-          </h4>
+          <motion.div
+            animate={isInView ? { rotate: [0, -10, 10, 0] } : {}}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <Share2 className="h-4 w-4" style={{ color: "var(--brand)" }} />
+          </motion.div>
+          <h4 className="text-[14px] font-semibold text-foreground">Share Report</h4>
           <span
             className="text-[10px] font-mono px-2 py-0.5 rounded font-bold"
             style={{ background: "var(--brand-dim)", color: "var(--brand)" }}
@@ -873,36 +1213,45 @@ export function ShareMock() {
         </div>
 
         {/* Share link bar */}
-        <div
+        <motion.div
           className="flex items-center gap-2 rounded-xl p-3 mb-4"
           style={{ background: "var(--s2)" }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+          transition={{ type: "spring", stiffness: 200, damping: 24, delay: 0.2 }}
         >
           <Link2 className="h-4 w-4 shrink-0" style={{ color: "var(--brand)" }} />
           <span className="flex-1 text-[12px] font-mono text-foreground/50 truncate">
             uxlens.pro/share/a8x2kf9p
           </span>
-          <div
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium animate-pulse"
+          <motion.div
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium"
             style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17, delay: 0.5 }}
           >
             <Copy className="h-3 w-3" />
             Copied!
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Mini shared report preview */}
-        <div
+        <motion.div
           className="rounded-xl overflow-hidden border"
           style={{ borderColor: "var(--border)", background: "var(--s1)" }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+          transition={{ type: "spring", stiffness: 200, damping: 24, delay: 0.35 }}
         >
           <div className="p-3.5 space-y-2.5">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[12px] font-semibold text-foreground">demo-landing.com</p>
-                <p className="text-[10px] text-foreground/40">Shared report • Public link</p>
+                <p className="text-[10px] text-foreground/40">Shared report &bull; Public link</p>
               </div>
               <div
-                className="px-2 py-1 rounded-lg text-[11px] font-bold"
+                className="px-2 py-1 rounded-lg text-[11px] font-bold tabular-nums"
                 style={{ background: "oklch(0.52 0.14 155 / 8%)", color: "var(--score-high)" }}
               >
                 82/100
@@ -915,16 +1264,13 @@ export function ShareMock() {
                 { label: "Clarity", w: 88, c: "var(--brand)" },
                 { label: "Trust", w: 70, c: "oklch(0.62 0.15 160)" },
                 { label: "Conversion", w: 79, c: "oklch(0.65 0.16 55)" },
-              ].map((bar) => (
+              ].map((bar, i) => (
                 <div key={bar.label} className="flex items-center gap-2">
                   <span className="text-[9px] text-foreground/35 w-[60px] truncate">{bar.label}</span>
-                  <div className="flex-1 h-[4px] rounded-full" style={{ background: "var(--s3)" }}>
-                    <div
-                      className="h-full rounded-full animate-bar-width"
-                      style={{ background: bar.c, width: `${bar.w}%`, "--bar-width": `${bar.w}%` } as React.CSSProperties}
-                    />
-                  </div>
-                  <span className="text-[10px] font-mono font-bold text-foreground/40 w-5 text-right">{bar.w}</span>
+                  <AnimatedBar width={bar.w} color={bar.c} delay={i + 5} />
+                  <span className="text-[10px] font-mono font-bold text-foreground/40 w-5 text-right tabular-nums">
+                    {bar.w}
+                  </span>
                 </div>
               ))}
             </div>
@@ -935,14 +1281,18 @@ export function ShareMock() {
             style={{ borderColor: "var(--border)", background: "var(--s2)" }}
           >
             <div className="flex items-center gap-1.5 text-[10px] text-foreground/40">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              <motion.div
+                className="w-1.5 h-1.5 rounded-full bg-green-500"
+                animate={{ scale: [1, 1.3, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              />
               Anyone with the link can view
             </div>
             <span className="text-[10px] font-medium" style={{ color: "var(--brand)" }}>
               Powered by UXLens
             </span>
           </div>
-        </div>
+        </motion.div>
       </div>
     </MockContainer>
   );

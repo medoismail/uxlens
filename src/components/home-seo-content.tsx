@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { motion } from "motion/react";
 import {
   ArrowRight,
   Target,
@@ -44,7 +45,7 @@ function SocialProofBar() {
     <ScrollReveal>
       <div
         className="border-y py-5"
-        style={{ borderColor: "rgba(0,0,0,0.05)" }}
+        style={{ borderColor: "var(--border)" }}
       >
         <div className="max-w-[960px] mx-auto px-7 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[12px] text-foreground/50">
           {count !== null && (
@@ -73,9 +74,9 @@ function Divider({ label }: { label: string }) {
   return (
     <ScrollReveal className="max-w-[960px] mx-auto px-7">
       <div className="flex items-center gap-4 text-foreground/50 text-[12px] font-medium">
-        <div className="flex-1 h-px" style={{ background: "rgba(0,0,0,0.08)" }} />
+        <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
         {label}
-        <div className="flex-1 h-px" style={{ background: "rgba(0,0,0,0.08)" }} />
+        <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
       </div>
     </ScrollReveal>
   );
@@ -222,27 +223,58 @@ export function HomeSEOContent() {
       <Divider label="How it works" />
 
       <section className="max-w-[960px] mx-auto px-7 py-14 sm:py-20">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-3 gap-8"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: { staggerChildren: 0.12, delayChildren: 0.1 },
+            },
+          }}
+        >
           {STEPS.map((step, i) => (
-            <ScrollReveal key={step.num} delay={i} className="space-y-3.5">
-              <span
+            <motion.div
+              key={step.num}
+              className="space-y-3.5"
+              variants={{
+                hidden: { opacity: 0, y: 16, filter: "blur(4px)" },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  filter: "blur(0px)",
+                  transition: {
+                    y: { type: "spring", stiffness: 200, damping: 24 },
+                    filter: { duration: 0.3 },
+                  },
+                },
+              }}
+            >
+              <motion.span
                 className="inline-block text-[12px] font-mono font-bold px-2.5 py-1 rounded-md"
                 style={{
                   background: "var(--brand-dim)",
                   color: "var(--brand)",
                 }}
+                whileHover={{
+                  scale: 1.08,
+                  transition: { type: "spring", stiffness: 400, damping: 17 },
+                }}
               >
                 {step.num}
-              </span>
+              </motion.span>
               <h3 className="text-[15px] font-semibold text-foreground tracking-tight">
                 {step.title}
               </h3>
               <p className="text-[12px] text-foreground/55 leading-relaxed">
                 {step.desc}
               </p>
-            </ScrollReveal>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
 
       {/* ── Feature Sections (alternating layout) ── */}
@@ -357,30 +389,59 @@ export function HomeSEOContent() {
           </p>
         </ScrollReveal>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+            },
+          }}
+        >
           {USE_CASES.map((uc, i) => (
-            <ScrollReveal key={uc.title} delay={i}>
-              <div
-                className="rounded-xl border p-6 transition-all duration-200 hover:border-[rgba(0,0,0,0.1)]"
-                style={{
-                  borderColor: "rgba(0,0,0,0.06)",
-                  background: "var(--s1)",
-                }}
-              >
-                <uc.icon
-                  className="h-4 w-4 mb-3.5"
-                  style={{ color: "var(--brand)" }}
-                />
-                <h3 className="text-[14px] font-semibold text-foreground mb-2">
-                  {uc.title}
-                </h3>
-                <p className="text-[12px] text-foreground/55 leading-relaxed">
-                  {uc.desc}
-                </p>
-              </div>
-            </ScrollReveal>
+            <motion.div
+              key={uc.title}
+              className="rounded-xl border p-6"
+              style={{
+                borderColor: "var(--border)",
+                background: "var(--s1)",
+              }}
+              variants={{
+                hidden: { opacity: 0, y: 12, scale: 0.97 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  scale: 1,
+                  transition: {
+                    y: { type: "spring", stiffness: 200, damping: 24 },
+                    scale: { type: "spring", stiffness: 200, damping: 20 },
+                  },
+                },
+              }}
+              whileHover={{
+                y: -3,
+                borderColor: "var(--brand-glow)",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                transition: { type: "spring", stiffness: 400, damping: 25 },
+              }}
+            >
+              <uc.icon
+                className="h-4 w-4 mb-3.5"
+                style={{ color: "var(--brand)" }}
+              />
+              <h3 className="text-[14px] font-semibold text-foreground mb-2">
+                {uc.title}
+              </h3>
+              <p className="text-[12px] text-foreground/55 leading-relaxed">
+                {uc.desc}
+              </p>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
 
       {/* ── Pricing Preview ── */}
@@ -405,7 +466,7 @@ export function HomeSEOContent() {
               style={{
                 borderColor: plan.popular
                   ? "var(--brand-glow)"
-                  : "rgba(0,0,0,0.06)",
+                  : "var(--border)",
                 background: plan.popular
                   ? "linear-gradient(135deg, var(--brand-dim), var(--s1))"
                   : "var(--s1)",
@@ -468,10 +529,10 @@ export function HomeSEOContent() {
       {/* ── CTA Banner ── */}
       <ScrollReveal className="max-w-[960px] mx-auto px-7 pb-20">
         <div
-          className="rounded-2xl border p-10 text-center"
+          className="rounded-xl border p-10 text-center"
           style={{
             background: "var(--brand-dim)",
-            borderColor: "rgba(76,44,255,0.08)",
+            borderColor: "var(--brand-glow)",
           }}
         >
           <h2 className="text-[20px] font-bold tracking-tight text-foreground mb-2">
@@ -481,17 +542,29 @@ export function HomeSEOContent() {
             Run your first AI-powered UX audit in 30 seconds. Free, no credit
             card, no signup required.
           </p>
-          <button
+          <motion.button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-[14px] font-bold transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+            className="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-[14px] font-bold cursor-pointer"
             style={{
               background: "var(--brand)",
               color: "var(--brand-fg)",
             }}
+            whileHover={{
+              scale: 1.04,
+              y: -1,
+              transition: { type: "spring", stiffness: 400, damping: 17 },
+            }}
+            whileTap={{ scale: 0.97 }}
           >
             Audit Your Page Now
-            <ArrowRight className="h-3.5 w-3.5" />
-          </button>
+            <motion.span
+              initial={{ x: 0 }}
+              whileHover={{ x: 3 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            >
+              <ArrowRight className="h-3.5 w-3.5" />
+            </motion.span>
+          </motion.button>
         </div>
       </ScrollReveal>
 

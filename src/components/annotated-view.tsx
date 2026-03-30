@@ -1,28 +1,29 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import {
-  ChevronRight, Flame, Maximize2, Minimize2,
+  ChevronRight, Flame, AlertTriangle, AlertCircle, Info,
+  ChevronDown, Eye, EyeOff,
 } from "lucide-react";
 import type { UXAuditResult, AuditSection, Finding, HeatmapZone, AnnotationCoordinate } from "@/lib/types";
 
 /* ═══════════════════════════════════════════════════════
-   Annotated View v3 — AI-powered coordinate placement
-   Dots placed precisely using GPT-4o vision coordinates
+   Annotated View v5 — Figma-style inspect mode
+   Side-by-side: screenshot (left) + findings (right)
+   Both scroll independently, always visible together
    ═══════════════════════════════════════════════════════ */
 
-const SEVERITY_COLORS: Record<string, string> = {
+const SEV_COLOR: Record<string, string> = {
   critical: "#dc2626",
   high:     "#ea580c",
   medium:   "#ca8a04",
   low:      "#16a34a",
 };
-
-const SEVERITY_BG: Record<string, string> = {
-  critical: "rgba(220,38,38,0.08)",
+const SEV_BG: Record<string, string> = {
+  critical: "rgba(220,38,38,0.07)",
   high:     "rgba(234,88,12,0.06)",
-  medium:   "rgba(202,138,4,0.06)",
-  low:      "rgba(22,163,74,0.05)",
+  medium:   "rgba(202,138,4,0.05)",
+  low:      "rgba(22,163,74,0.04)",
 };
 
 function scoreColor(s: number) {
@@ -33,146 +34,201 @@ function scoreColor(s: number) {
 
 interface Annotation {
   id: string;
-  index: number;       // global numbering (1, 2, 3...)
-  x: number;           // 0-1 normalized X on screenshot
-  y: number;           // 0-1 normalized Y on screenshot
+  index: number;
+  x: number;
+  y: number;
   severity: string;
   finding: Finding;
   sectionName: string;
   sectionId: string;
 }
 
-/** Generate annotations using AI coordinates, falling back to sequential positioning */
-function generateAnnotations(
-  sections: AuditSection[],
-  aiCoordinates?: AnnotationCoordinate[]
-): Annotation[] {
-  // Collect all issue/warning findings in order
-  const allFindings: { finding: Finding; sectionName: string; sectionId: string; globalIndex: number }[] = [];
-  let idx = 0;
+/* ── Force-directed jitter ── */
+function spreadDots(
+  pts: { x: number; y: number }[],
+  iters = 30,
+  minDist = 0.04,
+): { x: number; y: number }[] {
+  const r = pts.map(p => ({ ...p }));
+  if (r.length <= 1) return r;
+  const orig = pts.map(p => ({ ...p }));
 
-  for (const section of sections) {
-    for (const finding of section.findings) {
-      if (finding.type === "issue" || finding.type === "warning") {
-        allFindings.push({
-          finding,
-          sectionName: section.name,
-          sectionId: section.id,
-          globalIndex: idx,
-        });
-        idx++;
+  for (let t = 0; t < iters; t++) {
+    const f = r.map(() => ({ fx: 0, fy: 0 }));
+    for (let i = 0; i < r.length; i++) {
+      for (let j = i + 1; j < r.length; j++) {
+        const dx = r[i].x - r[j].x;
+        const dy = r[i].y - r[j].y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < minDist && d > 0.001) {
+          const s = ((minDist - d) / minDist) * 0.4;
+          const nx = dx / d, ny = dy / d;
+          f[i].fx += nx * s; f[i].fy += ny * s;
+          f[j].fx -= nx * s; f[j].fy -= ny * s;
+        }
+      }
+    }
+    for (let i = 0; i < r.length; i++) {
+      f[i].fx += (orig[i].x - r[i].x) * 0.15;
+      f[i].fy += (orig[i].y - r[i].y) * 0.15;
+    }
+    const damp = 1 - (t / iters) * 0.5;
+    for (let i = 0; i < r.length; i++) {
+      r[i].x = Math.min(0.95, Math.max(0.05, r[i].x + f[i].fx * damp));
+      r[i].y = Math.min(0.98, Math.max(0.02, r[i].y + f[i].fy * damp));
+    }
+  }
+  return r;
+}
+
+function buildAnnotations(sections: AuditSection[], ai?: AnnotationCoordinate[]): Annotation[] {
+  const items: { finding: Finding; sectionName: string; sectionId: string; gi: number }[] = [];
+  let idx = 0;
+  for (const sec of sections) {
+    for (const f of sec.findings) {
+      if (f.type === "issue" || f.type === "warning") {
+        items.push({ finding: f, sectionName: sec.name, sectionId: sec.id, gi: idx++ });
       }
     }
   }
 
-  const annotations: Annotation[] = allFindings.map((f, i) => {
-    // Try to find matching AI coordinate
-    let x = 0.5;
-    let y = (i + 1) / (allFindings.length + 1); // fallback: evenly spaced
-
-    if (aiCoordinates) {
-      // Match by index first
-      const byIndex = aiCoordinates.find(c => c.findingIndex === f.globalIndex);
-      if (byIndex) {
-        x = byIndex.x;
-        y = byIndex.y;
-      } else {
-        // Fallback: match by title similarity
-        const byTitle = aiCoordinates.find(
-          c => c.title.toLowerCase().includes(f.finding.title.toLowerCase().slice(0, 20)) ||
-               f.finding.title.toLowerCase().includes(c.title.toLowerCase().slice(0, 20))
+  const raw = items.map((f, i) => {
+    let x = 0.15 + (i % 3) * 0.35, y = (i + 1) / (items.length + 1);
+    if (ai) {
+      const m = ai.find(c => c.findingIndex === f.gi) ??
+        ai.find(c =>
+          c.title.toLowerCase().includes(f.finding.title.toLowerCase().slice(0, 20)) ||
+          f.finding.title.toLowerCase().includes(c.title.toLowerCase().slice(0, 20))
         );
-        if (byTitle) {
-          x = byTitle.x;
-          y = byTitle.y;
-        }
-      }
+      if (m) { x = m.x; y = m.y; }
     }
-
-    const severity = f.finding.severity || (f.finding.impact === "high" ? "high" : f.finding.impact === "medium" ? "medium" : "low");
-
-    return {
-      id: `${f.sectionId}-${i}`,
-      index: i + 1,
-      x: Math.min(0.95, Math.max(0.05, x)),
-      y: Math.min(0.98, Math.max(0.02, y)),
-      severity,
-      finding: f.finding,
-      sectionName: f.sectionName,
-      sectionId: f.sectionId,
-    };
+    return { x: Math.min(0.95, Math.max(0.05, x)), y: Math.min(0.98, Math.max(0.02, y)) };
   });
 
-  return annotations;
+  const spread = spreadDots(raw);
+  return items.map((f, i) => ({
+    id: `${f.sectionId}-${i}`,
+    index: i + 1,
+    x: spread[i].x,
+    y: spread[i].y,
+    severity: f.finding.severity || (f.finding.impact === "high" ? "high" : f.finding.impact === "medium" ? "medium" : "low"),
+    finding: f.finding,
+    sectionName: f.sectionName,
+    sectionId: f.sectionId,
+  }));
 }
 
-/* ── Finding Card in right panel ── */
-function FindingCard({
-  ann,
-  isActive,
-  onClick,
+/* ── Dot on screenshot ── */
+function Dot({
+  ann, isActive, isHovered, onClick, onHover,
 }: {
-  ann: Annotation;
-  isActive: boolean;
-  onClick: () => void;
+  ann: Annotation; isActive: boolean; isHovered: boolean;
+  onClick: () => void; onHover: (h: boolean) => void;
 }) {
-  const color = SEVERITY_COLORS[ann.severity] || SEVERITY_COLORS.medium;
-  const bg = SEVERITY_BG[ann.severity] || SEVERITY_BG.medium;
+  const c = SEV_COLOR[ann.severity] || SEV_COLOR.medium;
+  const on = isActive || isHovered;
 
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left rounded-xl p-3.5 transition-all duration-200 group ${
-        isActive ? "shadow-lg" : "hover:shadow-sm"
-      }`}
+      onMouseEnter={() => onHover(true)}
+      onMouseLeave={() => onHover(false)}
+      className="absolute z-10 transition-all duration-200 group"
       style={{
-        background: isActive ? bg : "var(--s1)",
-        border: `1.5px solid ${isActive ? color : "var(--border)"}`,
+        left: `${ann.x * 100}%`,
+        top: `${ann.y * 100}%`,
+        transform: "translate(-50%, -50%)",
       }}
     >
-      <div className="flex items-start gap-3">
-        {/* Number badge */}
+      {on && (
+        <span className="absolute inset-[-8px] rounded-full animate-ping" style={{ background: `${c}18`, animationDuration: "1.5s" }} />
+      )}
+      {on && (
+        <span className="absolute inset-[-5px] rounded-full" style={{ background: `${c}22` }} />
+      )}
+      <span
+        className={`relative flex items-center justify-center rounded-full text-white font-bold transition-all duration-150 ${
+          on ? "w-7 h-7 text-[11px]" : "w-[21px] h-[21px] text-[9px] group-hover:scale-110"
+        }`}
+        style={{
+          background: c,
+          boxShadow: on
+            ? `0 0 0 2.5px white, 0 0 16px ${c}44, 0 2px 8px rgba(0,0,0,0.15)`
+            : `0 0 0 2px white, 0 1px 4px rgba(0,0,0,0.2)`,
+        }}
+      >
+        {ann.index}
+      </span>
+      {/* Tooltip — flip near right edge */}
+      <span
+        className={`absolute whitespace-normal text-[10px] font-medium px-2 py-1.5 rounded-lg shadow-xl pointer-events-none transition-opacity duration-150 ${
+          on ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+        } ${ann.x > 0.65 ? "right-full mr-2.5" : "left-full ml-2.5"} top-1/2 -translate-y-1/2`}
+        style={{ background: "rgba(15,15,15,0.9)", color: "#fff", maxWidth: 180, lineHeight: 1.35, backdropFilter: "blur(6px)" }}
+      >
+        {ann.finding.title.length > 45 ? ann.finding.title.slice(0, 45) + "…" : ann.finding.title}
+      </span>
+    </button>
+  );
+}
+
+/* ── Finding card in right panel ── */
+function Card({
+  ann, isActive, isHovered, onClick, onHover,
+}: {
+  ann: Annotation; isActive: boolean; isHovered: boolean;
+  onClick: () => void; onHover: (h: boolean) => void;
+}) {
+  const c = SEV_COLOR[ann.severity] || SEV_COLOR.medium;
+  const bg = SEV_BG[ann.severity] || SEV_BG.medium;
+  const on = isActive || isHovered;
+
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => onHover(true)}
+      onMouseLeave={() => onHover(false)}
+      className={`w-full text-left rounded-lg transition-all duration-200 group ${on ? "shadow-sm" : ""}`}
+      style={{
+        background: on ? bg : "transparent",
+        border: `1px solid ${on ? c + "30" : "transparent"}`,
+        padding: "10px 12px",
+      }}
+    >
+      <div className="flex items-start gap-2.5">
+        {/* Number */}
         <span
-          className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
-          style={{ background: color }}
+          className="shrink-0 w-[22px] h-[22px] rounded-full flex items-center justify-center text-[9px] font-bold text-white mt-0.5"
+          style={{ background: c, boxShadow: on ? `0 0 8px ${c}30` : "none" }}
         >
           {ann.index}
         </span>
 
         <div className="flex-1 min-w-0">
-          <p className="text-[13px] font-semibold text-foreground leading-snug">
-            {ann.finding.title}
-          </p>
-          <p className="text-[11px] text-foreground/50 mt-1 line-clamp-2 leading-relaxed">
-            {ann.finding.desc}
-          </p>
+          <p className="text-[12px] font-semibold text-foreground leading-snug">{ann.finding.title}</p>
 
-          {/* Meta row */}
-          <div className="flex items-center gap-2 mt-2">
-            <span
-              className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
-              style={{ background: bg, color }}
-            >
+          {/* Severity + section — compact meta */}
+          <div className="flex items-center gap-1.5 mt-1">
+            <span className="text-[9px] font-bold uppercase px-1.5 py-[2px] rounded" style={{ background: bg, color: c }}>
               {ann.severity}
             </span>
-            <span className="text-[10px] text-foreground/35">
-              {ann.sectionName}
-            </span>
+            <span className="text-[9px] text-foreground/30">{ann.sectionName}</span>
           </div>
 
-          {/* Expanded detail when active */}
+          {/* Description — show on active only to keep panel compact */}
           {isActive && (
-            <div className="mt-3 pt-3 flex flex-col gap-2" style={{ borderTop: `1px solid ${color}22` }}>
+            <div className="mt-2 flex flex-col gap-2 animate-fade-in">
+              <p className="text-[11px] text-foreground/55 leading-relaxed">{ann.finding.desc}</p>
               {ann.finding.whyItMatters && (
-                <p className="text-[11px] text-foreground/55 leading-relaxed">
-                  <span className="font-semibold text-foreground/65">Impact: </span>
+                <p className="text-[11px] text-foreground/45 leading-relaxed">
+                  <span className="font-medium text-foreground/55">Why it matters: </span>
                   {ann.finding.whyItMatters}
                 </p>
               )}
               {ann.finding.recommendedFix && (
-                <div className="rounded-lg p-2.5" style={{ background: `${color}0a` }}>
-                  <p className="text-[11px] leading-relaxed font-medium" style={{ color }}>
-                    Fix: {ann.finding.recommendedFix}
+                <div className="rounded-md p-2" style={{ background: `${c}08` }}>
+                  <p className="text-[11px] leading-relaxed font-medium" style={{ color: c }}>
+                    {ann.finding.recommendedFix}
                   </p>
                 </div>
               )}
@@ -181,8 +237,8 @@ function FindingCard({
         </div>
 
         <ChevronRight
-          className={`h-3.5 w-3.5 shrink-0 mt-1 text-foreground/25 transition-transform duration-200 ${
-            isActive ? "rotate-90" : "group-hover:translate-x-0.5"
+          className={`h-3 w-3 shrink-0 mt-1.5 transition-transform duration-150 ${
+            isActive ? "rotate-90 text-foreground/35" : "text-foreground/15 group-hover:text-foreground/30"
           }`}
         />
       </div>
@@ -190,116 +246,37 @@ function FindingCard({
   );
 }
 
-/* ── Dot marker on the screenshot ── */
-function DotMarker({
-  ann,
-  isActive,
-  onClick,
-}: {
-  ann: Annotation;
-  isActive: boolean;
-  onClick: () => void;
-}) {
-  const color = SEVERITY_COLORS[ann.severity] || SEVERITY_COLORS.medium;
-
-  return (
-    <button
-      onClick={onClick}
-      className="absolute z-10 transition-all duration-200 group"
-      style={{
-        left: `${ann.x * 100}%`,
-        top: `${ann.y * 100}%`,
-        transform: "translate(-50%, -50%)",
-      }}
-      title={`#${ann.index}: ${ann.finding.title}`}
-    >
-      {/* Pulse ring when active */}
-      {isActive && (
-        <span
-          className="absolute inset-[-8px] rounded-full animate-ping"
-          style={{ background: `${color}20` }}
-        />
-      )}
-
-      {/* The dot */}
-      <span
-        className={`relative flex items-center justify-center rounded-full text-white font-bold transition-all duration-200 ${
-          isActive ? "w-7 h-7 text-[11px] shadow-lg" : "w-5 h-5 text-[9px] group-hover:w-6 group-hover:h-6 shadow-md"
-        }`}
-        style={{
-          background: color,
-          boxShadow: isActive
-            ? `0 0 0 3px white, 0 0 20px ${color}66`
-            : `0 0 0 2px white, 0 2px 4px rgba(0,0,0,0.2)`,
-        }}
-      >
-        {ann.index}
-      </span>
-
-      {/* Tooltip on hover */}
-      <span
-        className={`absolute left-full ml-2 top-1/2 -translate-y-1/2 whitespace-nowrap text-[10px] font-medium px-2 py-1 rounded-md shadow-lg pointer-events-none transition-opacity duration-150 ${
-          isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-        }`}
-        style={{ background: color, color: "white" }}
-      >
-        {ann.finding.title.length > 40 ? ann.finding.title.slice(0, 40) + "..." : ann.finding.title}
-      </span>
-    </button>
-  );
-}
-
-/* ── Floating score badge ── */
-function ScoreBadge({ score, grade }: { score: number; grade: string }) {
-  const color = scoreColor(score);
-  const circ = 2 * Math.PI * 16;
-  const offset = circ - (score / 100) * circ;
-
-  return (
-    <div
-      className="sticky top-3 z-20 ml-3 mb-3 inline-flex items-center gap-2 rounded-xl px-3 py-2 shadow-lg backdrop-blur-md"
-      style={{ background: "rgba(255,255,255,0.93)", border: "1px solid rgba(0,0,0,0.06)" }}
-    >
-      <div className="relative w-[34px] h-[34px]">
-        <svg className="-rotate-90 w-full h-full" viewBox="0 0 40 40">
-          <circle cx="20" cy="20" r="16" fill="none" strokeWidth="3" stroke="rgba(0,0,0,0.05)" />
-          <circle
-            cx="20" cy="20" r="16" fill="none" strokeWidth="3" strokeLinecap="round"
-            strokeDasharray={circ} strokeDashoffset={offset}
-            style={{ stroke: color }}
-          />
-        </svg>
-        <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold" style={{ color }}>
-          {score}
-        </span>
-      </div>
-      <div>
-        <p className="text-[11px] font-semibold text-gray-900 leading-none">{grade}</p>
-        <p className="text-[9px] text-gray-400">UX Score</p>
-      </div>
-    </div>
-  );
-}
-
-/* ── Issue count summary ── */
-function IssueSummary({ annotations }: { annotations: Annotation[] }) {
-  const counts: Record<string, number> = { critical: 0, high: 0, medium: 0, low: 0 };
-  annotations.forEach(a => { counts[a.severity] = (counts[a.severity] || 0) + 1; });
-
-  return (
-    <div className="flex items-center gap-2.5 text-[11px]">
-      {Object.entries(counts).filter(([, c]) => c > 0).map(([sev, count]) => (
-        <span key={sev} className="flex items-center gap-1 font-medium" style={{ color: SEVERITY_COLORS[sev] }}>
-          <span className="w-[7px] h-[7px] rounded-full" style={{ background: SEVERITY_COLORS[sev] }} />
-          {count} {sev.charAt(0).toUpperCase() + sev.slice(1)}
-        </span>
-      ))}
-    </div>
-  );
+/* ── Heatmap canvas ── */
+function HeatmapCanvas({ zones, pageHeight, viewportWidth }: { zones: HeatmapZone[]; pageHeight: number; viewportWidth: number }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const cvs = ref.current;
+    if (!cvs || !zones.length) return;
+    const p = cvs.parentElement;
+    if (!p) return;
+    const w = p.clientWidth;
+    const h = p.clientHeight || (w * (pageHeight / viewportWidth));
+    cvs.width = w; cvs.height = h;
+    const ctx = cvs.getContext("2d");
+    if (!ctx) return;
+    ctx.clearRect(0, 0, w, h);
+    for (const z of zones) {
+      const x = (z.x / viewportWidth) * w, y = (z.y / pageHeight) * h, r = (z.radius / viewportWidth) * w;
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, `rgba(255,0,0,${z.intensity * 0.4})`);
+      g.addColorStop(0.5, `rgba(255,165,0,${z.intensity * 0.2})`);
+      g.addColorStop(1, "rgba(255,165,0,0)");
+      ctx.fillStyle = g;
+      ctx.fillRect(x - r, y - r, r * 2, r * 2);
+    }
+  }, [zones, pageHeight, viewportWidth]);
+  return <canvas ref={ref} className="absolute inset-0 w-full h-full pointer-events-none opacity-60" style={{ mixBlendMode: "multiply" }} />;
 }
 
 /* ═══════════════════════════════════════════════════════
-   Main Component
+   Main — full-viewport side-by-side inspect mode
+   Left: screenshot with dots (scrollable)
+   Right: finding cards (scrollable)
    ═══════════════════════════════════════════════════════ */
 
 interface AnnotatedViewProps {
@@ -312,238 +289,228 @@ interface AnnotatedViewProps {
 }
 
 export function AnnotatedView({
-  data,
-  screenshotUrl,
-  heatmapZones,
-  pageHeight = 3000,
-  viewportWidth = 1280,
+  data, screenshotUrl, heatmapZones,
+  pageHeight = 3000, viewportWidth = 1280,
   annotationCoordinates,
 }: AnnotatedViewProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("all");
   const [showHeatmap, setShowHeatmap] = useState(false);
-  const [panelOpen, setPanelOpen] = useState(true);
+  const [showDots, setShowDots] = useState(true);
 
-  const screenshotRef = useRef<HTMLDivElement>(null);
+  const leftRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const allAnnotations = generateAnnotations(data.sections, annotationCoordinates);
-  const filtered = filter === "all"
-    ? allAnnotations
-    : allAnnotations.filter(a => a.severity === filter);
+  const all = useMemo(() => buildAnnotations(data.sections, annotationCoordinates), [data.sections, annotationCoordinates]);
+  const filtered = filter === "all" ? all : all.filter(a => a.severity === filter);
 
-  // Click dot → scroll finding into view
-  const handleDotClick = useCallback((id: string) => {
-    setActiveId(prev => prev === id ? null : id);
+  const sevCounts = useMemo(() => {
+    const c: Record<string, number> = { critical: 0, high: 0, medium: 0, low: 0 };
+    all.forEach(a => { c[a.severity] = (c[a.severity] || 0) + 1; });
+    return c;
+  }, [all]);
+
+  // Click dot → scroll right panel to card
+  const onDotClick = useCallback((id: string) => {
+    setActiveId(p => p === id ? null : id);
     const el = cardRefs.current[id];
     if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
   }, []);
 
-  // Click finding → scroll screenshot to that region
-  const handleCardClick = useCallback((id: string) => {
+  // Click card → scroll left panel to dot
+  const onCardClick = useCallback((id: string) => {
     const wasActive = activeId === id;
     setActiveId(wasActive ? null : id);
-
-    if (!wasActive) {
-      const ann = allAnnotations.find(a => a.id === id);
-      if (ann && screenshotRef.current) {
-        const target = ann.y * screenshotRef.current.scrollHeight - screenshotRef.current.clientHeight / 3;
-        screenshotRef.current.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
+    if (!wasActive && leftRef.current) {
+      const ann = all.find(a => a.id === id);
+      if (ann) {
+        const h = leftRef.current.scrollHeight;
+        const target = ann.y * h - leftRef.current.clientHeight / 3;
+        leftRef.current.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
       }
     }
-  }, [activeId, allAnnotations]);
+  }, [activeId, all]);
+
+  const onDotHover = useCallback((id: string, h: boolean) => setHoveredId(h ? id : null), []);
+  const onCardHover = useCallback((id: string, h: boolean) => setHoveredId(h ? id : null), []);
 
   return (
-    <div className="w-full flex flex-col" style={{ height: "calc(100vh - 100px)" }}>
-      {/* ── Top toolbar ── */}
+    <div className="flex flex-col" style={{ height: "calc(100vh - 80px)" }}>
+      {/* ── Compact top bar ── */}
       <div
         className="shrink-0 flex items-center justify-between px-4 py-2 border-b"
-        style={{ background: "var(--s1)", borderColor: "var(--border)" }}
+        style={{ background: "var(--background)", borderColor: "var(--border)" }}
       >
-        <IssueSummary annotations={allAnnotations} />
+        {/* Left: score + counts */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <ScoreRing score={data.overallScore} size={28} />
+            <span className="text-[12px] font-semibold text-foreground">
+              {all.length} issues
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            {(Object.entries(sevCounts) as [string, number][]).filter(([, c]) => c > 0).map(([sev, count]) => (
+              <span key={sev} className="flex items-center gap-1 text-[10px] font-medium" style={{ color: SEV_COLOR[sev] }}>
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: SEV_COLOR[sev] }} />
+                {count}
+              </span>
+            ))}
+          </div>
+        </div>
 
-        <div className="flex items-center gap-1.5">
-          {/* Filter pills */}
+        {/* Right: filters + toggles */}
+        <div className="flex items-center gap-1">
           {(["all", "critical", "high", "medium", "low"] as const).map(sev => {
-            const count = sev === "all" ? allAnnotations.length : allAnnotations.filter(a => a.severity === sev).length;
+            const count = sev === "all" ? all.length : sevCounts[sev] || 0;
             if (sev !== "all" && count === 0) return null;
             return (
               <button
                 key={sev}
                 onClick={() => setFilter(sev)}
-                className={`text-[10px] font-semibold px-2.5 py-1 rounded-md transition-all ${
-                  filter === sev ? "text-white shadow-sm" : "text-foreground/40 hover:text-foreground/55"
+                className={`text-[10px] font-semibold px-2 py-1 rounded-md transition-all ${
+                  filter === sev ? "text-white" : "text-foreground/30 hover:text-foreground/50"
                 }`}
-                style={{
-                  background: filter === sev
-                    ? (sev === "all" ? "var(--brand)" : SEVERITY_COLORS[sev])
-                    : "transparent",
-                }}
+                style={{ background: filter === sev ? (sev === "all" ? "var(--foreground)" : SEV_COLOR[sev]) : undefined }}
               >
-                {sev === "all" ? `All ${count}` : count}
+                {sev === "all" ? "All" : sev.charAt(0).toUpperCase() + sev.slice(1)}
               </button>
             );
           })}
 
-          <span className="w-px h-4 mx-1" style={{ background: "var(--border)" }} />
+          <span className="w-px h-3.5 mx-1" style={{ background: "var(--border)" }} />
 
-          {/* Heatmap toggle */}
+          <button onClick={() => setShowDots(!showDots)} className="p-1 text-foreground/30 hover:text-foreground/50 transition-colors">
+            {showDots ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+          </button>
+
           {heatmapZones && heatmapZones.length > 0 && (
             <button
               onClick={() => setShowHeatmap(!showHeatmap)}
-              className={`text-[10px] font-semibold px-2.5 py-1 rounded-md transition-all ${
-                showHeatmap ? "text-white shadow-sm" : "text-foreground/40 hover:text-foreground/55"
-              }`}
-              style={{ background: showHeatmap ? "#ef4444" : "transparent" }}
+              className={`text-[10px] font-semibold px-2 py-1 rounded-md transition-all ${showHeatmap ? "text-white" : "text-foreground/30 hover:text-foreground/50"}`}
+              style={{ background: showHeatmap ? "#ef4444" : undefined }}
             >
-              Heatmap
+              Heat
             </button>
           )}
-
-          {/* Panel toggle */}
-          <button
-            onClick={() => setPanelOpen(!panelOpen)}
-            className="text-foreground/35 hover:text-foreground/55 transition-colors p-1"
-          >
-            {panelOpen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
-          </button>
         </div>
       </div>
 
-      {/* ── Main split ── */}
-      <div className="flex-1 flex min-h-0 overflow-hidden">
+      {/* ── Side-by-side panels ── */}
+      <div className="flex-1 flex min-h-0">
 
-        {/* LEFT: Screenshot + dot markers */}
+        {/* LEFT: Screenshot with dots — independent scroll */}
         <div
-          ref={screenshotRef}
-          className={`relative overflow-y-auto overflow-x-hidden transition-all duration-300 ${
-            panelOpen ? "flex-[3]" : "flex-1"
-          }`}
-          style={{ background: "#f1f1f1" }}
+          ref={leftRef}
+          className="flex-1 overflow-y-auto overflow-x-hidden"
+          style={{ background: "#f5f5f5" }}
         >
-          <ScoreBadge score={data.overallScore} grade={data.grade} />
-
-          <div className="relative mx-auto" style={{ maxWidth: "720px" }}>
-            <div className="relative mx-4 mb-6 rounded-lg overflow-hidden shadow-xl border" style={{ borderColor: "var(--border)" }}>
+          <div className="p-4">
+            <div
+              className="relative rounded-xl overflow-hidden mx-auto"
+              style={{
+                maxWidth: 680,
+                border: "1px solid var(--border)",
+                boxShadow: "0 1px 6px rgba(0,0,0,0.08)",
+              }}
+            >
               <img
                 src={screenshotUrl}
                 alt="Page screenshot"
                 className="w-full h-auto block"
                 draggable={false}
               />
-
-              {/* Heatmap canvas overlay */}
               {showHeatmap && heatmapZones && (
                 <HeatmapCanvas zones={heatmapZones} pageHeight={pageHeight} viewportWidth={viewportWidth} />
               )}
-
-              {/* AI-positioned dot markers */}
-              {!showHeatmap && filtered.map(ann => (
-                <DotMarker
+              {showDots && !showHeatmap && filtered.map(ann => (
+                <Dot
                   key={ann.id}
                   ann={ann}
                   isActive={activeId === ann.id}
-                  onClick={() => handleDotClick(ann.id)}
+                  isHovered={hoveredId === ann.id}
+                  onClick={() => onDotClick(ann.id)}
+                  onHover={h => onDotHover(ann.id, h)}
                 />
               ))}
             </div>
           </div>
         </div>
 
-        {/* RIGHT: Findings panel */}
-        {panelOpen && (
-          <div
-            className="flex-[2] max-w-[420px] min-w-[300px] overflow-y-auto border-l flex flex-col"
-            style={{ borderColor: "var(--border)", background: "var(--background)" }}
-          >
-            {/* Panel header */}
-            <div
-              className="sticky top-0 z-10 px-4 py-3 border-b"
-              style={{ background: "var(--background)", borderColor: "var(--border)" }}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-[13px] font-semibold text-foreground">
-                    {filtered.length} Issue{filtered.length !== 1 ? "s" : ""} Found
-                  </h3>
-                  <p className="text-[10px] text-foreground/40 mt-0.5">
-                    Click an issue to highlight on page
-                  </p>
-                </div>
-                <Flame className="h-4 w-4 text-foreground/20" />
-              </div>
-            </div>
-
-            {/* Cards */}
-            <div className="flex-1 p-3 flex flex-col gap-2">
-              {filtered.length === 0 ? (
-                <div className="flex-1 flex items-center justify-center text-[12px] text-foreground/35 py-12">
-                  No issues at this severity
-                </div>
-              ) : (
-                filtered.map(ann => (
-                  <div key={ann.id} ref={el => { cardRefs.current[ann.id] = el; }}>
-                    <FindingCard
-                      ann={ann}
-                      isActive={activeId === ann.id}
-                      onClick={() => handleCardClick(ann.id)}
-                    />
-                  </div>
-                ))
-              )}
-            </div>
+        {/* RIGHT: Findings panel — independent scroll */}
+        <div
+          className="w-[340px] shrink-0 overflow-y-auto border-l flex flex-col"
+          style={{ borderColor: "var(--border)", background: "var(--background)" }}
+        >
+          {/* Panel header */}
+          <div className="sticky top-0 z-10 px-4 py-3 border-b" style={{ background: "var(--background)", borderColor: "var(--border)" }}>
+            <p className="text-[12px] font-semibold text-foreground">
+              {filtered.length} Issue{filtered.length !== 1 ? "s" : ""}
+            </p>
+            <p className="text-[10px] text-foreground/35 mt-0.5">
+              Click to locate on screenshot
+            </p>
           </div>
-        )}
+
+          {/* Card list */}
+          <div className="flex-1 p-2 flex flex-col gap-0.5">
+            {filtered.length === 0 ? (
+              <div className="flex-1 flex items-center justify-center text-[11px] text-foreground/30 py-8">
+                No issues at this severity
+              </div>
+            ) : (
+              filtered.map(ann => (
+                <div key={ann.id} ref={el => { cardRefs.current[ann.id] = el; }}>
+                  <Card
+                    ann={ann}
+                    isActive={activeId === ann.id}
+                    isHovered={hoveredId === ann.id}
+                    onClick={() => onCardClick(ann.id)}
+                    onHover={h => onCardHover(ann.id, h)}
+                  />
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
+
+      {/* ── Mobile: bottom sheet hint (on small screens right panel would stack) ── */}
+      <style>{`
+        @media (max-width: 768px) {
+          /* Stack vertically on mobile */
+          .flex-1.flex.min-h-0 {
+            flex-direction: column !important;
+          }
+          .flex-1.flex.min-h-0 > div:first-child {
+            max-height: 50vh;
+          }
+          .flex-1.flex.min-h-0 > div:last-child {
+            width: 100% !important;
+            border-left: none !important;
+            border-top: 1px solid var(--border);
+          }
+        }
+      `}</style>
     </div>
   );
 }
 
-/* ── Heatmap Canvas ── */
-function HeatmapCanvas({
-  zones,
-  pageHeight,
-  viewportWidth,
-}: {
-  zones: HeatmapZone[];
-  pageHeight: number;
-  viewportWidth: number;
-}) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || zones.length === 0) return;
-    const parent = canvas.parentElement;
-    if (!parent) return;
-
-    const w = parent.clientWidth;
-    const h = parent.clientHeight || (w * (pageHeight / viewportWidth));
-    canvas.width = w;
-    canvas.height = h;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    ctx.clearRect(0, 0, w, h);
-
-    for (const zone of zones) {
-      const x = (zone.x / viewportWidth) * w;
-      const y = (zone.y / pageHeight) * h;
-      const r = (zone.radius / viewportWidth) * w;
-      const grad = ctx.createRadialGradient(x, y, 0, x, y, r);
-      grad.addColorStop(0, `rgba(255,0,0,${zone.intensity * 0.4})`);
-      grad.addColorStop(0.5, `rgba(255,165,0,${zone.intensity * 0.2})`);
-      grad.addColorStop(1, "rgba(255,165,0,0)");
-      ctx.fillStyle = grad;
-      ctx.fillRect(x - r, y - r, r * 2, r * 2);
-    }
-  }, [zones, pageHeight, viewportWidth]);
-
+/* ── Tiny score ring ── */
+function ScoreRing({ score, size = 28 }: { score: number; size?: number }) {
+  const color = scoreColor(score);
+  const r = size / 2 - 3;
+  const circ = 2 * Math.PI * r;
+  const off = circ - (score / 100) * circ;
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none opacity-60"
-      style={{ mixBlendMode: "multiply" }}
-    />
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg className="-rotate-90 w-full h-full" viewBox={`0 0 ${size} ${size}`}>
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth="2.5" stroke="var(--border)" />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth="2.5" strokeLinecap="round"
+          strokeDasharray={circ} strokeDashoffset={off} style={{ stroke: color }} />
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center font-bold" style={{ color, fontSize: size * 0.32 }}>{score}</span>
+    </div>
   );
 }
