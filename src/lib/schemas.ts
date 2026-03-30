@@ -119,6 +119,7 @@ const sectionSchema = z.object({
 const categoryScoreSchema = z.object({
   score: z.number().min(0).max(100),
   note: z.string(),
+  benchmark: z.number().min(0).max(100).optional(),
 });
 
 /* ── Heuristic Evaluation Schemas ─────────────────────── */

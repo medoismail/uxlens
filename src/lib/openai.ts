@@ -376,7 +376,7 @@ The JSON structure must be exactly:
   "pageTypeLabel": <string: human-readable label, e.g. "Landing Page", "Web Application", "Signup Form", "Checkout Flow", "Contact Form", "Blog / Documentation", "Other">,
   "overallScore": <number 0-100>,
   "grade": <string: "Critical", "Poor", "Needs Work", "Decent", "Good", "Strong", "Excellent">,
-  "executiveSummary": <string: 2-3 sentences — senior consultant's behavioral verdict, not generic summary>,
+  "executiveSummary": <string: 3-4 sentences — (1) senior consultant behavioral verdict with overall score context, (2) the single biggest conversion leak with estimated revenue impact, (3) the top 3 priorities numbered as "Fix first: [1] ... [2] ... [3] ...", (4) estimated total conversion lift if all critical/high issues are fixed, e.g. "Addressing these issues could improve conversion by an estimated 25-40%.">,
   "conversionKillers": [
     { "title": <string: specific blocker name>, "description": <string: 2-3 sentences citing evidence + mechanism + visitor experience>, "affectedVisitors": <string: which visitors and why>, "behavioralCascade": <string: trace through decision stages>, "expectedLift": <string: estimated lift if fixed> }
   ],
@@ -388,12 +388,12 @@ The JSON structure must be exactly:
   ],
   "flags": [<string: short flag label, max 4>],
   "categories": {
-    "messageClarity":    { "score": <0-100>, "note": <string: 3-4 sentences — (1) what visitor understands in 5s citing headline, (2) awareness-stage gap, (3) behavioral consequence with mechanism, (4) specific fix with expected shift> },
-    "cognitiveLoad":     { "score": <0-100>, "note": <string: 3-4 sentences — (1) cognitive demands with counts, (2) scanning behavior impact citing Miller/Hick, (3) visitor experience shift, (4) specific simplification> },
-    "conversionArch":    { "score": <0-100>, "note": <string: 3-4 sentences — (1) map conversion pathway citing CTAs, (2) friction points with mechanism, (3) hesitation trigger, (4) specific pathway fix> },
-    "trustSignals":      { "score": <0-100>, "note": <string: 3-4 sentences — (1) trust inventory present vs missing, (2) signal absence interpretation, (3) conviction-stage doubt, (4) highest-impact trust addition> },
-    "contradictions":    { "score": <0-100>, "note": <string: 3-4 sentences — (1) specific contradictions quoted, (2) credibility erosion via negativity bias, (3) skepticism mode shift, (4) specific resolution> },
-    "firstScreen":       { "score": <0-100>, "note": <string: 3-4 sentences — (1) 5-second experience with scanning pattern, (2) mental model match/mismatch, (3) stay/leave trigger with mechanism, (4) highest-impact above-fold change> }
+    "messageClarity":    { "score": <0-100>, "benchmark": <0-100: industry average for this page type>, "note": <string: 3-4 sentences — (1) what visitor understands in 5s citing headline, (2) awareness-stage gap, (3) behavioral consequence with mechanism, (4) specific fix with expected shift> },
+    "cognitiveLoad":     { "score": <0-100>, "benchmark": <0-100>, "note": <string: 3-4 sentences — (1) cognitive demands with counts, (2) scanning behavior impact citing Miller/Hick, (3) visitor experience shift, (4) specific simplification> },
+    "conversionArch":    { "score": <0-100>, "benchmark": <0-100>, "note": <string: 3-4 sentences — (1) map conversion pathway citing CTAs, (2) friction points with mechanism, (3) hesitation trigger, (4) specific pathway fix> },
+    "trustSignals":      { "score": <0-100>, "benchmark": <0-100>, "note": <string: 3-4 sentences — (1) trust inventory present vs missing, (2) signal absence interpretation, (3) conviction-stage doubt, (4) highest-impact trust addition> },
+    "contradictions":    { "score": <0-100>, "benchmark": <0-100>, "note": <string: 3-4 sentences — (1) specific contradictions quoted, (2) credibility erosion via negativity bias, (3) skepticism mode shift, (4) specific resolution> },
+    "firstScreen":       { "score": <0-100>, "benchmark": <0-100>, "note": <string: 3-4 sentences — (1) 5-second experience with scanning pattern, (2) mental model match/mismatch, (3) stay/leave trigger with mechanism, (4) highest-impact above-fold change> }
   },
   "sections": [
     {
@@ -547,6 +547,17 @@ The JSON structure must be exactly:
 ═══════════════════════════════════════════
 QUALITY REMINDERS
 ═══════════════════════════════════════════
+
+═══ INDUSTRY BENCHMARKS ═══
+For each category score, include a "benchmark" field — the estimated industry average for this page type. Use these baselines (adjust up or down based on the specific niche):
+- Landing pages (SaaS): messageClarity ~60, cognitiveLoad ~55, conversionArch ~50, trustSignals ~55, contradictions ~70, firstScreen ~55
+- Landing pages (E-commerce): messageClarity ~55, cognitiveLoad ~50, conversionArch ~55, trustSignals ~60, contradictions ~65, firstScreen ~50
+- App interfaces: messageClarity ~65, cognitiveLoad ~45, conversionArch ~60, trustSignals ~70, contradictions ~75, firstScreen ~60
+- Signup/Forms: messageClarity ~60, cognitiveLoad ~55, conversionArch ~65, trustSignals ~55, contradictions ~70, firstScreen ~55
+These benchmarks help users understand whether their score is above or below average for their type of page.
+
+═══ FINDING QUALITY — BEFORE/AFTER EXAMPLES ═══
+For every finding with recommendedFix, include a concrete before/after example when possible. Do NOT just say "improve your headline" — say "Change 'AI-Powered Platform for Teams' to 'Ship campaigns in half the time — no training required'." Specific rewrites, not vague directions.
 
 CRITICAL REMINDERS:
 - Cite SPECIFIC page evidence for every finding. No generic advice.

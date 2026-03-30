@@ -504,9 +504,13 @@ export function ResultsReport({
               </div>
             )}
 
-            {/* Row 2: Executive summary (compact) */}
-            <div className="rounded-xl border p-4" style={{ background: "var(--s1)" }}>
-              <p className="text-[12px] text-foreground/60 leading-relaxed mb-2">{data.executiveSummary}</p>
+            {/* Row 2: Executive summary (prominent) */}
+            <div className="rounded-xl border p-4" style={{ background: "var(--s1)", borderColor: "hsl(var(--primary) / 0.2)" }}>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-1 h-4 rounded-full" style={{ background: scoreColor(data.overallScore) }} />
+                <p className="text-[11px] font-semibold text-foreground/50 uppercase tracking-wide">Executive Summary</p>
+              </div>
+              <p className="text-[12px] text-foreground/70 leading-relaxed mb-3" style={{ whiteSpace: "pre-line" }}>{data.executiveSummary}</p>
               <div className="flex flex-wrap gap-1.5">
                 {data.flags.map((flag, i) => (
                   <span key={i} className="text-[11px] px-2 py-[3px] rounded-[5px]" style={FLAG_STYLES[i % FLAG_STYLES.length]}>{flag}</span>
@@ -521,16 +525,70 @@ export function ResultsReport({
                 {sortedCategories.map((cat) => (
                   <div key={cat.key} className="flex items-center gap-2.5">
                     <span className="text-[11px] text-foreground/55 w-[120px] shrink-0 truncate">{cat.label}</span>
-                    <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
+                    <div className="flex-1 h-[5px] rounded-full overflow-hidden relative" style={{ background: "var(--s3)" }}>
                       <div className="h-full rounded-full" style={{ background: scoreColor(cat.data.score), width: `${cat.data.score}%` }} />
+                      {cat.data.benchmark != null && (
+                        <div className="absolute top-[-3px] w-[2px] h-[11px] rounded-full" style={{ left: `${cat.data.benchmark}%`, background: "var(--foreground)", opacity: 0.25 }} title={`Industry avg: ${cat.data.benchmark}`} />
+                      )}
                     </div>
                     <span className="text-[12px] font-bold font-mono w-7 text-right" style={{ color: scoreColor(cat.data.score) }}>{cat.data.score}</span>
+                    {cat.data.benchmark != null && (
+                      <span className="text-[9px] font-mono w-9 text-right" style={{ color: cat.data.score >= cat.data.benchmark ? "#22c55e" : "#ef4444", opacity: 0.7 }}>
+                        {cat.data.score >= cat.data.benchmark ? "+" : ""}{cat.data.score - cat.data.benchmark}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Row 4: Top critical issues (collapsed preview — click to go to Insights) */}
+            {/* Row 4: Effort/Impact Matrix (visual quadrant) */}
+            {(() => {
+              const allFindings = data.sections.flatMap(s => s.findings).filter(f => f.type !== "positive" && f.estimatedEffort);
+              if (allFindings.length === 0) return null;
+              const isQuick = (f: Finding) => {
+                const e = (f.estimatedEffort || "").toLowerCase();
+                return e.includes("15 min") || e.includes("30 min") || e.includes("1 hour") || e.includes("min");
+              };
+              const isHigh = (f: Finding) => f.impact === "high" || f.severity === "critical" || f.severity === "high";
+              const quickWins = allFindings.filter(f => isQuick(f) && isHigh(f));
+              const easyImprove = allFindings.filter(f => isQuick(f) && !isHigh(f));
+              const strategic = allFindings.filter(f => !isQuick(f) && isHigh(f));
+              const later = allFindings.filter(f => !isQuick(f) && !isHigh(f));
+              return (
+                <div className="rounded-xl border p-4" style={{ background: "var(--s1)" }}>
+                  <p className="text-[10px] font-semibold text-foreground/40 uppercase tracking-wide mb-3">Fix Priority Matrix</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { label: "Quick Wins", emoji: "🎯", items: quickWins, color: "#22c55e" },
+                      { label: "Strategic", emoji: "🧠", items: strategic, color: "#f59e0b" },
+                      { label: "Easy Tweaks", emoji: "✨", items: easyImprove, color: "#3b82f6" },
+                      { label: "Later", emoji: "📋", items: later, color: "var(--foreground)" },
+                    ].map((q) => (
+                      <div key={q.label} className="rounded-lg p-2.5" style={{ background: "var(--s2)" }}>
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <span className="text-[11px]">{q.emoji}</span>
+                          <span className="text-[10px] font-semibold" style={{ color: q.color, opacity: 0.85 }}>{q.label}</span>
+                          <span className="text-[10px] font-bold font-mono ml-auto" style={{ color: q.color, opacity: 0.7 }}>{q.items.length}</span>
+                        </div>
+                        <div className="flex flex-col gap-0.5">
+                          {q.items.slice(0, 2).map((f, i) => (
+                            <span key={i} className="text-[10px] text-foreground/50 truncate">{f.title}</span>
+                          ))}
+                          {q.items.length > 2 && <span className="text-[9px] text-foreground/35">+{q.items.length - 2} more</span>}
+                          {q.items.length === 0 && <span className="text-[9px] text-foreground/25">None</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-center gap-4 mt-2 text-[9px] text-foreground/30">
+                    <span>← Low effort &nbsp;|&nbsp; High effort →</span>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Row 5: Top critical issues (collapsed preview — click to go to Insights) */}
             {topFindings.length > 0 && (
               <div className="rounded-xl border p-4" style={{ background: "var(--s1)" }}>
                 <div className="flex items-center justify-between mb-3">
@@ -1459,14 +1517,17 @@ function InsightDashCard({ finding, defaultOpen = false }: { finding: Finding; d
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
           {finding.severity && <span className="text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider" style={SEVERITY_STYLES[finding.severity] || {}}>{finding.severity}</span>}
-          {finding.impact && <span className="text-[10px] px-2 py-0.5 rounded font-medium" style={impactBadge[finding.impact]}>{finding.impact}</span>}
-          {finding.category && <span className="text-[10px] px-1.5 py-0.5 rounded text-foreground/50 hidden sm:inline" style={{ background: "var(--s2)" }}>{finding.category}</span>}
+          {!open && finding.estimatedConversionLift && (
+            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full" style={{ background: "oklch(0.52 0.14 155 / 10%)", color: "var(--score-high)" }}>
+              {"↑"} {finding.estimatedConversionLift}
+            </span>
+          )}
+          {!open && finding.estimatedEffort && finding.estimatedEffort !== "—" && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full text-foreground/50 hidden sm:inline" style={{ background: "var(--s2)" }}>
+              {finding.estimatedEffort}
+            </span>
+          )}
         </div>
-        {finding.impactHeadline && !open && (
-          <span className="text-[10px] font-medium shrink-0 hidden sm:inline" style={{ color: finding.type === "positive" ? "var(--score-high)" : "var(--score-low)" }}>
-            {finding.impactHeadline}
-          </span>
-        )}
         <ChevronDown className={`h-3 w-3 text-foreground/50 transition-transform duration-200 shrink-0 ${open ? "rotate-180" : ""}`} />
       </div>
       <div className={`insight-expand ${open ? "open" : ""}`}>

@@ -3,6 +3,8 @@
 export interface CategoryScore {
   score: number;
   note: string;
+  /** Industry average benchmark for this category based on page type */
+  benchmark?: number;
 }
 
 export type JourneyStage = "awareness" | "consideration" | "evaluation" | "conviction" | "action";
