@@ -82,7 +82,7 @@ export const metadata: Metadata = {
       {
         url: "/og-image.png",
         width: 1200,
-        height: 675,
+        height: 630,
         alt: "UXLens — Find What's Killing Your Conversions",
       },
     ],
