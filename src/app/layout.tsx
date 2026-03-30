@@ -50,8 +50,8 @@ export const metadata: Metadata = {
     "website conversion audit",
     "ux feedback tool",
   ],
-  authors: [{ name: "UXLens" }],
-  creator: "UXLens",
+  authors: [{ name: "Medo Ismail" }],
+  creator: "Medo Ismail",
   publisher: "UXLens",
   robots: {
     index: true,
@@ -180,6 +180,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="author" content="Medo Ismail" />
         <meta name="theme-color" content="#4C2CFF" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <script

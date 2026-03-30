@@ -150,7 +150,7 @@ export function UrlForm({ onSubmit, onScreenshotSubmit, isLoading }: UrlFormProp
                 >
                   <img
                     src={URL.createObjectURL(selectedFile)}
-                    alt="Preview"
+                    alt="Uploaded screenshot preview for UX audit"
                     className="w-full h-full object-cover"
                   />
                 </div>

@@ -938,7 +938,7 @@ export function ResultsReport({
                 <div className="relative rounded-lg overflow-hidden" style={{ maxHeight: "400px" }}>
                   <img
                     src={screenshotUrl}
-                    alt="5-second test"
+                    alt="Website screenshot used for UXLens 5-second first impression test"
                     className="w-full object-cover object-top transition-all duration-700"
                     style={blurTestActive ? { filter: "blur(12px) brightness(0.7)" } : {}}
                   />
@@ -966,7 +966,7 @@ export function ResultsReport({
                       {/* Clear image on top, masked to only show attention zones */}
                       <img
                         src={screenshotUrl}
-                        alt=""
+                        alt="Attention zone spotlight overlay for 5-second test"
                         className="absolute inset-0 w-full h-full object-cover object-top"
                         style={{
                           maskImage: `url(#blur-mask)`,

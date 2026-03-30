@@ -417,7 +417,7 @@ export function AnnotatedView({
             >
               <img
                 src={screenshotUrl}
-                alt="Page screenshot"
+                alt="Annotated page screenshot with UX issue markers and recommendations"
                 className="w-full h-auto block"
                 draggable={false}
               />

@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
 import { Header } from "@/components/header";
+
+export const metadata: Metadata = {
+  title: "Sign In — UXLens AI UX Audit Platform",
+  description:
+    "Sign in to UXLens to access your AI-powered UX audit dashboard, saved reports, heatmaps, and AI chat assistant.",
+  robots: { index: false, follow: true },
+};
 
 export default function AuthLayout({
   children,

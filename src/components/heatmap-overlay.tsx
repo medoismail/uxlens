@@ -89,7 +89,7 @@ export function HeatmapOverlay({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={screenshotUrl}
-            alt="Page screenshot"
+            alt="Page screenshot with AI-generated attention heatmap overlay"
             className="w-full block"
             onLoad={(e) => {
               const img = e.target as HTMLImageElement;
