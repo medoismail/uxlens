@@ -504,18 +504,45 @@ export function ResultsReport({
               </div>
             )}
 
-            {/* Row 2: Executive summary (prominent) */}
+            {/* Row 2: Executive summary (visual cards) */}
             <div className="rounded-xl border p-4" style={{ background: "var(--s1)", borderColor: "hsl(var(--primary) / 0.2)" }}>
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2 mb-3">
                 <div className="w-1 h-4 rounded-full" style={{ background: scoreColor(data.overallScore) }} />
                 <p className="text-[11px] font-semibold text-foreground/50 uppercase tracking-wide">Executive Summary</p>
               </div>
-              <p className="text-[12px] text-foreground/70 leading-relaxed mb-3" style={{ whiteSpace: "pre-line" }}>{data.executiveSummary}</p>
-              <div className="flex flex-wrap gap-1.5">
-                {data.flags.map((flag, i) => (
-                  <span key={i} className="text-[11px] px-2 py-[3px] rounded-[5px]" style={FLAG_STYLES[i % FLAG_STYLES.length]}>{flag}</span>
-                ))}
-              </div>
+              {/* Visual priority cards extracted from summary */}
+              {(() => {
+                const summary = data.executiveSummary || "";
+                const fixMatch = summary.match(/Fix first:?\s*\[1\]\s*([^[]*)\[2\]\s*([^[]*)\[3\]\s*([^.]*)/i);
+                const liftMatch = summary.match(/(\d+-\d+%|\d+%)/);
+                const verdictText = fixMatch ? summary.slice(0, summary.indexOf("Fix first")).trim() : summary;
+                return (
+                  <>
+                    <p className="text-[12px] text-foreground/65 leading-relaxed mb-3">{verdictText}</p>
+                    {fixMatch && (
+                      <div className="grid grid-cols-3 gap-2 mb-3">
+                        {[fixMatch[1], fixMatch[2], fixMatch[3]].map((fix, i) => (
+                          <div key={i} className="rounded-lg p-2.5 relative overflow-hidden" style={{ background: "var(--s2)" }}>
+                            <div className="absolute top-0 left-0 w-full h-[2px]" style={{ background: i === 0 ? "var(--score-low)" : i === 1 ? "var(--score-mid)" : "var(--score-high)" }} />
+                            <span className="text-[18px] font-bold block mb-1" style={{ color: i === 0 ? "var(--score-low)" : i === 1 ? "var(--score-mid)" : "var(--score-high)", opacity: 0.3 }}>#{i + 1}</span>
+                            <span className="text-[10px] text-foreground/60 leading-snug block">{fix.trim().replace(/\.?\s*$/, "")}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {liftMatch && (
+                        <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full" style={{ background: "oklch(0.52 0.14 155 / 10%)", color: "var(--score-high)" }}>
+                          Estimated lift: {liftMatch[1]}
+                        </span>
+                      )}
+                      {data.flags.map((flag, i) => (
+                        <span key={i} className="text-[11px] px-2 py-[3px] rounded-[5px]" style={FLAG_STYLES[i % FLAG_STYLES.length]}>{flag}</span>
+                      ))}
+                    </div>
+                  </>
+                );
+              })()}
             </div>
 
             {/* Row 3: Category bars (compact — all 6 in one card) */}
@@ -867,18 +894,26 @@ export function ResultsReport({
                     <p className="text-[10px] text-foreground/55">Five trust dimensions</p>
                   </div>
                 </div>
-                <div className="flex flex-col gap-2.5">
-                  {[...data.trustMatrix].sort((a, b) => a.score - b.score).map((item) => (
-                    <div key={item.label}>
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-[10px] text-foreground/60 w-[100px] shrink-0 truncate">{item.label}</span>
-                        <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
-                          <div className="h-full rounded-full animate-bar-width" style={{ background: scoreColor(item.score), width: `${item.score}%`, "--bar-width": `${item.score}%` } as React.CSSProperties} />
-                        </div>
-                        <span className="text-[12px] font-bold font-mono w-7 text-right" style={{ color: scoreColor(item.score) }}>{item.score}</span>
+                {/* Visual ring gauges */}
+                <div className="grid grid-cols-5 gap-1.5 mb-3">
+                  {[...data.trustMatrix].sort((a, b) => a.score - b.score).map((item) => {
+                    const r = 22; const c = 2 * Math.PI * r; const offset = c - (item.score / 100) * c;
+                    return (
+                      <div key={item.label} className="flex flex-col items-center gap-1.5 p-2 rounded-lg" style={{ background: "var(--s2)" }}>
+                        <svg width="54" height="54" viewBox="0 0 54 54">
+                          <circle cx="27" cy="27" r={r} fill="none" stroke="var(--s3)" strokeWidth="4" />
+                          <circle cx="27" cy="27" r={r} fill="none" stroke={scoreColor(item.score)} strokeWidth="4" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={offset} transform="rotate(-90 27 27)" style={{ transition: "stroke-dashoffset 0.8s ease" }} />
+                          <text x="27" y="27" textAnchor="middle" dominantBaseline="central" fill={scoreColor(item.score)} fontSize="13" fontWeight="700" fontFamily="var(--font-mono)">{item.score}</text>
+                        </svg>
+                        <span className="text-[9px] text-foreground/55 text-center leading-tight">{item.label}</span>
                       </div>
-                      {item.behavioralNote && <p className="text-[10px] text-foreground/50 leading-relaxed mt-0.5 ml-[112px]">{item.behavioralNote}</p>}
-                    </div>
+                    );
+                  })}
+                </div>
+                {/* Behavioral notes collapsed */}
+                <div className="flex flex-col gap-1">
+                  {data.trustMatrix.filter(t => t.behavioralNote).slice(0, 2).map((item, i) => (
+                    <p key={i} className="text-[10px] text-foreground/45 leading-relaxed"><span className="font-medium text-foreground/55">{item.label}:</span> {item.behavioralNote}</p>
                   ))}
                 </div>
               </div>
@@ -894,26 +929,28 @@ export function ResultsReport({
                     <p className="text-[10px] text-foreground/55">Cognitive friction breakdown</p>
                   </div>
                 </div>
-                <div className="flex flex-col gap-2.5">
+                {/* Visual meter cards with emoji indicators */}
+                <div className="grid grid-cols-2 gap-2">
                   {[
-                    { label: "Jargon Level", score: data.confusionMap.jargonScore, impact: data.confusionMap.jargonImpact },
-                    { label: "Info Density", score: data.confusionMap.densityScore, impact: data.confusionMap.densityImpact },
-                    { label: "Friction Lang.", score: data.confusionMap.frictionWords, impact: data.confusionMap.frictionImpact },
-                    { label: "Decision Paralysis", score: data.confusionMap.decisionParalysis, impact: data.confusionMap.paralysisImpact },
+                    { label: "Jargon", emoji: "📖", score: data.confusionMap.jargonScore, impact: data.confusionMap.jargonImpact },
+                    { label: "Density", emoji: "📊", score: data.confusionMap.densityScore, impact: data.confusionMap.densityImpact },
+                    { label: "Friction", emoji: "🚧", score: data.confusionMap.frictionWords, impact: data.confusionMap.frictionImpact },
+                    { label: "Paralysis", emoji: "🔀", score: data.confusionMap.decisionParalysis, impact: data.confusionMap.paralysisImpact },
                   ].sort((a, b) => b.score - a.score).map((item) => (
-                    <div key={item.label}>
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-[10px] text-foreground/60 w-[100px] shrink-0 truncate">{item.label}</span>
-                        <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
-                          <div className="h-full rounded-full animate-bar-width" style={{ background: scoreColor(100 - item.score), width: `${item.score}%`, "--bar-width": `${item.score}%` } as React.CSSProperties} />
-                        </div>
-                        <span className="text-[12px] font-bold font-mono w-7 text-right" style={{ color: scoreColor(100 - item.score) }}>{item.score}</span>
+                    <div key={item.label} className="rounded-lg p-2.5" style={{ background: "var(--s2)" }}>
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <span className="text-[13px]">{item.emoji}</span>
+                        <span className="text-[10px] font-medium text-foreground/60">{item.label}</span>
+                        <span className="text-[12px] font-bold font-mono ml-auto" style={{ color: scoreColor(100 - item.score) }}>{item.score}</span>
                       </div>
-                      {item.impact && <p className="text-[10px] text-foreground/50 leading-relaxed mt-0.5 ml-[112px]">{item.impact}</p>}
+                      <div className="h-[4px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
+                        <div className="h-full rounded-full" style={{ background: scoreColor(100 - item.score), width: `${item.score}%`, transition: "width 0.8s ease" }} />
+                      </div>
+                      {item.impact && <p className="text-[9px] text-foreground/40 leading-snug mt-1.5 line-clamp-2">{item.impact}</p>}
                     </div>
                   ))}
                 </div>
-                <p className="text-[10px] text-foreground/45 mt-2.5">Higher scores = greater cognitive friction</p>
+                <p className="text-[9px] text-foreground/35 mt-2 text-center">Higher = more friction</p>
               </div>
             )}
           </div>
@@ -1085,11 +1122,55 @@ export function ResultsReport({
         if (!data.heuristicEvaluation) return null;
         return (
           <DashSection icon={<ListChecks className="h-4 w-4" style={{ color: "var(--accent-purple)" }} />} title="Heuristic Insights" subtitle={`Nielsen's 10 heuristics — Overall: ${data.heuristicEvaluation.overallHeuristicScore.toFixed(1)}/10`}>
-            <div className="flex items-center gap-3 mb-4 p-2.5 rounded-lg border" style={{ background: "var(--s2)", borderColor: "var(--border)" }}>
-              <span className="text-[22px] font-bold font-mono" style={{ color: heuristicColor(data.heuristicEvaluation.overallHeuristicScore) }}>{data.heuristicEvaluation.overallHeuristicScore.toFixed(1)}</span>
-              <div>
-                <div className="text-[12px] font-semibold">Overall Heuristic Score</div>
-                <div className="text-[10px] text-foreground/55">Average across 10 heuristics (0-10)</div>
+            {/* Radar chart + overall score */}
+            <div className="flex flex-col sm:flex-row items-center gap-4 mb-4 p-3 rounded-xl border" style={{ background: "var(--s2)", borderColor: "var(--border)" }}>
+              {/* SVG Spider/Radar Chart */}
+              <div className="shrink-0">
+                <svg width="200" height="200" viewBox="0 0 200 200">
+                  {/* Grid rings */}
+                  {[0.2, 0.4, 0.6, 0.8, 1.0].map((ring) => (
+                    <polygon key={ring} points={Array.from({ length: 10 }, (_, i) => {
+                      const angle = (Math.PI * 2 * i) / 10 - Math.PI / 2;
+                      return `${100 + Math.cos(angle) * 80 * ring},${100 + Math.sin(angle) * 80 * ring}`;
+                    }).join(" ")} fill="none" stroke="var(--foreground)" strokeOpacity={0.07} strokeWidth="1" />
+                  ))}
+                  {/* Axis lines */}
+                  {Array.from({ length: 10 }, (_, i) => {
+                    const angle = (Math.PI * 2 * i) / 10 - Math.PI / 2;
+                    return <line key={i} x1="100" y1="100" x2={100 + Math.cos(angle) * 80} y2={100 + Math.sin(angle) * 80} stroke="var(--foreground)" strokeOpacity={0.05} strokeWidth="1" />;
+                  })}
+                  {/* Data polygon */}
+                  <polygon points={data.heuristicEvaluation.heuristics.map((h, i) => {
+                    const angle = (Math.PI * 2 * i) / 10 - Math.PI / 2;
+                    const r = (h.score / 10) * 80;
+                    return `${100 + Math.cos(angle) * r},${100 + Math.sin(angle) * r}`;
+                  }).join(" ")} fill="hsl(var(--primary) / 0.15)" stroke="hsl(var(--primary))" strokeWidth="2" />
+                  {/* Score dots + labels */}
+                  {data.heuristicEvaluation.heuristics.map((h, i) => {
+                    const angle = (Math.PI * 2 * i) / 10 - Math.PI / 2;
+                    const r = (h.score / 10) * 80;
+                    const labelR = 92;
+                    return (
+                      <g key={h.id}>
+                        <circle cx={100 + Math.cos(angle) * r} cy={100 + Math.sin(angle) * r} r="3" fill={heuristicColor(h.score)} />
+                        <text x={100 + Math.cos(angle) * labelR} y={100 + Math.sin(angle) * labelR} textAnchor="middle" dominantBaseline="central" fill="var(--foreground)" fillOpacity="0.4" fontSize="7" fontWeight="500">
+                          {h.name.split(" ").slice(0, 2).join(" ")}
+                        </text>
+                      </g>
+                    );
+                  })}
+                </svg>
+              </div>
+              <div className="flex flex-col gap-1 flex-1">
+                <span className="text-[28px] font-bold font-mono" style={{ color: heuristicColor(data.heuristicEvaluation.overallHeuristicScore) }}>{data.heuristicEvaluation.overallHeuristicScore.toFixed(1)}<span className="text-[14px] text-foreground/30">/10</span></span>
+                <span className="text-[12px] font-semibold">Overall Heuristic Score</span>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {[...data.heuristicEvaluation.heuristics].sort((a, b) => a.score - b.score).slice(0, 3).map((h) => (
+                    <span key={h.id} className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: heuristicBg(h.score), color: heuristicColor(h.score) }}>
+                      {h.name.split(" ").slice(0, 2).join(" ")}: {h.score}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -1105,16 +1186,33 @@ export function ResultsReport({
           <DashSection icon={<Lightbulb className="h-4 w-4" style={{ color: "var(--score-high)" }} />} title="Improvements" subtitle="Quick wins and strategic fixes">
             {data.quickWins.length > 0 && (
               <>
-                <p className="text-[12px] uppercase tracking-[2px] mb-2.5" style={{ color: "var(--score-high)" }}>Quick wins (under 1 hour)</p>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <div className="w-6 h-6 rounded-full grid place-items-center" style={{ background: "oklch(0.52 0.14 155 / 12%)" }}>
+                    <Zap className="h-3 w-3" style={{ color: "var(--score-high)" }} />
+                  </div>
+                  <p className="text-[12px] font-semibold" style={{ color: "var(--score-high)" }}>Quick Wins</p>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full font-mono font-bold" style={{ background: "oklch(0.52 0.14 155 / 10%)", color: "var(--score-high)" }}>{data.quickWins.length}</span>
+                  <span className="text-[10px] text-foreground/40 ml-auto">Under 1 hour each</span>
+                </div>
                 <div className="flex flex-col gap-2 mb-5">
                   {data.quickWins.map((w, i) => {
                     const detail = getActionDetail(w);
                     return (
-                      <div key={i} className="flex gap-2.5 text-[12px] leading-relaxed text-foreground/65 p-2.5 px-3.5 rounded-[7px] border-l-2" style={{ background: "var(--s2)", borderColor: "var(--score-high)" }}>
-                        <Check className="h-3.5 w-3.5 shrink-0 mt-0.5" style={{ color: "var(--score-high)" }} />
-                        <div className="flex-1">
-                          <span>{getActionText(w)}</span>
-                          {detail?.expectedImpact && <p className="text-[10px] text-foreground/50 mt-1 italic">→ {detail.expectedImpact}</p>}
+                      <div key={i} className="rounded-lg p-3 relative overflow-hidden" style={{ background: "var(--s2)" }}>
+                        <div className="absolute top-0 left-0 w-[3px] h-full" style={{ background: "var(--score-high)" }} />
+                        <div className="flex items-start gap-2.5 pl-1">
+                          <div className="w-5 h-5 rounded-full grid place-items-center shrink-0 mt-0.5" style={{ background: "oklch(0.52 0.14 155 / 10%)" }}>
+                            <Check className="h-3 w-3" style={{ color: "var(--score-high)" }} />
+                          </div>
+                          <div className="flex-1">
+                            <span className="text-[12px] text-foreground/70">{getActionText(w)}</span>
+                            {detail?.expectedImpact && (
+                              <div className="flex items-center gap-1.5 mt-1.5">
+                                <TrendingUp className="h-3 w-3" style={{ color: "var(--score-high)", opacity: 0.6 }} />
+                                <span className="text-[10px] font-medium" style={{ color: "var(--score-high)", opacity: 0.7 }}>{detail.expectedImpact}</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     );
@@ -1124,18 +1222,32 @@ export function ResultsReport({
             )}
             {features.improvements && data.strategicFixes.length > 0 && (
               <>
-                <p className="text-[12px] uppercase tracking-[2px] mb-2.5" style={{ color: "var(--accent-purple)" }}>Strategic fixes</p>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <div className="w-6 h-6 rounded-full grid place-items-center" style={{ background: "oklch(0.637 0.185 295 / 12%)" }}>
+                    <Target className="h-3 w-3" style={{ color: "var(--accent-purple)" }} />
+                  </div>
+                  <p className="text-[12px] font-semibold" style={{ color: "var(--accent-purple)" }}>Strategic Fixes</p>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full font-mono font-bold" style={{ background: "oklch(0.637 0.185 295 / 10%)", color: "var(--accent-purple)" }}>{data.strategicFixes.length}</span>
+                  <span className="text-[10px] text-foreground/40 ml-auto">Deeper changes</span>
+                </div>
                 <div className="flex flex-col gap-2">
                   {data.strategicFixes.map((f, i) => {
                     const text = getActionText(f);
                     const detail = getActionDetail(f);
                     return (
-                      <div key={i} className="flex gap-2.5 text-[12px] leading-relaxed text-foreground/65 p-2.5 px-3.5 rounded-[7px] border-l-2" style={{ background: "var(--s2)", borderColor: "var(--accent-purple)" }}>
-                        <span className="font-medium shrink-0 min-w-[18px]" style={{ color: "var(--accent-purple)" }}>{i + 1}.</span>
-                        <div className="flex-1">
-                          <span>{text}</span>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded ml-2" style={{ color: "var(--accent-purple)", background: "oklch(0.637 0.185 295 / 7%)" }}>{deriveScope(text)}</span>
-                          {detail?.expectedImpact && <p className="text-[10px] text-foreground/50 mt-1 italic">→ {detail.expectedImpact}</p>}
+                      <div key={i} className="rounded-lg p-3 relative overflow-hidden" style={{ background: "var(--s2)" }}>
+                        <div className="absolute top-0 left-0 w-[3px] h-full" style={{ background: "var(--accent-purple)" }} />
+                        <div className="flex items-start gap-2.5 pl-1">
+                          <span className="w-5 h-5 rounded-full grid place-items-center shrink-0 text-[10px] font-bold" style={{ background: "oklch(0.637 0.185 295 / 10%)", color: "var(--accent-purple)" }}>{i + 1}</span>
+                          <div className="flex-1">
+                            <span className="text-[12px] text-foreground/70">{text}</span>
+                            <div className="flex items-center gap-1.5 mt-1.5">
+                              <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ color: "var(--accent-purple)", background: "oklch(0.637 0.185 295 / 7%)" }}>{deriveScope(text)}</span>
+                              {detail?.expectedImpact && (
+                                <span className="text-[10px] font-medium" style={{ color: "var(--accent-purple)", opacity: 0.7 }}>{detail.expectedImpact}</span>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     );
@@ -1710,12 +1822,16 @@ function SeverityDistribution({ counts }: { counts: Record<string, number> }) {
 /* ── Mini Insight (for first-screen analysis) ── */
 function MiniInsight({ icon, label, value, color, hint }: { icon: React.ReactNode; label: string; value: string; color: string; hint?: string }) {
   return (
-    <div className="flex gap-2 p-2.5 rounded-lg text-[12px] leading-relaxed" style={{ background: "var(--s2)" }}>
-      <span className="shrink-0 mt-0.5" style={{ color }}>{icon}</span>
-      <div>
-        <span className="font-medium text-foreground/70">{label}: </span>
-        <span className="text-foreground/60">{value}</span>
-        {hint && <p className="text-[10px] text-foreground/50 mt-0.5">{hint}</p>}
+    <div className="rounded-lg p-3 text-[12px] leading-relaxed relative overflow-hidden" style={{ background: "var(--s2)" }}>
+      <div className="absolute top-0 left-0 w-[3px] h-full rounded-r" style={{ background: color, opacity: 0.6 }} />
+      <div className="flex items-start gap-2 pl-1">
+        <div className="w-6 h-6 rounded-md grid place-items-center shrink-0 mt-0.5" style={{ background: `color-mix(in oklch, ${color} 15%, transparent)` }}>
+          <span style={{ color }}>{icon}</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <span className="text-[10px] font-semibold uppercase tracking-wider block mb-0.5" style={{ color, opacity: 0.75 }}>{label}</span>
+          <span className="text-[11px] text-foreground/65 block">{value}</span>
+        </div>
       </div>
     </div>
   );
