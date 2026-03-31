@@ -762,6 +762,107 @@ export async function generateUXAudit(
   return result.data;
 }
 
+/**
+ * Streaming version of generateUXAudit.
+ * Calls GPT-4o with stream:true and emits progress callbacks
+ * as chunks arrive. Returns the same UXAuditResult after full
+ * accumulation and Zod validation.
+ *
+ * No withRetry — caller handles retry logic.
+ */
+const STREAMING_STAGES = [
+  { name: "structural_decomposition", label: "Structural Decomposition" },
+  { name: "message_clarity", label: "Message Clarity Analysis" },
+  { name: "cognitive_load", label: "Cognitive Load Scan" },
+  { name: "conversion_architecture", label: "Conversion Architecture" },
+  { name: "trust_signals", label: "Trust Signal Inventory" },
+  { name: "contradiction_detection", label: "Contradiction Detection" },
+  { name: "first_screen", label: "First-Screen Hypothesis" },
+  { name: "self_critique", label: "Self-Critique Refinement" },
+  { name: "synthesis_rewrite", label: "Synthesis & Rewrite Engine" },
+  { name: "heuristic_evaluation", label: "Heuristic Evaluation" },
+] as const;
+
+// Estimated total chars for the full JSON response (~12-15k chars typical)
+const ESTIMATED_TOTAL_CHARS = 13000;
+
+export async function generateUXAuditStreaming(
+  content: ExtractedContent,
+  onProgress: (percent: number, stage: string) => void
+): Promise<UXAuditResult> {
+  const stream = await getClient().chat.completions.create({
+    model: "gpt-4o",
+    response_format: { type: "json_object" },
+    temperature: 0.4,
+    max_tokens: 16384,
+    stream: true,
+    messages: [
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user", content: buildUserPrompt(content) },
+    ],
+  });
+
+  let fullJson = "";
+  let lastPercent = 0;
+  let finishReason: string | null = null;
+
+  for await (const chunk of stream) {
+    const delta = chunk.choices[0]?.delta?.content;
+    if (delta) {
+      fullJson += delta;
+
+      // Calculate progress based on accumulated character count
+      const rawPercent = Math.min(95, Math.round((fullJson.length / ESTIMATED_TOTAL_CHARS) * 95));
+      // Only emit when percent changes by ≥3 to avoid flooding
+      if (rawPercent - lastPercent >= 3) {
+        lastPercent = rawPercent;
+        // Map percent to stage (10 stages, each ~10% of progress)
+        const stageIndex = Math.min(9, Math.floor(rawPercent / 10));
+        onProgress(rawPercent, STREAMING_STAGES[stageIndex].name);
+      }
+    }
+
+    // Capture finish_reason from the last chunk
+    if (chunk.choices[0]?.finish_reason) {
+      finishReason = chunk.choices[0].finish_reason;
+    }
+  }
+
+  if (!fullJson) {
+    throw new Error("No response from OpenAI (streaming)");
+  }
+
+  if (finishReason === "length") {
+    console.error("[UXAudit-Stream] Output truncated — finish_reason=length. Length:", fullJson.length);
+    throw new Error("AI output was truncated due to token limit.");
+  }
+
+  // Final progress
+  onProgress(98, STREAMING_STAGES[9].name);
+
+  let parsed;
+  try {
+    parsed = JSON.parse(fullJson);
+  } catch (jsonErr) {
+    console.error("[UXAudit-Stream] JSON parse failed. finish_reason:", finishReason, "length:", fullJson.length, "last 200:", fullJson.slice(-200));
+    throw new Error(`Failed to parse streamed AI response as JSON (finish_reason: ${finishReason})`);
+  }
+
+  const result = uxAuditSchema.safeParse(parsed);
+  if (!result.success) {
+    console.error("[UXAudit-Stream] Schema validation failed:", JSON.stringify(result.error.issues.slice(0, 5)));
+    const lenient = uxAuditSchema.passthrough().safeParse(parsed);
+    if (lenient.success) {
+      console.warn("[UXAudit-Stream] Passed with passthrough — some fields may be non-standard");
+      return lenient.data as UXAuditResult;
+    }
+    throw new Error(`AI response failed schema validation: ${result.error.issues[0]?.message}`);
+  }
+
+  onProgress(100, "complete");
+  return result.data;
+}
+
 /* ─────────────────────────────────────────────────────────
    AI Vision: Heatmap + Visual Analysis (Diagnostic Engine v0.7)
    ───────────────────────────────────────────────────────── */

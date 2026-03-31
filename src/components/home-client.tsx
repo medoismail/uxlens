@@ -18,6 +18,12 @@ import type { AnalysisResult, UXAuditResult, UsageCheck, HeatmapZone, Competitor
 type AppState =
   | { status: "idle" }
   | { status: "loading" }
+  | {
+      status: "streaming";
+      url: string;
+      metadata?: { title: string; description: string; headingsCount: number; language?: string };
+      progress?: { stage: string; percent: number };
+    }
   | { status: "error"; message: string }
   | { status: "limit_reached"; usage: UsageCheck }
   | {
@@ -45,13 +51,12 @@ export function HomeClient() {
   const { isSubscribed, email: subscriberEmail, plan, verifySubscription } = useSubscription();
 
   async function handleAnalyze(rawUrl: string, retryCount = 0) {
-    setState({ status: "loading" });
-
     const normalizedUrl = normalizeUrl(rawUrl);
     const MAX_RETRIES = 1;
 
+    setState({ status: "streaming", url: normalizedUrl });
+
     try {
-      // Step 1: Run the AI audit (fast — no screenshot)
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -61,47 +66,123 @@ export function HomeClient() {
         }),
       });
 
-      const result: AnalysisResult = await res.json();
+      // Pre-stream JSON errors (auth, validation, usage, fetch failures)
+      const contentType = res.headers.get("content-type") || "";
+      if (!contentType.includes("text/event-stream")) {
+        const result: AnalysisResult = await res.json();
+        if (!result.success) {
+          if (result.code === "USAGE_LIMIT" && result.usage) {
+            if (result.usage.audits_remaining === 0 && result.usage.upgrade_suggestion) {
+              setState({ status: "limit_reached", usage: result.usage });
+            } else {
+              setState({ status: "error", message: result.error });
+            }
+          } else if (
+            retryCount < MAX_RETRIES &&
+            result.code !== "INVALID_URL" &&
+            result.code !== "USAGE_LIMIT"
+          ) {
+            console.warn(`[Analyze] Retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+            await new Promise((r) => setTimeout(r, 1500));
+            return handleAnalyze(rawUrl, retryCount + 1);
+          } else {
+            setState({ status: "error", message: result.error });
+          }
+        }
+        return;
+      }
 
-      if (result.success) {
-        // Determine competitor analysis status based on plan
+      // ═══ SSE STREAM CONSUMER ═══
+      const reader = res.body?.getReader();
+      if (!reader) {
+        setState({ status: "error", message: "No response stream" });
+        return;
+      }
+
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let auditData: UXAuditResult | null = null;
+      let auditUrl = normalizedUrl;
+      let auditId: string | undefined;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || ""; // Keep incomplete line in buffer
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          try {
+            const event = JSON.parse(line.slice(6));
+
+            switch (event.type) {
+              case "metadata":
+                setState((prev) => {
+                  if (prev.status !== "streaming") return prev;
+                  return { ...prev, metadata: event };
+                });
+                break;
+
+              case "progress":
+                setState((prev) => {
+                  if (prev.status !== "streaming") return prev;
+                  return { ...prev, progress: { stage: event.stage, percent: event.percent } };
+                });
+                break;
+
+              case "complete":
+                auditData = event.data;
+                auditUrl = event.url;
+                break;
+
+              case "saved":
+                auditId = event.auditId;
+                break;
+
+              case "error":
+                if (retryCount < MAX_RETRIES && event.code !== "USAGE_LIMIT") {
+                  console.warn(`[Analyze-Stream] Error, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+                  await new Promise((r) => setTimeout(r, 1500));
+                  return handleAnalyze(rawUrl, retryCount + 1);
+                }
+                setState({ status: "error", message: event.error });
+                return;
+            }
+          } catch {
+            // Ignore individual SSE parse errors
+          }
+        }
+      }
+
+      // Stream finished — transition to success
+      if (auditData) {
         const features = PLAN_FEATURES[plan];
         const compStatus = features.competitorAnalysis ? "loading" as const : "locked" as const;
 
-        // Show the report immediately (without screenshot)
         setState({
           status: "success",
-          data: result.data,
-          url: result.url,
-          auditId: result.auditId,
+          data: auditData,
+          url: auditUrl,
+          auditId,
           screenshotStatus: "loading",
           competitorStatus: compStatus,
         });
 
-        // Step 2: Capture screenshot in the background
-        fetchScreenshot(result.url, result.data, result.auditId);
-
-        // Step 3: Run competitor analysis in background (Pro+ only)
+        // Fire background tasks
+        fetchScreenshot(auditUrl, auditData, auditId);
         if (features.competitorAnalysis) {
-          fetchCompetitorAnalysis(result.url, result.data, result.auditId);
+          fetchCompetitorAnalysis(auditUrl, auditData, auditId);
         }
-      } else if (result.code === "USAGE_LIMIT" && result.usage) {
-        if (result.usage.audits_remaining === 0 && result.usage.upgrade_suggestion) {
-          setState({ status: "limit_reached", usage: result.usage });
-        } else {
-          setState({ status: "error", message: result.error });
-        }
-      } else if (
-        retryCount < MAX_RETRIES &&
-        result.code !== "INVALID_URL" &&
-        result.code !== "USAGE_LIMIT"
-      ) {
-        // Auto-retry once for transient failures (AI, fetch, parse errors)
-        console.warn(`[Analyze] Retrying (${retryCount + 1}/${MAX_RETRIES})...`);
-        await new Promise((r) => setTimeout(r, 1500));
-        return handleAnalyze(rawUrl, retryCount + 1);
       } else {
-        setState({ status: "error", message: result.error });
+        if (retryCount < MAX_RETRIES) {
+          console.warn(`[Analyze-Stream] No data received, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+          await new Promise((r) => setTimeout(r, 1500));
+          return handleAnalyze(rawUrl, retryCount + 1);
+        }
+        setState({ status: "error", message: "Analysis failed. Please try again." });
       }
     } catch {
       if (retryCount < MAX_RETRIES) {
@@ -420,6 +501,12 @@ export function HomeClient() {
           <Hero onSubmit={handleAnalyze} onScreenshotSubmit={handleScreenshotAnalyze} isLoading={false} />
         )}
         {state.status === "loading" && <LoadingState />}
+        {state.status === "streaming" && (
+          <LoadingState
+            progress={state.progress}
+            metadata={state.metadata}
+          />
+        )}
         {state.status === "error" && (
           <ErrorState message={state.message} onRetry={handleReset} />
         )}

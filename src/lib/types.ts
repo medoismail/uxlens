@@ -267,6 +267,14 @@ export interface AnalysisError {
 
 export type AnalysisResult = AnalysisResponse | AnalysisError;
 
+/** SSE event types for streaming analyze endpoint */
+export type AnalyzeSSEEvent =
+  | { type: "metadata"; url: string; title: string; description: string; headingsCount: number; language?: string }
+  | { type: "progress"; stage: string; percent: number }
+  | { type: "complete"; data: UXAuditResult; url: string }
+  | { type: "saved"; auditId: string }
+  | { type: "error"; error: string; code: AnalysisError["code"] };
+
 /** Subscription plan tiers */
 export type PlanTier = "free" | "starter" | "pro" | "agency";
 
