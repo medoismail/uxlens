@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Check } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 const PIPELINE_STEPS = [
   { num: "01", name: "Structural Decomposition", desc: "Extracting page sections, hierarchy & element inventory" },
@@ -17,7 +16,7 @@ const PIPELINE_STEPS = [
 ];
 
 const TOTAL_STEPS = PIPELINE_STEPS.length;
-const STEP_DURATION = 2000;
+const STEP_DURATION = 2500; // 2.5s per step in timer mode
 
 // Map SSE stage names → step index
 const STAGE_TO_INDEX: Record<string, number> = {
@@ -36,34 +35,60 @@ const STAGE_TO_INDEX: Record<string, number> = {
 };
 
 interface LoadingStateProps {
+  /** Real progress from SSE stream. Drives step advancement. */
   progress?: { stage: string; percent: number };
+  /** Page metadata from SSE stream. Shows the detected page title. */
   metadata?: { title: string; description: string; headingsCount: number; language?: string };
 }
 
 export function LoadingState({ progress, metadata }: LoadingStateProps) {
   const [activeStep, setActiveStep] = useState(0);
-  const isStreaming = !!progress;
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const hasReceivedProgress = useRef(false);
+
+  // Track if we ever got real progress — once true, never go back to timer
+  if (progress) {
+    hasReceivedProgress.current = true;
+  }
 
   // ═══ REAL PROGRESS MODE (SSE-driven) ═══
   useEffect(() => {
     if (!progress) return;
     const targetStep = STAGE_TO_INDEX[progress.stage] ?? Math.min(9, Math.floor(progress.percent / 10));
-    if (targetStep > activeStep) {
-      setActiveStep(targetStep);
-    }
-  }, [progress, activeStep]);
+    // Only advance forward, never backwards
+    setActiveStep((prev) => Math.max(prev, targetStep));
+  }, [progress]);
 
-  // ═══ TIMER MODE (fallback for screenshot-analyze flow) ═══
+  // ═══ TIMER MODE (fallback — stops once real progress arrives or at last step) ═══
   useEffect(() => {
-    if (isStreaming) return;
-    const interval = setInterval(() => {
-      setActiveStep((prev) => (prev < TOTAL_STEPS - 1 ? prev + 1 : prev));
+    // Don't start timer if we already have real progress
+    if (hasReceivedProgress.current) return;
+
+    timerRef.current = setInterval(() => {
+      // Stop if real progress has arrived
+      if (hasReceivedProgress.current) {
+        if (timerRef.current) clearInterval(timerRef.current);
+        return;
+      }
+      setActiveStep((prev) => {
+        // Stop at last step — never loop
+        if (prev >= TOTAL_STEPS - 1) {
+          if (timerRef.current) clearInterval(timerRef.current);
+          return prev;
+        }
+        return prev + 1;
+      });
     }, STEP_DURATION);
-    return () => clearInterval(interval);
-  }, [isStreaming]);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const step = PIPELINE_STEPS[activeStep];
-  const percent = isStreaming && progress ? progress.percent : Math.round(((activeStep + 0.5) / TOTAL_STEPS) * 100);
+  const percent = progress
+    ? progress.percent
+    : Math.min(95, Math.round(((activeStep + 0.5) / TOTAL_STEPS) * 100));
 
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 animate-fade-in relative z-[1]">
@@ -127,7 +152,7 @@ export function LoadingState({ progress, metadata }: LoadingStateProps) {
         </div>
       </div>
 
-      {/* Step dots — compact indicator of which step we're on */}
+      {/* Step dots */}
       <div className="flex items-center gap-1.5 mt-5">
         {PIPELINE_STEPS.map((_, i) => (
           <div
