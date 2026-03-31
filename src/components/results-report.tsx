@@ -667,11 +667,91 @@ export function ResultsReport({
 
       case "killers":
         return (
-          <DashSection icon={<Flame className="h-4 w-4" style={{ color: "var(--score-low)" }} />} title="Conversion Killers" subtitle="Sorted by weakness — lowest scores first">
-            <div className="flex flex-col gap-3">
-              {sortedCategories.map((cat) => (
-                <BarChartRow key={cat.key} label={cat.label} score={cat.data.score} color={scoreColor(cat.data.score)} note={cat.data.note} />
-              ))}
+          <DashSection icon={<Flame className="h-4 w-4" style={{ color: "var(--score-low)" }} />} title="Conversion Killers" subtitle="Top blockers ranked by revenue impact">
+            {/* Top 3 Conversion Killers — visual impact cards */}
+            {data.conversionKillers.length > 0 && (
+              <div className="flex flex-col gap-3 mb-5">
+                {data.conversionKillers.map((killer, i) => {
+                  const isObj = typeof killer === "object";
+                  const title = isObj ? (killer as ConversionKillerItem).title : String(killer);
+                  const desc = isObj ? (killer as ConversionKillerItem).description : "";
+                  const affected = isObj ? (killer as ConversionKillerItem).affectedVisitors : undefined;
+                  const cascade = isObj ? (killer as ConversionKillerItem).behavioralCascade : undefined;
+                  const lift = isObj ? (killer as ConversionKillerItem).expectedLift : undefined;
+                  const rankColors = ["#ef4444", "#f97316", "#eab308"];
+                  const rankBgs = ["oklch(0.55 0.17 25 / 8%)", "oklch(0.60 0.15 55 / 8%)", "oklch(0.65 0.14 85 / 8%)"];
+                  return (
+                    <div key={i} className="rounded-xl p-4 relative overflow-hidden border" style={{ background: "var(--s1)", borderColor: `color-mix(in oklch, ${rankColors[i] || rankColors[2]} 20%, transparent)` }}>
+                      {/* Rank indicator */}
+                      <div className="absolute top-0 left-0 w-full h-[3px]" style={{ background: `linear-gradient(90deg, ${rankColors[i] || rankColors[2]}, transparent)` }} />
+                      <div className="flex items-start gap-3">
+                        {/* Rank circle */}
+                        <div className="w-10 h-10 rounded-xl grid place-items-center shrink-0" style={{ background: rankBgs[i] || rankBgs[2] }}>
+                          <span className="text-[18px] font-bold font-mono" style={{ color: rankColors[i] || rankColors[2] }}>#{i + 1}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-[13px] font-semibold mb-1">{title}</h4>
+                          {desc && <p className="text-[11px] text-foreground/55 leading-relaxed mb-2">{desc}</p>}
+                          <div className="flex flex-wrap gap-2">
+                            {lift && (
+                              <span className="text-[10px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1" style={{ background: "oklch(0.52 0.14 155 / 10%)", color: "var(--score-high)" }}>
+                                <TrendingUp className="h-3 w-3" /> {lift} if fixed
+                              </span>
+                            )}
+                            {affected && (
+                              <span className="text-[10px] px-2 py-0.5 rounded-full text-foreground/50" style={{ background: "var(--s2)" }}>
+                                Affects: {affected}
+                              </span>
+                            )}
+                          </div>
+                          {cascade && (
+                            <div className="mt-2 flex items-start gap-1.5">
+                              <Activity className="h-3 w-3 shrink-0 mt-0.5" style={{ color: rankColors[i] || rankColors[2], opacity: 0.5 }} />
+                              <p className="text-[10px] text-foreground/40 leading-relaxed">{cascade}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Category weakness breakdown — visual bars */}
+            <p className="text-[10px] font-semibold text-foreground/40 uppercase tracking-wide mb-2.5">Category Breakdown</p>
+            <div className="flex flex-col gap-2.5">
+              {sortedCategories.map((cat) => {
+                const pct = cat.data.score;
+                return (
+                  <div key={cat.key} className="rounded-lg p-3 relative overflow-hidden" style={{ background: "var(--s2)" }}>
+                    {/* Background fill indicator */}
+                    <div className="absolute inset-0 opacity-[0.04]" style={{ background: scoreColor(pct), width: `${pct}%` }} />
+                    <div className="flex items-center gap-3 relative">
+                      {/* Mini ring gauge */}
+                      <svg width="36" height="36" viewBox="0 0 36 36" className="shrink-0">
+                        <circle cx="18" cy="18" r="14" fill="none" stroke="var(--s3)" strokeWidth="3" />
+                        <circle cx="18" cy="18" r="14" fill="none" stroke={scoreColor(pct)} strokeWidth="3" strokeLinecap="round"
+                          strokeDasharray={`${2 * Math.PI * 14}`} strokeDashoffset={`${2 * Math.PI * 14 - (pct / 100) * 2 * Math.PI * 14}`}
+                          transform="rotate(-90 18 18)" style={{ transition: "stroke-dashoffset 0.8s ease" }} />
+                        <text x="18" y="18" textAnchor="middle" dominantBaseline="central" fill={scoreColor(pct)} fontSize="10" fontWeight="700" fontFamily="var(--font-mono)">{pct}</text>
+                      </svg>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[11px] font-medium block">{cat.label}</span>
+                        <p className="text-[10px] text-foreground/45 line-clamp-1 mt-0.5">{cat.data.note.split(".")[0]}.</p>
+                      </div>
+                      {cat.data.benchmark != null && (
+                        <span className="text-[10px] font-mono shrink-0 px-1.5 py-0.5 rounded" style={{
+                          color: pct >= cat.data.benchmark ? "var(--score-high)" : "var(--score-low)",
+                          background: pct >= cat.data.benchmark ? "oklch(0.52 0.14 155 / 8%)" : "oklch(0.55 0.17 20 / 8%)"
+                        }}>
+                          {pct >= cat.data.benchmark ? "+" : ""}{pct - cat.data.benchmark} vs avg
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </DashSection>
         );
