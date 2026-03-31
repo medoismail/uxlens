@@ -219,6 +219,31 @@ export const uxAuditSchema = z.object({
   heuristicEvaluation: heuristicEvaluationSchema.optional(),
   uxStrengths: z.array(z.string()).optional(),
   personaFeedback: z.array(personaFeedbackSchema).optional(),
+  journeyMap: z.array(z.object({
+    section: z.string(),
+    emotion: z.enum(["confidence", "interest", "neutral", "doubt", "frustration"]),
+    intensity: z.number().min(0).max(100),
+    note: z.string(),
+  })).optional(),
+  accessibilityScore: z.object({
+    overallScore: z.number().min(0).max(100),
+    contrastScore: z.number().min(0).max(100),
+    textSizeScore: z.number().min(0).max(100),
+    touchTargetScore: z.number().min(0).max(100),
+    altTextScore: z.number().min(0).max(100),
+    keyboardNavScore: z.number().min(0).max(100),
+    issues: z.array(z.string()),
+    passes: z.array(z.string()),
+  }).optional(),
+  iaScore: z.object({
+    overallScore: z.number().min(0).max(100),
+    sectionOrderScore: z.number().min(0).max(100),
+    navigationScore: z.number().min(0).max(100),
+    contentGroupingScore: z.number().min(0).max(100),
+    scanabilityScore: z.number().min(0).max(100),
+    suggestedOrder: z.array(z.string()),
+    issues: z.array(z.string()),
+  }).optional(),
 });
 
 /** API request body schema */

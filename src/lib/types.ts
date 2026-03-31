@@ -158,6 +158,37 @@ export interface PersonaFeedback {
   priority: "high" | "medium" | "low";  // How urgent from their perspective
 }
 
+/** Visitor emotional journey point across page sections */
+export interface JourneyPoint {
+  section: string;
+  emotion: "confidence" | "interest" | "neutral" | "doubt" | "frustration";
+  intensity: number; // 0-100
+  note: string;
+}
+
+/** Accessibility audit results */
+export interface AccessibilityScore {
+  overallScore: number; // 0-100
+  contrastScore: number;
+  textSizeScore: number;
+  touchTargetScore: number;
+  altTextScore: number;
+  keyboardNavScore: number;
+  issues: string[];
+  passes: string[];
+}
+
+/** Information architecture analysis */
+export interface IAScore {
+  overallScore: number; // 0-100
+  sectionOrderScore: number;
+  navigationScore: number;
+  contentGroupingScore: number;
+  scanabilityScore: number;
+  suggestedOrder: string[];
+  issues: string[];
+}
+
 export type PageType = "landing" | "app" | "signup" | "checkout" | "form" | "content" | "other";
 
 export interface UXAuditResult {
@@ -186,6 +217,12 @@ export interface UXAuditResult {
   heuristicEvaluation?: HeuristicEvaluation;
   uxStrengths?: string[];
   personaFeedback?: PersonaFeedback[];
+  /** Visitor emotional journey across page sections */
+  journeyMap?: JourneyPoint[];
+  /** WCAG accessibility audit */
+  accessibilityScore?: AccessibilityScore;
+  /** Information architecture analysis */
+  iaScore?: IAScore;
 }
 
 export interface ExtractedContent {

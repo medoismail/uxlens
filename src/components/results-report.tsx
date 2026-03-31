@@ -17,7 +17,7 @@ import { ChatWidget } from "@/components/chat-widget";
 import { AnnotatedView } from "@/components/annotated-view";
 import { PLAN_FEATURES } from "@/lib/types";
 import { CompetitorSection, CompetitorLockedPreview } from "@/components/competitor-section";
-import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone, CompetitorAnalysis, VisualAnalysis, SectionRewrite, HeuristicScore, FirstScreenAnalysis, ConversionKiller, ConversionKillerItem, ActionableItem, ActionItem, PersonaFeedback, AnnotationCoordinate } from "@/lib/types";
+import type { UXAuditResult, AuditSection, Finding, PlanTier, HeatmapZone, CompetitorAnalysis, VisualAnalysis, SectionRewrite, HeuristicScore, FirstScreenAnalysis, ConversionKiller, ConversionKillerItem, ActionableItem, ActionItem, PersonaFeedback, AnnotationCoordinate, JourneyPoint } from "@/lib/types";
 
 interface ResultsReportProps {
   data: UXAuditResult;
@@ -435,6 +435,9 @@ export function ResultsReport({
     ...(data.trustMatrix?.length > 0 || data.confusionMap ? [{ id: "trust", label: "Trust", icon: <Shield className="h-3.5 w-3.5" />, color: "var(--accent-blue)", badge: trustIssueCount || undefined }] : []),
     { id: "attention", label: "Attention", icon: <Eye className="h-3.5 w-3.5" />, color: "var(--brand)", badge: attentionIssueCount || undefined },
     ...(data.heuristicEvaluation ? [{ id: "heuristics", label: "Heuristics", icon: <ListChecks className="h-3.5 w-3.5" />, color: "var(--accent-purple)", badge: heuristicIssueCount || undefined }] : []),
+    ...(data.journeyMap && data.journeyMap.length > 0 ? [{ id: "journey", label: "Journey", icon: <Activity className="h-3.5 w-3.5" />, color: "var(--brand)", badge: data.journeyMap.length }] : []),
+    ...(data.accessibilityScore ? [{ id: "accessibility", label: "A11y", icon: <Eye className="h-3.5 w-3.5" />, color: "var(--score-high)", badge: data.accessibilityScore.issues.length || undefined }] : []),
+    ...(data.iaScore ? [{ id: "ia", label: "IA", icon: <Layers className="h-3.5 w-3.5" />, color: "var(--accent-blue)", badge: data.iaScore.issues.length || undefined }] : []),
     { id: "improvements", label: "Fixes", icon: <Lightbulb className="h-3.5 w-3.5" />, color: "var(--score-high)", badge: improvementCount || undefined },
     { id: "rewrite", label: "Rewrite", icon: <Sparkles className="h-3.5 w-3.5" />, color: "var(--brand)" },
     ...((data.personaFeedback?.length ?? 0) > 0 ? [{ id: "personas", label: "Feedback", icon: <User className="h-3.5 w-3.5" />, color: "var(--brand)", badge: data.personaFeedback?.length }] : []),
@@ -1391,6 +1394,239 @@ export function ResultsReport({
             </div>
           </DashSection>
         );
+
+      case "journey":
+        if (!data.journeyMap || data.journeyMap.length === 0) return null;
+        {
+          const emotionConfig: Record<string, { color: string; emoji: string }> = {
+            confidence: { color: "#22c55e", emoji: "😊" },
+            interest: { color: "#3b82f6", emoji: "🤔" },
+            neutral: { color: "#94a3b8", emoji: "😐" },
+            doubt: { color: "#f59e0b", emoji: "😟" },
+            frustration: { color: "#ef4444", emoji: "😤" },
+          };
+          return (
+            <DashSection icon={<Activity className="h-4 w-4" style={{ color: "var(--brand)" }} />} title="Visitor Journey Map" subtitle="Emotional arc as visitors scroll through the page">
+              {/* SVG Journey Graph */}
+              <div className="rounded-xl border p-4 mb-4" style={{ background: "var(--s1)" }}>
+                <svg width="100%" height="200" viewBox={`0 0 ${Math.max(data.journeyMap.length * 120, 600)} 200`} preserveAspectRatio="xMidYMid meet">
+                  {/* Background zones */}
+                  <rect x="0" y="0" width="100%" height="40" fill="#22c55e" fillOpacity="0.04" />
+                  <rect x="0" y="40" width="100%" height="40" fill="#3b82f6" fillOpacity="0.04" />
+                  <rect x="0" y="80" width="100%" height="40" fill="#94a3b8" fillOpacity="0.03" />
+                  <rect x="0" y="120" width="100%" height="40" fill="#f59e0b" fillOpacity="0.04" />
+                  <rect x="0" y="160" width="100%" height="40" fill="#ef4444" fillOpacity="0.04" />
+                  {/* Labels */}
+                  <text x="8" y="22" fill="#22c55e" fillOpacity="0.4" fontSize="10" fontWeight="500">Confident</text>
+                  <text x="8" y="102" fill="#94a3b8" fillOpacity="0.4" fontSize="10" fontWeight="500">Neutral</text>
+                  <text x="8" y="182" fill="#ef4444" fillOpacity="0.4" fontSize="10" fontWeight="500">Frustrated</text>
+                  {/* Connection line */}
+                  <polyline
+                    fill="none"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth="2.5"
+                    strokeLinejoin="round"
+                    strokeLinecap="round"
+                    points={data.journeyMap.map((p, i) => {
+                      const x = 60 + i * ((Math.max(data.journeyMap!.length * 120, 600) - 120) / Math.max(data.journeyMap!.length - 1, 1));
+                      const emotionY: Record<string, number> = { confidence: 20, interest: 60, neutral: 100, doubt: 140, frustration: 180 };
+                      const y = emotionY[p.emotion] || 100;
+                      return `${x},${y}`;
+                    }).join(" ")}
+                  />
+                  {/* Data points */}
+                  {data.journeyMap.map((p, i) => {
+                    const x = 60 + i * ((Math.max(data.journeyMap!.length * 120, 600) - 120) / Math.max(data.journeyMap!.length - 1, 1));
+                    const emotionY: Record<string, number> = { confidence: 20, interest: 60, neutral: 100, doubt: 140, frustration: 180 };
+                    const y = emotionY[p.emotion] || 100;
+                    const cfg = emotionConfig[p.emotion] || emotionConfig.neutral;
+                    return (
+                      <g key={i}>
+                        <circle cx={x} cy={y} r="6" fill={cfg.color} />
+                        <circle cx={x} cy={y} r="10" fill={cfg.color} fillOpacity="0.15" />
+                        <text x={x} y={y + 24} textAnchor="middle" fill="var(--foreground)" fillOpacity="0.5" fontSize="9" fontWeight="500">{p.section}</text>
+                      </g>
+                    );
+                  })}
+                </svg>
+              </div>
+              {/* Journey point cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {data.journeyMap.map((p, i) => {
+                  const cfg = emotionConfig[p.emotion] || emotionConfig.neutral;
+                  return (
+                    <div key={i} className="rounded-lg p-3 relative overflow-hidden" style={{ background: "var(--s2)" }}>
+                      <div className="absolute top-0 left-0 w-full h-[2px]" style={{ background: cfg.color }} />
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="text-[16px]">{cfg.emoji}</span>
+                        <span className="text-[13px] font-semibold">{p.section}</span>
+                        <span className="text-[13px] font-mono font-bold ml-auto" style={{ color: cfg.color }}>{p.intensity}</span>
+                      </div>
+                      <p className="text-[12px] text-foreground/55 leading-relaxed">{p.note}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </DashSection>
+          );
+        }
+
+      case "accessibility":
+        if (!data.accessibilityScore) return null;
+        {
+          const a11y = data.accessibilityScore;
+          const dimensions = [
+            { label: "Contrast", score: a11y.contrastScore, icon: "🎨" },
+            { label: "Text Size", score: a11y.textSizeScore, icon: "🔤" },
+            { label: "Touch Targets", score: a11y.touchTargetScore, icon: "👆" },
+            { label: "Alt Text", score: a11y.altTextScore, icon: "🖼" },
+            { label: "Keyboard Nav", score: a11y.keyboardNavScore, icon: "⌨️" },
+          ];
+          return (
+            <DashSection icon={<Eye className="h-4 w-4" style={{ color: "var(--score-high)" }} />} title="Accessibility" subtitle={`WCAG Assessment — Score: ${a11y.overallScore}/100`}>
+              {/* Overall score + dimension rings */}
+              <div className="rounded-xl border p-4 mb-4" style={{ background: "var(--s1)" }}>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="relative w-[64px] h-[64px] shrink-0">
+                    <svg className="-rotate-90 w-full h-full" viewBox="0 0 100 100">
+                      <circle cx="50" cy="50" r="42" fill="none" strokeWidth="8" style={{ stroke: "var(--s3)" }} />
+                      <circle cx="50" cy="50" r="42" fill="none" strokeWidth="8" strokeLinecap="round"
+                        strokeDasharray={`${2 * Math.PI * 42}`} strokeDashoffset={`${2 * Math.PI * 42 - (a11y.overallScore / 100) * 2 * Math.PI * 42}`}
+                        style={{ stroke: scoreColor(a11y.overallScore), transition: "stroke-dashoffset 0.8s ease" }} />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-[20px] font-bold font-mono" style={{ color: scoreColor(a11y.overallScore) }}>{a11y.overallScore}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-[15px] font-semibold block">Accessibility Score</span>
+                    <span className="text-[13px] text-foreground/50">
+                      {a11y.overallScore >= 80 ? "Good accessibility practices" : a11y.overallScore >= 50 ? "Some accessibility gaps to address" : "Significant accessibility concerns"}
+                    </span>
+                  </div>
+                </div>
+                {/* Dimension mini gauges */}
+                <div className="grid grid-cols-5 gap-2">
+                  {dimensions.map((d) => {
+                    const r = 18; const c = 2 * Math.PI * r; const off = c - (d.score / 100) * c;
+                    return (
+                      <div key={d.label} className="flex flex-col items-center gap-1 p-2 rounded-lg" style={{ background: "var(--s2)" }}>
+                        <svg width="44" height="44" viewBox="0 0 44 44">
+                          <circle cx="22" cy="22" r={r} fill="none" stroke="var(--s3)" strokeWidth="3" />
+                          <circle cx="22" cy="22" r={r} fill="none" stroke={scoreColor(d.score)} strokeWidth="3" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={off} transform="rotate(-90 22 22)" />
+                          <text x="22" y="22" textAnchor="middle" dominantBaseline="central" fill={scoreColor(d.score)} fontSize="11" fontWeight="700" fontFamily="var(--font-mono)">{d.score}</text>
+                        </svg>
+                        <span className="text-[10px] text-foreground/50 text-center leading-tight">{d.icon} {d.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              {/* Issues and passes */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {a11y.issues.length > 0 && (
+                  <div className="rounded-xl border p-4" style={{ background: "var(--s1)" }}>
+                    <p className="text-[13px] font-semibold mb-2" style={{ color: "var(--score-low)" }}>Issues Found</p>
+                    <div className="flex flex-col gap-1.5">
+                      {a11y.issues.map((issue, i) => (
+                        <div key={i} className="flex gap-2 text-[13px] text-foreground/60"><X className="h-3.5 w-3.5 shrink-0 mt-0.5" style={{ color: "var(--score-low)" }} /><span>{issue}</span></div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {a11y.passes.length > 0 && (
+                  <div className="rounded-xl border p-4" style={{ background: "var(--s1)" }}>
+                    <p className="text-[13px] font-semibold mb-2" style={{ color: "var(--score-high)" }}>Passing</p>
+                    <div className="flex flex-col gap-1.5">
+                      {a11y.passes.map((pass, i) => (
+                        <div key={i} className="flex gap-2 text-[13px] text-foreground/60"><Check className="h-3.5 w-3.5 shrink-0 mt-0.5" style={{ color: "var(--score-high)" }} /><span>{pass}</span></div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </DashSection>
+          );
+        }
+
+      case "ia":
+        if (!data.iaScore) return null;
+        {
+          const ia = data.iaScore;
+          const iaDimensions = [
+            { label: "Section Order", score: ia.sectionOrderScore, icon: <Layers className="h-3.5 w-3.5" /> },
+            { label: "Navigation", score: ia.navigationScore, icon: <ArrowRight className="h-3.5 w-3.5" /> },
+            { label: "Content Groups", score: ia.contentGroupingScore, icon: <Target className="h-3.5 w-3.5" /> },
+            { label: "Scanability", score: ia.scanabilityScore, icon: <Eye className="h-3.5 w-3.5" /> },
+          ];
+          return (
+            <DashSection icon={<Layers className="h-4 w-4" style={{ color: "var(--accent-blue)" }} />} title="Information Architecture" subtitle={`IA Score: ${ia.overallScore}/100`}>
+              {/* IA Score + dimensions */}
+              <div className="rounded-xl border p-4 mb-4" style={{ background: "var(--s1)" }}>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="relative w-[64px] h-[64px] shrink-0">
+                    <svg className="-rotate-90 w-full h-full" viewBox="0 0 100 100">
+                      <circle cx="50" cy="50" r="42" fill="none" strokeWidth="8" style={{ stroke: "var(--s3)" }} />
+                      <circle cx="50" cy="50" r="42" fill="none" strokeWidth="8" strokeLinecap="round"
+                        strokeDasharray={`${2 * Math.PI * 42}`} strokeDashoffset={`${2 * Math.PI * 42 - (ia.overallScore / 100) * 2 * Math.PI * 42}`}
+                        style={{ stroke: scoreColor(ia.overallScore), transition: "stroke-dashoffset 0.8s ease" }} />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-[20px] font-bold font-mono" style={{ color: scoreColor(ia.overallScore) }}>{ia.overallScore}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-[15px] font-semibold block">IA Score</span>
+                    <span className="text-[13px] text-foreground/50">
+                      {ia.overallScore >= 80 ? "Well-organized information architecture" : ia.overallScore >= 50 ? "Some structural improvements needed" : "Information architecture needs significant work"}
+                    </span>
+                  </div>
+                </div>
+                {/* Dimension bars */}
+                <div className="grid grid-cols-2 gap-2">
+                  {iaDimensions.map((d) => (
+                    <div key={d.label} className="rounded-lg p-3" style={{ background: "var(--s2)" }}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span style={{ color: scoreColor(d.score) }}>{d.icon}</span>
+                        <span className="text-[12px] font-medium flex-1">{d.label}</span>
+                        <span className="text-[14px] font-bold font-mono" style={{ color: scoreColor(d.score) }}>{d.score}</span>
+                      </div>
+                      <div className="h-[4px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
+                        <div className="h-full rounded-full" style={{ background: scoreColor(d.score), width: `${d.score}%`, transition: "width 0.8s ease" }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Suggested order */}
+              {ia.suggestedOrder.length > 0 && (
+                <div className="rounded-xl border p-4 mb-3" style={{ background: "var(--s1)" }}>
+                  <p className="text-[13px] font-semibold mb-3">Recommended Section Order</p>
+                  <div className="flex flex-wrap gap-2">
+                    {ia.suggestedOrder.map((section, i) => (
+                      <div key={i} className="flex items-center gap-1.5">
+                        <span className="w-5 h-5 rounded-full grid place-items-center text-[11px] font-bold" style={{ background: "hsl(var(--primary) / 0.1)", color: "hsl(var(--primary))" }}>{i + 1}</span>
+                        <span className="text-[13px] text-foreground/65">{section}</span>
+                        {i < ia.suggestedOrder.length - 1 && <ArrowRight className="h-3 w-3 text-foreground/25 ml-1" />}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {/* Issues */}
+              {ia.issues.length > 0 && (
+                <div className="rounded-xl border p-4" style={{ background: "var(--s1)" }}>
+                  <p className="text-[13px] font-semibold mb-2" style={{ color: "var(--score-low)" }}>IA Issues</p>
+                  <div className="flex flex-col gap-1.5">
+                    {ia.issues.map((issue, i) => (
+                      <div key={i} className="flex gap-2 text-[13px] text-foreground/60"><X className="h-3.5 w-3.5 shrink-0 mt-0.5" style={{ color: "var(--score-low)" }} /><span>{issue}</span></div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </DashSection>
+          );
+        }
 
       case "competitors":
         return (

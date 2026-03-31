@@ -541,12 +541,62 @@ The JSON structure must be exactly:
     { "persona": "Product Manager", "emoji": "🧩", "feedback": "<2-3 sentences — focus on user flow, value communication, feature discoverability, onboarding clarity>", "topConcern": "<one short sentence>", "priority": "high|medium|low" },
     { "persona": "Developer", "emoji": "💻", "feedback": "<2-3 sentences — focus on technical implementation quality, performance indicators, responsive behavior, form handling>", "topConcern": "<one short sentence>", "priority": "high|medium|low" },
     { "persona": "First-Time Visitor", "emoji": "👤", "feedback": "<2-3 sentences — focus on immediate understanding, trust feeling, clarity of next steps, overall first impression>", "topConcern": "<one short sentence>", "priority": "high|medium|low" }
-  ]
+  ],
+  "journeyMap": [
+    { "section": "<section name, e.g. Hero, Features, Social Proof, Pricing, CTA, Footer>", "emotion": "<confidence|interest|neutral|doubt|frustration>", "intensity": <0-100: how strong this emotion is>, "note": "<1 sentence explaining why the visitor feels this way at this point>" }
+  ],
+  "accessibilityScore": {
+    "overallScore": <0-100>,
+    "contrastScore": <0-100: estimate text/background contrast adequacy from content structure>,
+    "textSizeScore": <0-100: evaluate if text hierarchy suggests readable sizes>,
+    "touchTargetScore": <0-100: evaluate button/link sizing for mobile from content>,
+    "altTextScore": <0-100: estimate image accessibility from available content>,
+    "keyboardNavScore": <0-100: evaluate navigation flow and focus order>,
+    "issues": ["<specific accessibility concern>"],
+    "passes": ["<what the page does well for accessibility>"]
+  },
+  "iaScore": {
+    "overallScore": <0-100>,
+    "sectionOrderScore": <0-100: does the section order match visitor question sequence?>,
+    "navigationScore": <0-100: is navigation clear, minimal, and logical?>,
+    "contentGroupingScore": <0-100: are related elements grouped together?>,
+    "scanabilityScore": <0-100: can visitors find what they need by scanning?>,
+    "suggestedOrder": ["<optimal section order for this page type>"],
+    "issues": ["<specific IA issue>"]
+  }
 }
 
 ═══════════════════════════════════════════
 QUALITY REMINDERS
 ═══════════════════════════════════════════
+
+═══ JOURNEY MAP ═══
+Generate a journeyMap array that traces the visitor's emotional arc as they scroll through the page. Include 5-8 points covering the major sections from top to bottom. The emotion should reflect what a first-time visitor realistically feels at each section:
+- "confidence" — clear value, strong trust signals, good design
+- "interest" — curiosity piqued, wants to learn more
+- "neutral" — neither positive nor negative, scanning
+- "doubt" — unclear messaging, missing proof, confusion
+- "frustration" — friction, cognitive overload, contradictions
+For LANDING PAGES: trace Hero → Value Prop → Features → Social Proof → Pricing → CTA → Footer
+For APP INTERFACES: trace Onboarding → Dashboard → Key Feature → Settings → Help
+For FORMS: trace Header → Fields → Validation → Submit → Confirmation
+
+═══ ACCESSIBILITY ANALYSIS ═══
+Evaluate accessibility from the available content. You cannot run automated WCAG tests, but you CAN assess:
+- Text contrast: Does the content structure suggest adequate contrast? Are there light-on-light or low-contrast patterns?
+- Text sizing: Does the heading hierarchy suggest readable sizes? Is body text likely readable?
+- Touch targets: Are buttons and links described with sufficient size/spacing?
+- Alt text: Are images described or is there evidence of missing descriptions?
+- Keyboard nav: Is the navigation structure keyboard-friendly?
+Score conservatively — you are estimating, not measuring. Note that image-based audits (screenshots) have limited accessibility data.
+
+═══ INFORMATION ARCHITECTURE ═══
+Evaluate the page's information architecture:
+- Section ordering: Does it match the visitor's natural question sequence?
+- Navigation: Is it clear, minimal, and logically structured?
+- Content grouping: Are related elements placed together?
+- Scanability: Can visitors find what they need by scanning headings and visual landmarks?
+Provide a suggestedOrder with the optimal section sequence for this page type.
 
 ═══ INDUSTRY BENCHMARKS ═══
 For each category score, include a "benchmark" field — the estimated industry average for this page type. Use these baselines (adjust up or down based on the specific niche):
