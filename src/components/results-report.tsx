@@ -259,7 +259,7 @@ function countSeverities(sections: AuditSection[]): Record<string, number> {
 
 function LockedHint({ count, label }: { count: number; label: string }) {
   return (
-    <Link href="/pricing" className="flex items-center gap-2 text-[12px] text-foreground/55 py-2.5 px-3.5 rounded-[7px] transition-colors hover:text-foreground/65 group" style={{ background: "var(--s2)" }}>
+    <Link href="/pricing" className="flex items-center gap-2 text-[14px] text-foreground/55 py-2.5 px-3.5 rounded-[7px] transition-colors hover:text-foreground/65 group" style={{ background: "var(--s2)" }}>
       <Lock className="h-3 w-3 shrink-0 text-foreground/45 group-hover:text-foreground/55 transition-colors" />
       <span>{count} {label} — <span className="font-medium underline underline-offset-2">upgrade to unlock</span></span>
     </Link>
@@ -271,7 +271,7 @@ function UpgradeCard() {
     <div className="rounded-xl p-4 my-5 text-center" style={{ background: "linear-gradient(135deg, var(--brand-dim), var(--s1))" }}>
       <Lock className="h-5 w-5 mx-auto mb-2" style={{ color: "var(--brand)" }} />
       <h3 className="text-[14px] font-semibold tracking-tight mb-1">Unlock strategic fixes & optimized copy</h3>
-      <p className="text-[12px] text-foreground/55 leading-relaxed max-w-sm mx-auto mb-4">Upgrade to get strategic improvements, AI-optimized hero copy, and PDF export.</p>
+      <p className="text-[14px] text-foreground/55 leading-relaxed max-w-sm mx-auto mb-4">Upgrade to get strategic improvements, AI-optimized hero copy, and PDF export.</p>
       <Link href="/pricing" className="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-[14px] font-bold transition-all duration-150 hover:opacity-90 active:scale-[0.98]" style={{ background: "var(--brand)", color: "var(--brand-fg)" }}>
         View Plans <ArrowRight className="h-3.5 w-3.5" />
       </Link>
@@ -283,8 +283,8 @@ function LockedOverlay({ message }: { message: string }) {
   return (
     <Link href="/pricing" className="relative flex flex-col items-center justify-center py-8 rounded-lg text-center group cursor-pointer" style={{ background: "var(--s2)" }}>
       <Lock className="h-5 w-5 mb-2 text-foreground/40 group-hover:text-foreground/55 transition-colors" />
-      <p className="text-[12px] text-foreground/50 group-hover:text-foreground/60 transition-colors">{message}</p>
-      <span className="mt-2 text-[12px] font-medium underline underline-offset-2 transition-colors" style={{ color: "var(--brand)" }}>Upgrade to unlock</span>
+      <p className="text-[14px] text-foreground/50 group-hover:text-foreground/60 transition-colors">{message}</p>
+      <span className="mt-2 text-[14px] font-medium underline underline-offset-2 transition-colors" style={{ color: "var(--brand)" }}>Upgrade to unlock</span>
     </Link>
   );
 }
@@ -346,7 +346,7 @@ export function ResultsReport({
               </svg>
             </Link>
             <span className="w-px h-5 shrink-0" style={{ background: "var(--border)" }} />
-            <span className="text-[12px] font-medium text-foreground/55">{domain}</span>
+            <span className="text-[14px] font-medium text-foreground/55">{domain}</span>
           </div>
 
           {/* Center: View toggle */}
@@ -354,12 +354,12 @@ export function ResultsReport({
             <div className="flex items-center gap-0.5 rounded-lg p-0.5" style={{ background: "var(--s2)" }}>
               <button
                 onClick={() => setViewMode("report")}
-                className="text-[11px] font-medium px-4 py-1.5 rounded-md transition-all text-foreground/50 hover:text-foreground/70"
+                className="text-[13px] font-medium px-4 py-1.5 rounded-md transition-all text-foreground/50 hover:text-foreground/70"
               >
                 Report
               </button>
               <button
-                className="text-[11px] font-medium px-4 py-1.5 rounded-md transition-all text-white shadow-sm"
+                className="text-[13px] font-medium px-4 py-1.5 rounded-md transition-all text-white shadow-sm"
                 style={{ background: "var(--brand)" }}
               >
                 Annotated
@@ -369,13 +369,13 @@ export function ResultsReport({
 
           {/* Right: actions */}
           <div className="flex items-center gap-2 shrink-0">
-            <button onClick={onReset} className="inline-flex items-center gap-1.5 text-[11px] text-foreground/35 hover:text-foreground/55 transition-colors px-2 py-1 rounded-md hover:bg-foreground/[0.03]">
+            <button onClick={onReset} className="inline-flex items-center gap-1.5 text-[13px] text-foreground/35 hover:text-foreground/55 transition-colors px-2 py-1 rounded-md hover:bg-foreground/[0.03]">
               <RotateCcw className="h-3 w-3" /> New
             </button>
             {onToggleShare && !isSharedView && (
               shareToken ? (
                 <div className="flex items-center gap-1">
-                  <button onClick={onCopyShareLink} className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-medium transition-colors" style={{ background: "var(--s2)" }}>
+                  <button onClick={onCopyShareLink} className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors" style={{ background: "var(--s2)" }}>
                     {shareCopied ? <Check className="h-3 w-3 text-green-600" /> : <Link2 className="h-3 w-3" />}
                     {shareCopied ? "Copied" : "Copy Link"}
                   </button>
@@ -384,7 +384,7 @@ export function ResultsReport({
                   </button>
                 </div>
               ) : (
-                <button onClick={onToggleShare} disabled={shareLoading} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold text-white transition-all hover:opacity-90" style={{ background: "var(--brand)" }}>
+                <button onClick={onToggleShare} disabled={shareLoading} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[13px] font-semibold text-white transition-all hover:opacity-90" style={{ background: "var(--brand)" }}>
                   {shareLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Share2 className="h-3 w-3" />}
                   Share
                 </button>
@@ -460,27 +460,27 @@ export function ResultsReport({
                     <span className="text-[18px] font-bold tabular-nums leading-none animate-count-up" style={{ color: dialColor }}>{data.overallScore}</span>
                   </div>
                 </div>
-                <span className="text-[11px] text-foreground/55 font-medium">UX Score</span>
-                <span className="text-[9px] text-foreground/40 mt-0.5">{data.grade}</span>
+                <span className="text-[13px] text-foreground/55 font-medium">UX Score</span>
+                <span className="text-[13px] text-foreground/40 mt-0.5">{data.grade}</span>
               </div>
               <MetricCard label="Conversion Risk" value={conversionRisk} suffix="%" color={scoreColor(100 - conversionRisk)} />
               <MetricCard label="Readability" value={readability} suffix="%" color={scoreColor(readability)} />
               <MetricCard label="Trust" value={trustScore} suffix="/100" color={scoreColor(trustScore)} />
               <div className="dash-card rounded-xl border p-4 flex flex-col items-center justify-center text-center" style={{ background: "var(--s1)" }}>
                 <span className="text-[18px] font-bold animate-count-up mb-0.5" style={{ color: complexity.color }}>{complexity.label}</span>
-                <span className="text-[10px] text-foreground/60 font-medium">Complexity</span>
+                <span className="text-[14px] text-foreground/60 font-medium">Complexity</span>
               </div>
             </div>
 
             {/* Severity pill bar */}
             <div className="flex items-center gap-2 px-1">
               {(Object.entries(severityCounts) as [string, number][]).filter(([, c]) => c > 0).map(([sev, count]) => (
-                <span key={sev} className="flex items-center gap-1.5 text-[10px] font-semibold px-2 py-1 rounded-md" style={{ background: SEVERITY_STYLES[sev]?.background, color: SEVERITY_STYLES[sev]?.color }}>
+                <span key={sev} className="flex items-center gap-1.5 text-[14px] font-semibold px-2 py-1 rounded-md" style={{ background: SEVERITY_STYLES[sev]?.background, color: SEVERITY_STYLES[sev]?.color }}>
                   <span className="w-1.5 h-1.5 rounded-full" style={{ background: "currentColor" }} />
                   {count} {sev}
                 </span>
               ))}
-              <span className="text-[10px] text-foreground/30 ml-auto">{totalIssues} total issues</span>
+              <span className="text-[14px] text-foreground/30 ml-auto">{totalIssues} total issues</span>
             </div>
 
             {/* Revenue Impact Banner */}
@@ -488,15 +488,15 @@ export function ResultsReport({
               <div className="rounded-xl border p-4 border-l-3" style={{ background: "var(--s1)", borderLeft: "3px solid var(--score-low)" }}>
                 <div className="flex items-center gap-2 mb-2">
                   <TrendingUp className="h-4 w-4" style={{ color: "var(--score-low)" }} />
-                  <span className="text-[12px] font-semibold" style={{ color: "var(--score-low)" }}>Revenue at Risk</span>
+                  <span className="text-[14px] font-semibold" style={{ color: "var(--score-low)" }}>Revenue at Risk</span>
                 </div>
                 <div className="flex flex-col gap-1.5">
                   {topFindings.filter(f => f.impactHeadline).slice(0, 3).map((f, i) => (
-                    <div key={i} className="flex items-center gap-2 text-[11px]">
+                    <div key={i} className="flex items-center gap-2 text-[13px]">
                       <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: "var(--score-low)" }} />
                       <span className="text-foreground/60 flex-1">{f.impactHeadline}</span>
                       {f.estimatedConversionLift && (
-                        <span className="text-[10px] font-medium shrink-0" style={{ color: "var(--score-high)" }}>↑ {f.estimatedConversionLift} if fixed</span>
+                        <span className="text-[14px] font-medium shrink-0" style={{ color: "var(--score-high)" }}>↑ {f.estimatedConversionLift} if fixed</span>
                       )}
                     </div>
                   ))}
@@ -508,7 +508,7 @@ export function ResultsReport({
             <div className="rounded-xl border p-4" style={{ background: "var(--s1)", borderColor: "hsl(var(--primary) / 0.2)" }}>
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-1 h-4 rounded-full" style={{ background: scoreColor(data.overallScore) }} />
-                <p className="text-[11px] font-semibold text-foreground/50 uppercase tracking-wide">Executive Summary</p>
+                <p className="text-[13px] font-semibold text-foreground/50 uppercase tracking-wide">Executive Summary</p>
               </div>
               {/* Visual priority cards extracted from summary */}
               {(() => {
@@ -518,26 +518,26 @@ export function ResultsReport({
                 const verdictText = fixMatch ? summary.slice(0, summary.indexOf("Fix first")).trim() : summary;
                 return (
                   <>
-                    <p className="text-[12px] text-foreground/65 leading-relaxed mb-3">{verdictText}</p>
+                    <p className="text-[14px] text-foreground/65 leading-relaxed mb-3">{verdictText}</p>
                     {fixMatch && (
                       <div className="grid grid-cols-3 gap-2 mb-3">
                         {[fixMatch[1], fixMatch[2], fixMatch[3]].map((fix, i) => (
                           <div key={i} className="rounded-lg p-2.5 relative overflow-hidden" style={{ background: "var(--s2)" }}>
                             <div className="absolute top-0 left-0 w-full h-[2px]" style={{ background: i === 0 ? "var(--score-low)" : i === 1 ? "var(--score-mid)" : "var(--score-high)" }} />
                             <span className="text-[18px] font-bold block mb-1" style={{ color: i === 0 ? "var(--score-low)" : i === 1 ? "var(--score-mid)" : "var(--score-high)", opacity: 0.3 }}>#{i + 1}</span>
-                            <span className="text-[10px] text-foreground/60 leading-snug block">{fix.trim().replace(/\.?\s*$/, "")}</span>
+                            <span className="text-[14px] text-foreground/60 leading-snug block">{fix.trim().replace(/\.?\s*$/, "")}</span>
                           </div>
                         ))}
                       </div>
                     )}
                     <div className="flex items-center gap-2 flex-wrap">
                       {liftMatch && (
-                        <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full" style={{ background: "oklch(0.52 0.14 155 / 10%)", color: "var(--score-high)" }}>
+                        <span className="text-[13px] font-semibold px-2.5 py-1 rounded-full" style={{ background: "oklch(0.52 0.14 155 / 10%)", color: "var(--score-high)" }}>
                           Estimated lift: {liftMatch[1]}
                         </span>
                       )}
                       {data.flags.map((flag, i) => (
-                        <span key={i} className="text-[11px] px-2 py-[3px] rounded-[5px]" style={FLAG_STYLES[i % FLAG_STYLES.length]}>{flag}</span>
+                        <span key={i} className="text-[13px] px-2 py-[3px] rounded-[5px]" style={FLAG_STYLES[i % FLAG_STYLES.length]}>{flag}</span>
                       ))}
                     </div>
                   </>
@@ -547,20 +547,20 @@ export function ResultsReport({
 
             {/* Row 3: Category bars (compact — all 6 in one card) */}
             <div className="rounded-xl border p-4" style={{ background: "var(--s1)" }}>
-              <p className="text-[10px] font-semibold text-foreground/40 uppercase tracking-wide mb-3">Category Scores</p>
+              <p className="text-[14px] font-semibold text-foreground/40 uppercase tracking-wide mb-3">Category Scores</p>
               <div className="flex flex-col gap-2">
                 {sortedCategories.map((cat) => (
                   <div key={cat.key} className="flex items-center gap-2.5">
-                    <span className="text-[11px] text-foreground/55 w-[120px] shrink-0 truncate">{cat.label}</span>
+                    <span className="text-[13px] text-foreground/55 w-[120px] shrink-0 truncate">{cat.label}</span>
                     <div className="flex-1 h-[5px] rounded-full overflow-hidden relative" style={{ background: "var(--s3)" }}>
                       <div className="h-full rounded-full" style={{ background: scoreColor(cat.data.score), width: `${cat.data.score}%` }} />
                       {cat.data.benchmark != null && (
                         <div className="absolute top-[-3px] w-[2px] h-[11px] rounded-full" style={{ left: `${cat.data.benchmark}%`, background: "var(--foreground)", opacity: 0.25 }} title={`Industry avg: ${cat.data.benchmark}`} />
                       )}
                     </div>
-                    <span className="text-[12px] font-bold font-mono w-7 text-right" style={{ color: scoreColor(cat.data.score) }}>{cat.data.score}</span>
+                    <span className="text-[14px] font-bold font-mono w-7 text-right" style={{ color: scoreColor(cat.data.score) }}>{cat.data.score}</span>
                     {cat.data.benchmark != null && (
-                      <span className="text-[9px] font-mono w-9 text-right" style={{ color: cat.data.score >= cat.data.benchmark ? "#22c55e" : "#ef4444", opacity: 0.7 }}>
+                      <span className="text-[13px] font-mono w-9 text-right" style={{ color: cat.data.score >= cat.data.benchmark ? "#22c55e" : "#ef4444", opacity: 0.7 }}>
                         {cat.data.score >= cat.data.benchmark ? "+" : ""}{cat.data.score - cat.data.benchmark}
                       </span>
                     )}
@@ -584,7 +584,7 @@ export function ResultsReport({
               const later = allFindings.filter(f => !isQuick(f) && !isHigh(f));
               return (
                 <div className="rounded-xl border p-4" style={{ background: "var(--s1)" }}>
-                  <p className="text-[10px] font-semibold text-foreground/40 uppercase tracking-wide mb-3">Fix Priority Matrix</p>
+                  <p className="text-[14px] font-semibold text-foreground/40 uppercase tracking-wide mb-3">Fix Priority Matrix</p>
                   <div className="grid grid-cols-2 gap-2">
                     {[
                       { label: "Quick Wins", emoji: "🎯", items: quickWins, color: "#22c55e" },
@@ -594,21 +594,21 @@ export function ResultsReport({
                     ].map((q) => (
                       <div key={q.label} className="rounded-lg p-2.5" style={{ background: "var(--s2)" }}>
                         <div className="flex items-center gap-1.5 mb-1.5">
-                          <span className="text-[11px]">{q.emoji}</span>
-                          <span className="text-[10px] font-semibold" style={{ color: q.color, opacity: 0.85 }}>{q.label}</span>
-                          <span className="text-[10px] font-bold font-mono ml-auto" style={{ color: q.color, opacity: 0.7 }}>{q.items.length}</span>
+                          <span className="text-[13px]">{q.emoji}</span>
+                          <span className="text-[14px] font-semibold" style={{ color: q.color, opacity: 0.85 }}>{q.label}</span>
+                          <span className="text-[14px] font-bold font-mono ml-auto" style={{ color: q.color, opacity: 0.7 }}>{q.items.length}</span>
                         </div>
                         <div className="flex flex-col gap-0.5">
                           {q.items.slice(0, 2).map((f, i) => (
-                            <span key={i} className="text-[10px] text-foreground/50 truncate">{f.title}</span>
+                            <span key={i} className="text-[14px] text-foreground/50 truncate">{f.title}</span>
                           ))}
-                          {q.items.length > 2 && <span className="text-[9px] text-foreground/35">+{q.items.length - 2} more</span>}
-                          {q.items.length === 0 && <span className="text-[9px] text-foreground/25">None</span>}
+                          {q.items.length > 2 && <span className="text-[13px] text-foreground/35">+{q.items.length - 2} more</span>}
+                          {q.items.length === 0 && <span className="text-[13px] text-foreground/25">None</span>}
                         </div>
                       </div>
                     ))}
                   </div>
-                  <div className="flex items-center justify-center gap-4 mt-2 text-[9px] text-foreground/30">
+                  <div className="flex items-center justify-center gap-4 mt-2 text-[13px] text-foreground/30">
                     <span>← Low effort &nbsp;|&nbsp; High effort →</span>
                   </div>
                 </div>
@@ -619,8 +619,8 @@ export function ResultsReport({
             {topFindings.length > 0 && (
               <div className="rounded-xl border p-4" style={{ background: "var(--s1)" }}>
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-[10px] font-semibold text-foreground/40 uppercase tracking-wide">Top Issues</p>
-                  <button onClick={() => setActiveNav("insights")} className="text-[10px] font-medium flex items-center gap-1 hover:text-foreground/60 transition-colors" style={{ color: "var(--brand)" }}>
+                  <p className="text-[14px] font-semibold text-foreground/40 uppercase tracking-wide">Top Issues</p>
+                  <button onClick={() => setActiveNav("insights")} className="text-[14px] font-medium flex items-center gap-1 hover:text-foreground/60 transition-colors" style={{ color: "var(--brand)" }}>
                     View all <ChevronRight className="h-3 w-3" />
                   </button>
                 </div>
@@ -629,8 +629,8 @@ export function ResultsReport({
                     const sevStyle = SEVERITY_STYLES[f.severity || "medium"] || {};
                     return (
                       <div key={i} className="flex items-center gap-2.5 py-1.5 px-2 rounded-lg hover:bg-foreground/[0.02] transition-colors cursor-pointer" onClick={() => setActiveNav("insights")}>
-                        <span className="text-[9px] font-bold uppercase px-1.5 py-[2px] rounded" style={sevStyle}>{f.severity || f.impact}</span>
-                        <span className="text-[11px] text-foreground/60 flex-1 truncate">{f.title}</span>
+                        <span className="text-[13px] font-bold uppercase px-1.5 py-[2px] rounded" style={sevStyle}>{f.severity || f.impact}</span>
+                        <span className="text-[13px] text-foreground/60 flex-1 truncate">{f.title}</span>
                         <ChevronRight className="h-3 w-3 text-foreground/20 shrink-0" />
                       </div>
                     );
@@ -655,10 +655,10 @@ export function ResultsReport({
                   <div className="flex items-center gap-2 mb-1.5">
                     <span style={{ color: nav.color }}>{nav.icon}</span>
                     {nav.count > 0 && (
-                      <span className="text-[9px] font-bold px-1.5 py-[1px] rounded-md text-white" style={{ background: nav.color }}>{nav.count}</span>
+                      <span className="text-[13px] font-bold px-1.5 py-[1px] rounded-md text-white" style={{ background: nav.color }}>{nav.count}</span>
                     )}
                   </div>
-                  <p className="text-[10px] text-foreground/50 group-hover:text-foreground/65 transition-colors">{nav.label}</p>
+                  <p className="text-[14px] text-foreground/50 group-hover:text-foreground/65 transition-colors">{nav.label}</p>
                 </button>
               ))}
             </div>
@@ -691,15 +691,15 @@ export function ResultsReport({
                         </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="text-[13px] font-semibold mb-1">{title}</h4>
-                          {desc && <p className="text-[11px] text-foreground/55 leading-relaxed mb-2">{desc}</p>}
+                          {desc && <p className="text-[13px] text-foreground/55 leading-relaxed mb-2">{desc}</p>}
                           <div className="flex flex-wrap gap-2">
                             {lift && (
-                              <span className="text-[10px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1" style={{ background: "oklch(0.52 0.14 155 / 10%)", color: "var(--score-high)" }}>
+                              <span className="text-[14px] font-medium px-2 py-0.5 rounded-full inline-flex items-center gap-1" style={{ background: "oklch(0.52 0.14 155 / 10%)", color: "var(--score-high)" }}>
                                 <TrendingUp className="h-3 w-3" /> {lift} if fixed
                               </span>
                             )}
                             {affected && (
-                              <span className="text-[10px] px-2 py-0.5 rounded-full text-foreground/50" style={{ background: "var(--s2)" }}>
+                              <span className="text-[14px] px-2 py-0.5 rounded-full text-foreground/50" style={{ background: "var(--s2)" }}>
                                 Affects: {affected}
                               </span>
                             )}
@@ -707,7 +707,7 @@ export function ResultsReport({
                           {cascade && (
                             <div className="mt-2 flex items-start gap-1.5">
                               <Activity className="h-3 w-3 shrink-0 mt-0.5" style={{ color: rankColors[i] || rankColors[2], opacity: 0.5 }} />
-                              <p className="text-[10px] text-foreground/40 leading-relaxed">{cascade}</p>
+                              <p className="text-[14px] text-foreground/40 leading-relaxed">{cascade}</p>
                             </div>
                           )}
                         </div>
@@ -719,7 +719,7 @@ export function ResultsReport({
             )}
 
             {/* Category weakness breakdown — visual bars */}
-            <p className="text-[10px] font-semibold text-foreground/40 uppercase tracking-wide mb-2.5">Category Breakdown</p>
+            <p className="text-[14px] font-semibold text-foreground/40 uppercase tracking-wide mb-2.5">Category Breakdown</p>
             <div className="flex flex-col gap-2.5">
               {sortedCategories.map((cat) => {
                 const pct = cat.data.score;
@@ -737,11 +737,11 @@ export function ResultsReport({
                         <text x="18" y="18" textAnchor="middle" dominantBaseline="central" fill={scoreColor(pct)} fontSize="10" fontWeight="700" fontFamily="var(--font-mono)">{pct}</text>
                       </svg>
                       <div className="flex-1 min-w-0">
-                        <span className="text-[11px] font-medium block">{cat.label}</span>
-                        <p className="text-[10px] text-foreground/45 line-clamp-1 mt-0.5">{cat.data.note.split(".")[0]}.</p>
+                        <span className="text-[13px] font-medium block">{cat.label}</span>
+                        <p className="text-[14px] text-foreground/45 line-clamp-1 mt-0.5">{cat.data.note.split(".")[0]}.</p>
                       </div>
                       {cat.data.benchmark != null && (
-                        <span className="text-[10px] font-mono shrink-0 px-1.5 py-0.5 rounded" style={{
+                        <span className="text-[14px] font-mono shrink-0 px-1.5 py-0.5 rounded" style={{
                           color: pct >= cat.data.benchmark ? "var(--score-high)" : "var(--score-low)",
                           background: pct >= cat.data.benchmark ? "oklch(0.52 0.14 155 / 8%)" : "oklch(0.55 0.17 20 / 8%)"
                         }}>
@@ -778,24 +778,24 @@ export function ResultsReport({
             </div>
             {data.conversionKillers.length > 0 && (
               <div className="mt-4 pt-4">
-                <p className="text-[12px] uppercase tracking-[2px] text-foreground/45 mb-2.5">Top conversion blockers</p>
+                <p className="text-[14px] uppercase tracking-[2px] text-foreground/45 mb-2.5">Top conversion blockers</p>
                 <div className="flex flex-col gap-2">
                   {data.conversionKillers.map((k, i) => {
                     const detail = getKillerDetail(k);
                     return (
                       <div key={i} className="rounded-lg p-3 px-3.5" style={{ background: "var(--s2)" }}>
-                        <div className="flex gap-2.5 text-[12px] leading-relaxed text-foreground/65">
+                        <div className="flex gap-2.5 text-[14px] leading-relaxed text-foreground/65">
                           <span className="font-bold shrink-0" style={{ color: "var(--score-low)" }}>{i + 1}.</span>
                           <div className="flex-1">
                             {detail ? (
                               <>
                                 <span className="font-semibold text-foreground/60">{detail.title}</span>
-                                <p className="text-[12px] text-foreground/55 mt-0.5">{detail.description}</p>
+                                <p className="text-[14px] text-foreground/55 mt-0.5">{detail.description}</p>
                                 {(detail.affectedVisitors || detail.behavioralCascade || detail.expectedLift) && (
                                   <div className="flex flex-col gap-1 mt-2">
-                                    {detail.affectedVisitors && <p className="text-[10px] text-foreground/55"><span className="font-medium text-foreground/60">Affects:</span> {detail.affectedVisitors}</p>}
-                                    {detail.behavioralCascade && <p className="text-[10px] text-foreground/55"><span className="font-medium text-foreground/60">Cascade:</span> {detail.behavioralCascade}</p>}
-                                    {detail.expectedLift && <p className="text-[10px] font-medium" style={{ color: "var(--score-high)" }}>↑ {detail.expectedLift}</p>}
+                                    {detail.affectedVisitors && <p className="text-[14px] text-foreground/55"><span className="font-medium text-foreground/60">Affects:</span> {detail.affectedVisitors}</p>}
+                                    {detail.behavioralCascade && <p className="text-[14px] text-foreground/55"><span className="font-medium text-foreground/60">Cascade:</span> {detail.behavioralCascade}</p>}
+                                    {detail.expectedLift && <p className="text-[14px] font-medium" style={{ color: "var(--score-high)" }}>↑ {detail.expectedLift}</p>}
                                   </div>
                                 )}
                               </>
@@ -844,11 +844,11 @@ export function ResultsReport({
                           {SECTION_ICONS[sec.id] || <Layers className="h-3 w-3" />}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className={`text-[11px] font-medium truncate ${isActive ? "text-foreground" : "text-foreground/55"}`}>{sec.name}</p>
+                          <p className={`text-[13px] font-medium truncate ${isActive ? "text-foreground" : "text-foreground/55"}`}>{sec.name}</p>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[11px] font-bold font-mono" style={{ color: scoreColor(sec.score) }}>{sec.score}</span>
+                            <span className="text-[13px] font-bold font-mono" style={{ color: scoreColor(sec.score) }}>{sec.score}</span>
                             {issueCount > 0 && (
-                              <span className="text-[9px] px-1 py-[1px] rounded" style={{ background: "oklch(0.55 0.17 20 / 8%)", color: "var(--score-low)" }}>{issueCount}</span>
+                              <span className="text-[13px] px-1 py-[1px] rounded" style={{ background: "oklch(0.55 0.17 20 / 8%)", color: "var(--score-low)" }}>{issueCount}</span>
                             )}
                           </div>
                         </div>
@@ -870,7 +870,7 @@ export function ResultsReport({
                           </div>
                           <div>
                             <h4 className="text-[14px] font-semibold">{sec.name}</h4>
-                            <p className="text-[11px] text-foreground/45">{sec.subtitle}</p>
+                            <p className="text-[13px] text-foreground/45">{sec.subtitle}</p>
                           </div>
                           <span className="text-[20px] font-bold font-mono ml-2" style={{ color: scoreColor(sec.score) }}>{sec.score}</span>
                         </div>
@@ -887,10 +887,10 @@ export function ResultsReport({
                       {/* Recommendations */}
                       {features.improvements && sec.recommendations.length > 0 && (
                         <div className="mb-3">
-                          <p className="text-[12px] uppercase tracking-[2px] text-foreground/50 mb-2">Recommendations</p>
+                          <p className="text-[14px] uppercase tracking-[2px] text-foreground/50 mb-2">Recommendations</p>
                           <div className="flex flex-col gap-1.5">
                             {sec.recommendations.map((r, i) => (
-                              <div key={i} className="flex gap-2 text-[12px] leading-relaxed text-foreground/65 p-2.5 rounded-md border-l-2" style={{ background: "var(--s1)", borderColor: "var(--brand)" }}>
+                              <div key={i} className="flex gap-2 text-[14px] leading-relaxed text-foreground/65 p-2.5 rounded-md border-l-2" style={{ background: "var(--s1)", borderColor: "var(--brand)" }}>
                                 <span className="font-medium shrink-0" style={{ color: "var(--brand)" }}>{i + 1}.</span>
                                 <span>{r}</span>
                               </div>
@@ -916,17 +916,17 @@ export function ResultsReport({
           <DashSection icon={<Activity className="h-4 w-4" style={{ color: "var(--accent-blue)" }} />} title="Visual Analytics" subtitle="UX quality breakdown and issue distribution">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div className="rounded-xl border p-4 flex flex-col items-center" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-                <p className="text-[12px] uppercase tracking-[2px] text-foreground/50 mb-3 self-start">UX Score Radar</p>
+                <p className="text-[14px] uppercase tracking-[2px] text-foreground/50 mb-3 self-start">UX Score Radar</p>
                 <RadarChart categories={data.categories} />
               </div>
               <div className="flex flex-col gap-3">
                 <div className="rounded-xl border p-4" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-                  <p className="text-[12px] uppercase tracking-[2px] text-foreground/50 mb-2.5">Issue Severity</p>
+                  <p className="text-[14px] uppercase tracking-[2px] text-foreground/50 mb-2.5">Issue Severity</p>
                   <SeverityDistribution counts={severityCounts} />
                 </div>
                 {visualAnalysis && visualAnalysisStatus === "done" && (
                   <div className="rounded-xl border p-4" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-                    <p className="text-[12px] uppercase tracking-[2px] text-foreground/50 mb-2.5">Visual Health</p>
+                    <p className="text-[14px] uppercase tracking-[2px] text-foreground/50 mb-2.5">Visual Health</p>
                     <div className="flex flex-col gap-2">
                       {[
                         { label: "Layout", score: visualAnalysis.layoutScore },
@@ -935,7 +935,7 @@ export function ResultsReport({
                         { label: "Contrast", score: visualAnalysis.colorContrastScore },
                         { label: "Mobile", score: visualAnalysis.mobileReadinessScore },
                       ].map(dim => (
-                        <div key={dim.label} className="flex items-center gap-2 text-[12px]">
+                        <div key={dim.label} className="flex items-center gap-2 text-[14px]">
                           <span className="w-16 text-foreground/55 shrink-0">{dim.label}</span>
                           <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
                             <div className="h-full rounded-full animate-bar-width" style={{ background: scoreColor(dim.score), width: `${dim.score}%`, "--bar-width": `${dim.score}%` } as React.CSSProperties} />
@@ -948,10 +948,10 @@ export function ResultsReport({
                 )}
                 {visualAnalysisStatus === "loading" && (
                   <div className="rounded-xl border p-5" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
-                    <p className="text-[12px] uppercase tracking-[2px] text-foreground/45 mb-3">Visual Health</p>
+                    <p className="text-[14px] uppercase tracking-[2px] text-foreground/45 mb-3">Visual Health</p>
                     <div className="flex items-center gap-2 justify-center py-4">
                       <div className="h-3.5 w-3.5 border-2 border-foreground/15 border-t-foreground/40 rounded-full animate-spin" />
-                      <span className="text-[12px] text-foreground/50">Analyzing...</span>
+                      <span className="text-[14px] text-foreground/50">Analyzing...</span>
                     </div>
                   </div>
                 )}
@@ -970,8 +970,8 @@ export function ResultsReport({
                     <Shield className="h-3.5 w-3.5" style={{ color: "var(--accent-blue)" }} />
                   </div>
                   <div>
-                    <h3 className="text-[12px] font-semibold">Trust Matrix</h3>
-                    <p className="text-[10px] text-foreground/55">Five trust dimensions</p>
+                    <h3 className="text-[14px] font-semibold">Trust Matrix</h3>
+                    <p className="text-[14px] text-foreground/55">Five trust dimensions</p>
                   </div>
                 </div>
                 {/* Visual ring gauges */}
@@ -985,7 +985,7 @@ export function ResultsReport({
                           <circle cx="27" cy="27" r={r} fill="none" stroke={scoreColor(item.score)} strokeWidth="4" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={offset} transform="rotate(-90 27 27)" style={{ transition: "stroke-dashoffset 0.8s ease" }} />
                           <text x="27" y="27" textAnchor="middle" dominantBaseline="central" fill={scoreColor(item.score)} fontSize="13" fontWeight="700" fontFamily="var(--font-mono)">{item.score}</text>
                         </svg>
-                        <span className="text-[9px] text-foreground/55 text-center leading-tight">{item.label}</span>
+                        <span className="text-[13px] text-foreground/55 text-center leading-tight">{item.label}</span>
                       </div>
                     );
                   })}
@@ -993,7 +993,7 @@ export function ResultsReport({
                 {/* Behavioral notes collapsed */}
                 <div className="flex flex-col gap-1">
                   {data.trustMatrix.filter(t => t.behavioralNote).slice(0, 2).map((item, i) => (
-                    <p key={i} className="text-[10px] text-foreground/45 leading-relaxed"><span className="font-medium text-foreground/55">{item.label}:</span> {item.behavioralNote}</p>
+                    <p key={i} className="text-[14px] text-foreground/45 leading-relaxed"><span className="font-medium text-foreground/55">{item.label}:</span> {item.behavioralNote}</p>
                   ))}
                 </div>
               </div>
@@ -1005,8 +1005,8 @@ export function ResultsReport({
                     <Brain className="h-3.5 w-3.5" style={{ color: "var(--accent-purple)" }} />
                   </div>
                   <div>
-                    <h3 className="text-[12px] font-semibold">Confusion Map</h3>
-                    <p className="text-[10px] text-foreground/55">Cognitive friction breakdown</p>
+                    <h3 className="text-[14px] font-semibold">Confusion Map</h3>
+                    <p className="text-[14px] text-foreground/55">Cognitive friction breakdown</p>
                   </div>
                 </div>
                 {/* Visual meter cards with emoji indicators */}
@@ -1020,17 +1020,17 @@ export function ResultsReport({
                     <div key={item.label} className="rounded-lg p-2.5" style={{ background: "var(--s2)" }}>
                       <div className="flex items-center gap-1.5 mb-2">
                         <span className="text-[13px]">{item.emoji}</span>
-                        <span className="text-[10px] font-medium text-foreground/60">{item.label}</span>
-                        <span className="text-[12px] font-bold font-mono ml-auto" style={{ color: scoreColor(100 - item.score) }}>{item.score}</span>
+                        <span className="text-[14px] font-medium text-foreground/60">{item.label}</span>
+                        <span className="text-[14px] font-bold font-mono ml-auto" style={{ color: scoreColor(100 - item.score) }}>{item.score}</span>
                       </div>
                       <div className="h-[4px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
                         <div className="h-full rounded-full" style={{ background: scoreColor(100 - item.score), width: `${item.score}%`, transition: "width 0.8s ease" }} />
                       </div>
-                      {item.impact && <p className="text-[9px] text-foreground/40 leading-snug mt-1.5 line-clamp-2">{item.impact}</p>}
+                      {item.impact && <p className="text-[13px] text-foreground/40 leading-snug mt-1.5 line-clamp-2">{item.impact}</p>}
                     </div>
                   ))}
                 </div>
-                <p className="text-[9px] text-foreground/35 mt-2 text-center">Higher = more friction</p>
+                <p className="text-[13px] text-foreground/35 mt-2 text-center">Higher = more friction</p>
               </div>
             )}
           </div>
@@ -1054,12 +1054,12 @@ export function ResultsReport({
                 {data.firstScreenAnalysis.attentionSequence && data.firstScreenAnalysis.attentionSequence.length > 0 && (
                   <MiniInsight icon={<Eye className="h-3.5 w-3.5" />} label="Attention sequence" value={data.firstScreenAnalysis.attentionSequence.map((s, i) => `${i + 1}. ${s}`).join(" → ")} color="var(--brand)" hint="What visitors look at first → second → third" />
                 )}
-                <div className="flex gap-2.5 p-3 rounded-lg text-[12px] leading-relaxed sm:col-span-2" style={{ background: "var(--s2)" }}>
+                <div className="flex gap-2.5 p-3 rounded-lg text-[14px] leading-relaxed sm:col-span-2" style={{ background: "var(--s2)" }}>
                   <span className="shrink-0 mt-0.5" style={{ color: scoreColor(data.firstScreenAnalysis.clarityConfidence) }}><Target className="h-3.5 w-3.5" /></span>
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-medium text-foreground/70">Clarity confidence: </span>
                     <span className="text-[16px] font-bold font-mono" style={{ color: scoreColor(data.firstScreenAnalysis.clarityConfidence) }}>{data.firstScreenAnalysis.clarityConfidence}%</span>
-                    <span className="text-[10px] text-foreground/50">
+                    <span className="text-[14px] text-foreground/50">
                       {data.firstScreenAnalysis.clarityConfidence >= 70 ? "Visitors likely understand the offer" : data.firstScreenAnalysis.clarityConfidence >= 40 ? "Some visitors may struggle to understand" : "Most visitors will leave confused"}
                     </span>
                   </div>
@@ -1077,14 +1077,14 @@ export function ResultsReport({
                     </div>
                     <div className="relative flex items-center gap-2.5">
                       <div className="h-4 w-4 border-2 border-foreground/15 border-t-foreground/40 rounded-full animate-spin" />
-                      <span className="text-[12px] text-foreground/55 font-medium">Generating screenshot & heatmap...</span>
+                      <span className="text-[14px] text-foreground/55 font-medium">Generating screenshot & heatmap...</span>
                     </div>
                   </div>
                 </div>
               </div>
             ) : screenshotStatus === "failed" ? (
               <div className="rounded-xl border p-5 flex items-center justify-center" style={{ background: "var(--s1)", minHeight: "60px" }}>
-                <p className="text-[12px] text-foreground/45">Screenshot capture unavailable for this page</p>
+                <p className="text-[14px] text-foreground/45">Screenshot capture unavailable for this page</p>
               </div>
             ) : null}
 
@@ -1096,12 +1096,12 @@ export function ResultsReport({
                     <Eye className="h-4 w-4" style={{ color: "var(--brand)" }} />
                     <div>
                       <h4 className="text-[13px] font-semibold">5-Second Test Simulation</h4>
-                      <p className="text-[10px] text-foreground/45">What visitors notice vs miss in the first 5 seconds</p>
+                      <p className="text-[14px] text-foreground/45">What visitors notice vs miss in the first 5 seconds</p>
                     </div>
                   </div>
                   <button
                     onClick={() => setBlurTestActive(!blurTestActive)}
-                    className="text-[11px] font-medium px-3 py-1.5 rounded-lg transition-all"
+                    className="text-[13px] font-medium px-3 py-1.5 rounded-lg transition-all"
                     style={blurTestActive
                       ? { background: "var(--brand)", color: "white" }
                       : { background: "var(--s2)", color: "var(--foreground)" }
@@ -1175,8 +1175,8 @@ export function ResultsReport({
                   {blurTestActive && (!heatmapZones || heatmapZones.length === 0) && (
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="bg-background/80 backdrop-blur-sm rounded-lg px-4 py-2.5 text-center">
-                        <p className="text-[12px] font-medium text-foreground/70">Heatmap data needed for spotlight effect</p>
-                        <p className="text-[10px] text-foreground/45">The blur shows what visitors likely miss</p>
+                        <p className="text-[14px] font-medium text-foreground/70">Heatmap data needed for spotlight effect</p>
+                        <p className="text-[14px] text-foreground/45">The blur shows what visitors likely miss</p>
                       </div>
                     </div>
                   )}
@@ -1184,12 +1184,12 @@ export function ResultsReport({
                 {blurTestActive && (
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     <div className="rounded-lg p-2.5" style={{ background: "oklch(0.504 0.282 276.1 / 5%)" }}>
-                      <p className="text-[10px] font-semibold mb-0.5" style={{ color: "var(--brand)" }}>What visitors see</p>
-                      <p className="text-[10px] text-foreground/50">Bright areas = high attention zones where eyes naturally land</p>
+                      <p className="text-[14px] font-semibold mb-0.5" style={{ color: "var(--brand)" }}>What visitors see</p>
+                      <p className="text-[14px] text-foreground/50">Bright areas = high attention zones where eyes naturally land</p>
                     </div>
                     <div className="rounded-lg p-2.5" style={{ background: "oklch(0.55 0.17 20 / 5%)" }}>
-                      <p className="text-[10px] font-semibold mb-0.5" style={{ color: "var(--score-low)" }}>What they miss</p>
-                      <p className="text-[10px] text-foreground/50">Blurred areas = content most visitors skip in the first 5 seconds</p>
+                      <p className="text-[14px] font-semibold mb-0.5" style={{ color: "var(--score-low)" }}>What they miss</p>
+                      <p className="text-[14px] text-foreground/50">Blurred areas = content most visitors skip in the first 5 seconds</p>
                     </div>
                   </div>
                 )}
@@ -1243,10 +1243,10 @@ export function ResultsReport({
               </div>
               <div className="flex flex-col gap-1 flex-1">
                 <span className="text-[28px] font-bold font-mono" style={{ color: heuristicColor(data.heuristicEvaluation.overallHeuristicScore) }}>{data.heuristicEvaluation.overallHeuristicScore.toFixed(1)}<span className="text-[14px] text-foreground/30">/10</span></span>
-                <span className="text-[12px] font-semibold">Overall Heuristic Score</span>
+                <span className="text-[14px] font-semibold">Overall Heuristic Score</span>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {[...data.heuristicEvaluation.heuristics].sort((a, b) => a.score - b.score).slice(0, 3).map((h) => (
-                    <span key={h.id} className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: heuristicBg(h.score), color: heuristicColor(h.score) }}>
+                    <span key={h.id} className="text-[13px] px-1.5 py-0.5 rounded" style={{ background: heuristicBg(h.score), color: heuristicColor(h.score) }}>
                       {h.name.split(" ").slice(0, 2).join(" ")}: {h.score}
                     </span>
                   ))}
@@ -1270,9 +1270,9 @@ export function ResultsReport({
                   <div className="w-6 h-6 rounded-full grid place-items-center" style={{ background: "oklch(0.52 0.14 155 / 12%)" }}>
                     <Zap className="h-3 w-3" style={{ color: "var(--score-high)" }} />
                   </div>
-                  <p className="text-[12px] font-semibold" style={{ color: "var(--score-high)" }}>Quick Wins</p>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full font-mono font-bold" style={{ background: "oklch(0.52 0.14 155 / 10%)", color: "var(--score-high)" }}>{data.quickWins.length}</span>
-                  <span className="text-[10px] text-foreground/40 ml-auto">Under 1 hour each</span>
+                  <p className="text-[14px] font-semibold" style={{ color: "var(--score-high)" }}>Quick Wins</p>
+                  <span className="text-[14px] px-1.5 py-0.5 rounded-full font-mono font-bold" style={{ background: "oklch(0.52 0.14 155 / 10%)", color: "var(--score-high)" }}>{data.quickWins.length}</span>
+                  <span className="text-[14px] text-foreground/40 ml-auto">Under 1 hour each</span>
                 </div>
                 <div className="flex flex-col gap-2 mb-5">
                   {data.quickWins.map((w, i) => {
@@ -1285,11 +1285,11 @@ export function ResultsReport({
                             <Check className="h-3 w-3" style={{ color: "var(--score-high)" }} />
                           </div>
                           <div className="flex-1">
-                            <span className="text-[12px] text-foreground/70">{getActionText(w)}</span>
+                            <span className="text-[14px] text-foreground/70">{getActionText(w)}</span>
                             {detail?.expectedImpact && (
                               <div className="flex items-center gap-1.5 mt-1.5">
                                 <TrendingUp className="h-3 w-3" style={{ color: "var(--score-high)", opacity: 0.6 }} />
-                                <span className="text-[10px] font-medium" style={{ color: "var(--score-high)", opacity: 0.7 }}>{detail.expectedImpact}</span>
+                                <span className="text-[14px] font-medium" style={{ color: "var(--score-high)", opacity: 0.7 }}>{detail.expectedImpact}</span>
                               </div>
                             )}
                           </div>
@@ -1306,9 +1306,9 @@ export function ResultsReport({
                   <div className="w-6 h-6 rounded-full grid place-items-center" style={{ background: "oklch(0.637 0.185 295 / 12%)" }}>
                     <Target className="h-3 w-3" style={{ color: "var(--accent-purple)" }} />
                   </div>
-                  <p className="text-[12px] font-semibold" style={{ color: "var(--accent-purple)" }}>Strategic Fixes</p>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full font-mono font-bold" style={{ background: "oklch(0.637 0.185 295 / 10%)", color: "var(--accent-purple)" }}>{data.strategicFixes.length}</span>
-                  <span className="text-[10px] text-foreground/40 ml-auto">Deeper changes</span>
+                  <p className="text-[14px] font-semibold" style={{ color: "var(--accent-purple)" }}>Strategic Fixes</p>
+                  <span className="text-[14px] px-1.5 py-0.5 rounded-full font-mono font-bold" style={{ background: "oklch(0.637 0.185 295 / 10%)", color: "var(--accent-purple)" }}>{data.strategicFixes.length}</span>
+                  <span className="text-[14px] text-foreground/40 ml-auto">Deeper changes</span>
                 </div>
                 <div className="flex flex-col gap-2">
                   {data.strategicFixes.map((f, i) => {
@@ -1318,13 +1318,13 @@ export function ResultsReport({
                       <div key={i} className="rounded-lg p-3 relative overflow-hidden" style={{ background: "var(--s2)" }}>
                         <div className="absolute top-0 left-0 w-[3px] h-full" style={{ background: "var(--accent-purple)" }} />
                         <div className="flex items-start gap-2.5 pl-1">
-                          <span className="w-5 h-5 rounded-full grid place-items-center shrink-0 text-[10px] font-bold" style={{ background: "oklch(0.637 0.185 295 / 10%)", color: "var(--accent-purple)" }}>{i + 1}</span>
+                          <span className="w-5 h-5 rounded-full grid place-items-center shrink-0 text-[14px] font-bold" style={{ background: "oklch(0.637 0.185 295 / 10%)", color: "var(--accent-purple)" }}>{i + 1}</span>
                           <div className="flex-1">
-                            <span className="text-[12px] text-foreground/70">{text}</span>
+                            <span className="text-[14px] text-foreground/70">{text}</span>
                             <div className="flex items-center gap-1.5 mt-1.5">
-                              <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ color: "var(--accent-purple)", background: "oklch(0.637 0.185 295 / 7%)" }}>{deriveScope(text)}</span>
+                              <span className="text-[14px] px-1.5 py-0.5 rounded" style={{ color: "var(--accent-purple)", background: "oklch(0.637 0.185 295 / 7%)" }}>{deriveScope(text)}</span>
                               {detail?.expectedImpact && (
-                                <span className="text-[10px] font-medium" style={{ color: "var(--accent-purple)", opacity: 0.7 }}>{detail.expectedImpact}</span>
+                                <span className="text-[14px] font-medium" style={{ color: "var(--accent-purple)", opacity: 0.7 }}>{detail.expectedImpact}</span>
                               )}
                             </div>
                           </div>
@@ -1338,12 +1338,12 @@ export function ResultsReport({
             {!features.improvements && data.strategicFixes.length > 0 && <LockedHint count={data.strategicFixes.length} label="strategic fixes" />}
             {data.uxStrengths && data.uxStrengths.length > 0 && (
               <div className="mt-5 pt-4">
-                <p className="text-[12px] uppercase tracking-[2px] mb-2.5 flex items-center gap-1.5" style={{ color: "var(--score-high)" }}>
+                <p className="text-[14px] uppercase tracking-[2px] mb-2.5 flex items-center gap-1.5" style={{ color: "var(--score-high)" }}>
                   <Sparkles className="h-3 w-3" /> UX Strengths
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                   {data.uxStrengths.map((s, i) => (
-                    <div key={i} className="flex gap-2 text-[12px] leading-relaxed text-foreground/65 p-2 px-2.5 rounded-md" style={{ background: "oklch(0.52 0.14 155 / 4%)" }}>
+                    <div key={i} className="flex gap-2 text-[14px] leading-relaxed text-foreground/65 p-2 px-2.5 rounded-md" style={{ background: "oklch(0.52 0.14 155 / 4%)" }}>
                       <Check className="h-3 w-3 shrink-0 mt-0.5" style={{ color: "var(--score-high)" }} />
                       <span>{s}</span>
                     </div>
@@ -1360,7 +1360,7 @@ export function ResultsReport({
           <div className="flex flex-col gap-4">
             <HeroRewrite rewrite={data.rewrite} locked={!features.improvements} />
             {features.improvements && data.rewrite.rewriteRationale && (
-              <p className="text-[12px] text-foreground/50 leading-relaxed px-1">{data.rewrite.rewriteRationale}</p>
+              <p className="text-[14px] text-foreground/50 leading-relaxed px-1">{data.rewrite.rewriteRationale}</p>
             )}
           </div>
         );
@@ -1376,14 +1376,14 @@ export function ResultsReport({
                     <span className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--brand-dim)" }}>
                       {getPersonaIcon(p.persona)}
                     </span>
-                    <span className="text-[12px] font-semibold text-foreground">{p.persona}</span>
-                    <span className="ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded" style={{
+                    <span className="text-[14px] font-semibold text-foreground">{p.persona}</span>
+                    <span className="ml-auto text-[14px] font-mono px-1.5 py-0.5 rounded" style={{
                       background: p.priority === "high" ? "oklch(0.65 0.25 29 / 10%)" : p.priority === "medium" ? "oklch(0.72 0.19 75 / 10%)" : "oklch(0.52 0.14 155 / 8%)",
                       color: p.priority === "high" ? "var(--score-low)" : p.priority === "medium" ? "var(--score-mid)" : "var(--score-high)",
                     }}>{p.priority}</span>
                   </div>
-                  <p className="text-[11px] text-foreground/55 leading-relaxed mb-2">{p.feedback}</p>
-                  <p className="text-[11px] font-medium text-foreground/70">
+                  <p className="text-[13px] text-foreground/55 leading-relaxed mb-2">{p.feedback}</p>
+                  <p className="text-[13px] font-medium text-foreground/70">
                     <span className="text-foreground/40">Top concern: </span>{p.topConcern}
                   </p>
                 </div>
@@ -1442,8 +1442,8 @@ export function ResultsReport({
               </div>
             </div>
             <div className="min-w-0">
-              <p className="text-[12px] font-medium text-foreground leading-none truncate">{domain}</p>
-              <p className="text-[9px] text-foreground/30 mt-0.5 truncate">
+              <p className="text-[14px] font-medium text-foreground leading-none truncate">{domain}</p>
+              <p className="text-[13px] text-foreground/30 mt-0.5 truncate">
                 {data.pageTypeLabel ? `${data.pageTypeLabel} Audit` : "UX Audit"}
               </p>
             </div>
@@ -1453,7 +1453,7 @@ export function ResultsReport({
         {/* ▸ Center: Report label */}
         <div className="flex-1 flex items-center justify-center">
           <div className="flex items-center gap-0.5 rounded-lg p-0.5" style={{ background: "var(--s2)" }}>
-            <span className="text-[11px] font-medium px-4 py-1.5 rounded-md text-white shadow-sm" style={{ background: "var(--brand)" }}>
+            <span className="text-[13px] font-medium px-4 py-1.5 rounded-md text-white shadow-sm" style={{ background: "var(--brand)" }}>
               Report
             </span>
           </div>
@@ -1461,13 +1461,13 @@ export function ResultsReport({
 
         {/* ▸ Right: Actions + share */}
         <div className="flex items-center gap-2 shrink-0">
-          <button onClick={onReset} className="inline-flex items-center gap-1.5 text-[11px] text-foreground/35 hover:text-foreground/55 transition-colors px-2 py-1 rounded-md hover:bg-foreground/[0.03]">
+          <button onClick={onReset} className="inline-flex items-center gap-1.5 text-[13px] text-foreground/35 hover:text-foreground/55 transition-colors px-2 py-1 rounded-md hover:bg-foreground/[0.03]">
             <RotateCcw className="h-3 w-3" /> New
           </button>
           {onToggleShare && !isSharedView && (
             shareToken ? (
               <div className="flex items-center gap-1">
-                <button onClick={onCopyShareLink} className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-medium transition-colors" style={{ background: "var(--s2)", color: "var(--foreground)" }}>
+                <button onClick={onCopyShareLink} className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors" style={{ background: "var(--s2)", color: "var(--foreground)" }}>
                   {shareCopied ? <Check className="h-3 w-3 text-green-600" /> : <Link2 className="h-3 w-3" />}
                   {shareCopied ? "Copied" : "Copy Link"}
                 </button>
@@ -1476,7 +1476,7 @@ export function ResultsReport({
                 </button>
               </div>
             ) : (
-              <button onClick={onToggleShare} disabled={shareLoading} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold text-white transition-all hover:opacity-90" style={{ background: "var(--brand)" }}>
+              <button onClick={onToggleShare} disabled={shareLoading} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[13px] font-semibold text-white transition-all hover:opacity-90" style={{ background: "var(--brand)" }}>
                 {shareLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Share2 className="h-3 w-3" />}
                 Share
               </button>
@@ -1503,11 +1503,11 @@ export function ResultsReport({
                   style={isActive ? { background: "var(--brand-dim)" } : undefined}
                 >
                   <span className="shrink-0" style={{ color: isActive ? "var(--brand)" : "var(--foreground)", opacity: isActive ? 1 : 0.3 }}>{sec.icon}</span>
-                  <span className={`text-[11px] flex-1 truncate ${isActive ? "font-semibold text-foreground" : "text-foreground/50"}`}>
+                  <span className={`text-[13px] flex-1 truncate ${isActive ? "font-semibold text-foreground" : "text-foreground/50"}`}>
                     {sec.label}
                   </span>
                   {sec.badge !== undefined && sec.badge > 0 && (
-                    <span className="text-[9px] font-medium tabular-nums" style={{ color: isActive ? "var(--brand)" : "var(--foreground)", opacity: isActive ? 0.7 : 0.25 }}>
+                    <span className="text-[13px] font-medium tabular-nums" style={{ color: isActive ? "var(--brand)" : "var(--foreground)", opacity: isActive ? 0.7 : 0.25 }}>
                       {sec.badge}
                     </span>
                   )}
@@ -1533,14 +1533,14 @@ export function ResultsReport({
                       <button
                         key={sec.id}
                         onClick={() => setActiveNav(sec.id)}
-                        className={`relative shrink-0 flex items-center gap-1.5 px-3 py-2 text-[11px] font-medium transition-all rounded-md ${
+                        className={`relative shrink-0 flex items-center gap-1.5 px-3 py-2 text-[13px] font-medium transition-all rounded-md ${
                           isActive ? "text-foreground" : "text-foreground/40 hover:text-foreground/60 hover:bg-foreground/[0.03]"
                         }`}
                       >
                         <span style={isActive ? { color: sec.color } : undefined}>{sec.icon}</span>
                         <span>{sec.label}</span>
                         {sec.badge !== undefined && sec.badge > 0 && (
-                          <span className="text-[9px] font-bold px-1.5 py-[1px] rounded-md" style={isActive ? { background: sec.color, color: "white" } : { background: "var(--s2)", color: "var(--foreground)", opacity: 0.4 }}>
+                          <span className="text-[13px] font-bold px-1.5 py-[1px] rounded-md" style={isActive ? { background: sec.color, color: "white" } : { background: "var(--s2)", color: "var(--foreground)", opacity: 0.4 }}>
                             {sec.badge}
                           </span>
                         )}
@@ -1616,7 +1616,7 @@ function DashSection({ icon, title, subtitle, children }: { icon: React.ReactNod
         <div className="w-7 h-7 rounded-lg grid place-items-center shrink-0" style={{ background: "var(--s2)" }}>{icon}</div>
         <div>
           <h3 className="text-[15px] font-semibold">{title}</h3>
-          <p className="text-[12px] text-foreground/45">{subtitle}</p>
+          <p className="text-[14px] text-foreground/45">{subtitle}</p>
         </div>
       </div>
       {children}
@@ -1630,9 +1630,9 @@ function MetricCard({ label, value, suffix = "", color }: { label: string; value
     <div className="dash-card rounded-xl border p-4 flex flex-col items-center justify-center text-center" style={{ background: "var(--s1)" }}>
       <div className="flex items-baseline gap-0.5 mb-1">
         <span className="text-[24px] font-bold tabular-nums animate-count-up" style={{ color }}>{value}</span>
-        {suffix && <span className="text-[11px] text-foreground/40">{suffix}</span>}
+        {suffix && <span className="text-[13px] text-foreground/40">{suffix}</span>}
       </div>
-      <span className="text-[11px] text-foreground/50 font-medium leading-tight">{label}</span>
+      <span className="text-[13px] text-foreground/50 font-medium leading-tight">{label}</span>
     </div>
   );
 }
@@ -1642,7 +1642,7 @@ function BarChartRow({ label, score, color, note }: { label: string; score: numb
   return (
     <div className="group">
       <div className="flex items-center gap-3">
-        <span className="text-[12px] text-foreground/60 w-[130px] sm:w-[155px] shrink-0 truncate">{label}</span>
+        <span className="text-[14px] text-foreground/60 w-[130px] sm:w-[155px] shrink-0 truncate">{label}</span>
         <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
           <div className="h-full rounded-full animate-bar-width" style={{ background: color, width: `${score}%`, "--bar-width": `${score}%` } as React.CSSProperties} />
         </div>
@@ -1652,7 +1652,7 @@ function BarChartRow({ label, score, color, note }: { label: string; score: numb
       {note && (
         <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows] duration-200">
           <div className="overflow-hidden">
-            <p className="text-[10px] text-foreground/55 leading-relaxed pt-1.5 pl-[130px] sm:pl-[155px] ml-3">{note}</p>
+            <p className="text-[14px] text-foreground/55 leading-relaxed pt-1.5 pl-[130px] sm:pl-[155px] ml-3">{note}</p>
           </div>
         </div>
       )}
@@ -1665,21 +1665,21 @@ function MetricGridCard({ label, score, color, icon, sparkData, note, desc }: { 
   return (
     <div className="dash-card rounded-xl border p-4" style={{ background: "var(--s1)" }}>
       <div className="flex items-center justify-between mb-1">
-        <div className="flex items-center gap-2 text-[12px] text-foreground/50">
+        <div className="flex items-center gap-2 text-[14px] text-foreground/50">
           <span style={{ color }}>{icon}</span>
           <span className="truncate">{label}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="text-[20px] font-bold font-mono" style={{ color }}>{score}</span>
-          <span className="text-[10px] text-foreground/40 leading-none">{scoreInterpretation(score)}</span>
+          <span className="text-[14px] text-foreground/40 leading-none">{scoreInterpretation(score)}</span>
         </div>
       </div>
-      {desc && <p className="text-[10px] text-foreground/40 mb-2 leading-snug">{desc}</p>}
+      {desc && <p className="text-[14px] text-foreground/40 mb-2 leading-snug">{desc}</p>}
       {/* Score bar — single clean progress indicator */}
       <div className="h-[4px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
         <div className="h-full rounded-full transition-all duration-700" style={{ background: color, width: `${score}%` }} />
       </div>
-      {note && <p className="text-[10px] text-foreground/45 leading-snug mt-2.5">{note}</p>}
+      {note && <p className="text-[14px] text-foreground/45 leading-snug mt-2.5">{note}</p>}
     </div>
   );
 }
@@ -1704,18 +1704,18 @@ function InsightDashCard({ finding, defaultOpen = false }: { finding: Finding; d
       <div className="flex items-center gap-3 p-4">
         <span className="shrink-0" style={{ color: s.color }}>{s.icon}</span>
         <div className="flex-1 min-w-0">
-          <span className="text-[12px] font-medium block" style={{ color: s.color }}>{finding.title}</span>
-          {!open && finding.desc && <p className="text-[12px] text-foreground/55 mt-0.5 line-clamp-1">{finding.desc}</p>}
+          <span className="text-[14px] font-medium block" style={{ color: s.color }}>{finding.title}</span>
+          {!open && finding.desc && <p className="text-[14px] text-foreground/55 mt-0.5 line-clamp-1">{finding.desc}</p>}
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
-          {finding.severity && <span className="text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider" style={SEVERITY_STYLES[finding.severity] || {}}>{finding.severity}</span>}
+          {finding.severity && <span className="text-[14px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider" style={SEVERITY_STYLES[finding.severity] || {}}>{finding.severity}</span>}
           {!open && finding.estimatedConversionLift && (
-            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full" style={{ background: "oklch(0.52 0.14 155 / 10%)", color: "var(--score-high)" }}>
+            <span className="text-[14px] font-medium px-1.5 py-0.5 rounded-full" style={{ background: "oklch(0.52 0.14 155 / 10%)", color: "var(--score-high)" }}>
               {"↑"} {finding.estimatedConversionLift}
             </span>
           )}
           {!open && finding.estimatedEffort && finding.estimatedEffort !== "—" && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full text-foreground/50 hidden sm:inline" style={{ background: "var(--s2)" }}>
+            <span className="text-[14px] px-1.5 py-0.5 rounded-full text-foreground/50 hidden sm:inline" style={{ background: "var(--s2)" }}>
               {finding.estimatedEffort}
             </span>
           )}
@@ -1724,24 +1724,24 @@ function InsightDashCard({ finding, defaultOpen = false }: { finding: Finding; d
       </div>
       <div className={`insight-expand ${open ? "open" : ""}`}>
         <div>
-          <div className="px-3.5 pb-3.5 pt-0 text-[12px] text-foreground/65 leading-relaxed">
+          <div className="px-3.5 pb-3.5 pt-0 text-[14px] text-foreground/65 leading-relaxed">
             <p className="pt-3">{finding.desc}</p>
 
             {/* Revenue impact strip */}
             {(finding.impactHeadline || finding.estimatedConversionLift || finding.estimatedEffort) && (
               <div className="mt-2.5 flex flex-wrap items-center gap-2 p-2.5 rounded-lg" style={{ background: finding.type === "positive" ? "oklch(0.52 0.14 155 / 6%)" : "oklch(0.55 0.17 20 / 6%)" }}>
                 {finding.impactHeadline && (
-                  <span className="text-[11px] font-semibold" style={{ color: finding.type === "positive" ? "var(--score-high)" : "var(--score-low)" }}>
+                  <span className="text-[13px] font-semibold" style={{ color: finding.type === "positive" ? "var(--score-high)" : "var(--score-low)" }}>
                     {finding.impactHeadline}
                   </span>
                 )}
                 {finding.estimatedConversionLift && (
-                  <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ background: "oklch(0.52 0.14 155 / 10%)", color: "var(--score-high)" }}>
+                  <span className="text-[14px] font-medium px-2 py-0.5 rounded-full" style={{ background: "oklch(0.52 0.14 155 / 10%)", color: "var(--score-high)" }}>
                     ↑ {finding.estimatedConversionLift}
                   </span>
                 )}
                 {finding.estimatedEffort && finding.estimatedEffort !== "—" && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full text-foreground/50" style={{ background: "var(--s2)" }}>
+                  <span className="text-[14px] px-2 py-0.5 rounded-full text-foreground/50" style={{ background: "var(--s2)" }}>
                     ⏱ {finding.estimatedEffort}
                   </span>
                 )}
@@ -1750,7 +1750,7 @@ function InsightDashCard({ finding, defaultOpen = false }: { finding: Finding; d
 
             {/* Behavioral context block */}
             {finding.userExperience && (
-              <div className="mt-2.5 p-2.5 rounded-md text-[12px] border-l-2" style={{ background: "var(--brand-dim)", borderColor: "var(--brand-glow)" }}>
+              <div className="mt-2.5 p-2.5 rounded-md text-[14px] border-l-2" style={{ background: "var(--brand-dim)", borderColor: "var(--brand-glow)" }}>
                 <span className="font-semibold text-foreground/70 flex items-center gap-1 mb-0.5"><User className="h-3 w-3" style={{ color: "var(--brand)" }} /> User experience</span>
                 <span className="text-foreground/55">{finding.userExperience}</span>
               </div>
@@ -1760,12 +1760,12 @@ function InsightDashCard({ finding, defaultOpen = false }: { finding: Finding; d
             {(finding.journeyStage || finding.behavioralMechanism) && (
               <div className="flex flex-wrap items-center gap-1.5 mt-2">
                 {finding.journeyStage && JOURNEY_STAGE_COLORS[finding.journeyStage] && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ background: JOURNEY_STAGE_COLORS[finding.journeyStage].bg, color: JOURNEY_STAGE_COLORS[finding.journeyStage].color }}>
+                  <span className="text-[14px] px-2 py-0.5 rounded-full font-medium" style={{ background: JOURNEY_STAGE_COLORS[finding.journeyStage].bg, color: JOURNEY_STAGE_COLORS[finding.journeyStage].color }}>
                     {JOURNEY_STAGE_COLORS[finding.journeyStage].label} stage
                   </span>
                 )}
                 {finding.behavioralMechanism && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ color: "var(--foreground)", opacity: 0.4, background: "var(--s2)" }}>
+                  <span className="text-[14px] px-2 py-0.5 rounded-full font-medium" style={{ color: "var(--foreground)", opacity: 0.4, background: "var(--s2)" }}>
                     {finding.behavioralMechanism}
                   </span>
                 )}
@@ -1774,19 +1774,19 @@ function InsightDashCard({ finding, defaultOpen = false }: { finding: Finding; d
 
             {/* Friction cascade */}
             {finding.frictionCascade && (
-              <div className="mt-2 p-2.5 rounded-md text-[12px]" style={{ background: "var(--s1)" }}>
+              <div className="mt-2 p-2.5 rounded-md text-[14px]" style={{ background: "var(--s1)" }}>
                 <span className="font-semibold" style={{ color: "var(--score-low)" }}>Friction cascade: </span>
                 <span className="text-foreground/55">{finding.frictionCascade}</span>
               </div>
             )}
 
             {finding.whyItMatters && (
-              <div className="mt-1.5 p-2.5 rounded-md text-[12px]" style={{ background: "oklch(0.58 0.16 75 / 4%)" }}>
+              <div className="mt-1.5 p-2.5 rounded-md text-[14px]" style={{ background: "oklch(0.58 0.16 75 / 4%)" }}>
                 <span className="font-semibold" style={{ color: "var(--score-mid)" }}>Why it matters: </span>{finding.whyItMatters}
               </div>
             )}
             {finding.recommendedFix && (
-              <div className="mt-1.5 p-2.5 rounded-md text-[12px]" style={{ background: "oklch(0.52 0.14 155 / 4%)" }}>
+              <div className="mt-1.5 p-2.5 rounded-md text-[14px]" style={{ background: "oklch(0.52 0.14 155 / 4%)" }}>
                 <span className="font-semibold" style={{ color: "var(--score-high)" }}>Fix: </span>{finding.recommendedFix}
               </div>
             )}
@@ -1808,15 +1808,15 @@ function SectionCard({ section, isExpanded, onClick }: { section: AuditSection; 
         </div>
         <ChevronRight className={`h-3 w-3 text-foreground/30 ml-auto transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`} />
       </div>
-      <p className="text-[12px] font-semibold text-foreground/65 mb-1 truncate">{section.name}</p>
+      <p className="text-[14px] font-semibold text-foreground/65 mb-1 truncate">{section.name}</p>
       <div className="flex items-center gap-2">
         <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: scoreColor(section.score) }} />
         <span className="text-[18px] font-bold font-mono" style={{ color: scoreColor(section.score) }}>{section.score}</span>
         {issueCount > 0 && (
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: "oklch(0.55 0.17 20 / 8%)", color: "var(--score-low)" }}>{issueCount}</span>
+          <span className="text-[14px] px-1.5 py-0.5 rounded-full" style={{ background: "oklch(0.55 0.17 20 / 8%)", color: "var(--score-low)" }}>{issueCount}</span>
         )}
       </div>
-      <span className="text-[10px] text-foreground/35 mt-2 flex items-center gap-0.5">View details <ChevronRight className="h-2.5 w-2.5" /></span>
+      <span className="text-[14px] text-foreground/35 mt-2 flex items-center gap-0.5">View details <ChevronRight className="h-2.5 w-2.5" /></span>
     </button>
   );
 }
@@ -1868,7 +1868,7 @@ function RadarChart({ categories }: { categories: UXAuditResult["categories"] })
       {/* Labels */}
       {cats.map((c, i) => {
         const p = getPoint(i, 130);
-        return <text key={i} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central" className="text-[10px] fill-foreground/55">{c.label}</text>;
+        return <text key={i} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central" className="text-[14px] fill-foreground/55">{c.label}</text>;
       })}
     </svg>
   );
@@ -1887,7 +1887,7 @@ function SeverityDistribution({ counts }: { counts: Record<string, number> }) {
   return (
     <div className="flex flex-col gap-2">
       {items.map(item => (
-        <div key={item.label} className="flex items-center gap-2.5 text-[12px]">
+        <div key={item.label} className="flex items-center gap-2.5 text-[14px]">
           <span className="w-14 text-foreground/55 shrink-0">{item.label}</span>
           <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
             <div className="h-full rounded-full animate-bar-width" style={{ background: item.color, width: `${(item.count / total) * 100}%`, "--bar-width": `${(item.count / total) * 100}%` } as React.CSSProperties} />
@@ -1902,15 +1902,15 @@ function SeverityDistribution({ counts }: { counts: Record<string, number> }) {
 /* ── Mini Insight (for first-screen analysis) ── */
 function MiniInsight({ icon, label, value, color, hint }: { icon: React.ReactNode; label: string; value: string; color: string; hint?: string }) {
   return (
-    <div className="rounded-lg p-3 text-[12px] leading-relaxed relative overflow-hidden" style={{ background: "var(--s2)" }}>
+    <div className="rounded-lg p-3 text-[14px] leading-relaxed relative overflow-hidden" style={{ background: "var(--s2)" }}>
       <div className="absolute top-0 left-0 w-[3px] h-full rounded-r" style={{ background: color, opacity: 0.6 }} />
       <div className="flex items-start gap-2 pl-1">
         <div className="w-6 h-6 rounded-md grid place-items-center shrink-0 mt-0.5" style={{ background: `color-mix(in oklch, ${color} 15%, transparent)` }}>
           <span style={{ color }}>{icon}</span>
         </div>
         <div className="flex-1 min-w-0">
-          <span className="text-[10px] font-semibold uppercase tracking-wider block mb-0.5" style={{ color, opacity: 0.75 }}>{label}</span>
-          <span className="text-[11px] text-foreground/65 block">{value}</span>
+          <span className="text-[14px] font-semibold uppercase tracking-wider block mb-0.5" style={{ color, opacity: 0.75 }}>{label}</span>
+          <span className="text-[13px] text-foreground/65 block">{value}</span>
         </div>
       </div>
     </div>
@@ -1923,8 +1923,8 @@ function HeuristicCard({ heuristic }: { heuristic: HeuristicScore }) {
   return (
     <div className="rounded-lg border p-3" style={{ background: "var(--s1)", borderColor: "var(--border)" }}>
       <div className="flex items-start justify-between gap-2 mb-1.5">
-        <div className="text-[12px] font-semibold leading-snug flex-1">{heuristic.name}</div>
-        <span className="text-[12px] font-bold font-mono px-1.5 py-0.5 rounded-[5px] shrink-0" style={{ color, background: heuristicBg(heuristic.score) }}>{heuristic.score}/10</span>
+        <div className="text-[14px] font-semibold leading-snug flex-1">{heuristic.name}</div>
+        <span className="text-[14px] font-bold font-mono px-1.5 py-0.5 rounded-[5px] shrink-0" style={{ color, background: heuristicBg(heuristic.score) }}>{heuristic.score}/10</span>
       </div>
       <div className="h-[3px] rounded-full overflow-hidden mb-1.5" style={{ background: "var(--s3)" }}>
         <div className="h-full rounded-full animate-bar-width" style={{ background: color, width: `${heuristic.score * 10}%`, "--bar-width": `${heuristic.score * 10}%` } as React.CSSProperties} />
@@ -1932,7 +1932,7 @@ function HeuristicCard({ heuristic }: { heuristic: HeuristicScore }) {
       {heuristic.issues.length > 0 && (
         <div className="flex flex-col gap-1 mb-1">
           {heuristic.issues.slice(0, 2).map((issue, i) => (
-            <div key={i} className="flex gap-1.5 text-[12px] leading-relaxed">
+            <div key={i} className="flex gap-1.5 text-[14px] leading-relaxed">
               <X className="h-3 w-3 shrink-0 mt-0.5" style={{ color: "var(--score-low)" }} />
               <span className="text-foreground/60 line-clamp-2">{issue}</span>
             </div>
@@ -1942,7 +1942,7 @@ function HeuristicCard({ heuristic }: { heuristic: HeuristicScore }) {
       {heuristic.passes.length > 0 && (
         <div className="flex flex-col gap-1">
           {heuristic.passes.slice(0, 1).map((pass, i) => (
-            <div key={i} className="flex gap-1.5 text-[12px] leading-relaxed">
+            <div key={i} className="flex gap-1.5 text-[14px] leading-relaxed">
               <Check className="h-3 w-3 shrink-0 mt-0.5" style={{ color: "var(--score-high)" }} />
               <span className="text-foreground/60 line-clamp-2">{pass}</span>
             </div>
@@ -1962,30 +1962,30 @@ function FindingCard({ finding }: { finding: Finding }) {
   };
   const s = styles[finding.type];
   return (
-    <div className="flex gap-3 p-3 rounded-lg text-[12px] leading-relaxed" style={{ background: s.bg }}>
+    <div className="flex gap-3 p-3 rounded-lg text-[14px] leading-relaxed" style={{ background: s.bg }}>
       <span className="shrink-0 mt-0.5" style={{ color: s.titleColor }}>{s.icon}</span>
       <div className="flex-1">
         <div className="font-medium mb-0.5" style={{ color: s.titleColor }}>
           {finding.title}
-          {finding.severity && <span className="text-[10px] px-[5px] py-[1px] rounded ml-1.5 uppercase tracking-wider" style={SEVERITY_STYLES[finding.severity] || {}}>{finding.severity}</span>}
-          {finding.category && <span className="text-[10px] px-1.5 py-[1px] rounded ml-1.5 text-foreground/50" style={{ background: "var(--s2)" }}>{finding.category}</span>}
+          {finding.severity && <span className="text-[14px] px-[5px] py-[1px] rounded ml-1.5 uppercase tracking-wider" style={SEVERITY_STYLES[finding.severity] || {}}>{finding.severity}</span>}
+          {finding.category && <span className="text-[14px] px-1.5 py-[1px] rounded ml-1.5 text-foreground/50" style={{ background: "var(--s2)" }}>{finding.category}</span>}
         </div>
         <div className="text-foreground/65">{finding.desc}</div>
         {/* Revenue impact */}
         {(finding.impactHeadline || finding.estimatedConversionLift || finding.estimatedEffort) && (
           <div className="mt-1.5 flex flex-wrap items-center gap-2 p-2 rounded-md" style={{ background: finding.type === "positive" ? "oklch(0.52 0.14 155 / 5%)" : "oklch(0.55 0.17 20 / 5%)" }}>
             {finding.impactHeadline && (
-              <span className="text-[11px] font-semibold" style={{ color: finding.type === "positive" ? "var(--score-high)" : "var(--score-low)" }}>
+              <span className="text-[13px] font-semibold" style={{ color: finding.type === "positive" ? "var(--score-high)" : "var(--score-low)" }}>
                 {finding.impactHeadline}
               </span>
             )}
             {finding.estimatedConversionLift && (
-              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full" style={{ background: "oklch(0.52 0.14 155 / 10%)", color: "var(--score-high)" }}>
+              <span className="text-[14px] font-medium px-1.5 py-0.5 rounded-full" style={{ background: "oklch(0.52 0.14 155 / 10%)", color: "var(--score-high)" }}>
                 ↑ {finding.estimatedConversionLift}
               </span>
             )}
             {finding.estimatedEffort && finding.estimatedEffort !== "—" && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full text-foreground/50" style={{ background: "var(--s2)" }}>
+              <span className="text-[14px] px-1.5 py-0.5 rounded-full text-foreground/50" style={{ background: "var(--s2)" }}>
                 ⏱ {finding.estimatedEffort}
               </span>
             )}
@@ -1995,30 +1995,30 @@ function FindingCard({ finding }: { finding: Finding }) {
         {(finding.journeyStage || finding.behavioralMechanism) && (
           <div className="flex flex-wrap items-center gap-1 mt-1.5">
             {finding.journeyStage && JOURNEY_STAGE_COLORS[finding.journeyStage] && (
-              <span className="text-[10px] px-1.5 py-[2px] rounded-full font-medium" style={{ background: JOURNEY_STAGE_COLORS[finding.journeyStage].bg, color: JOURNEY_STAGE_COLORS[finding.journeyStage].color }}>
+              <span className="text-[14px] px-1.5 py-[2px] rounded-full font-medium" style={{ background: JOURNEY_STAGE_COLORS[finding.journeyStage].bg, color: JOURNEY_STAGE_COLORS[finding.journeyStage].color }}>
                 {JOURNEY_STAGE_COLORS[finding.journeyStage].label}
               </span>
             )}
             {finding.behavioralMechanism && (
-              <span className="text-[10px] px-1.5 py-[2px] rounded-full text-foreground/55" style={{ background: "var(--s2)" }}>
+              <span className="text-[14px] px-1.5 py-[2px] rounded-full text-foreground/55" style={{ background: "var(--s2)" }}>
                 {finding.behavioralMechanism}
               </span>
             )}
           </div>
         )}
         {finding.userExperience && (
-          <div className="mt-1.5 p-2 rounded-md text-[12px] border-l-2" style={{ background: "oklch(0.62 0.18 275 / 4%)", borderColor: "oklch(0.62 0.18 275 / 30%)" }}>
+          <div className="mt-1.5 p-2 rounded-md text-[14px] border-l-2" style={{ background: "oklch(0.62 0.18 275 / 4%)", borderColor: "oklch(0.62 0.18 275 / 30%)" }}>
             <span className="text-foreground/55">{finding.userExperience}</span>
           </div>
         )}
         {finding.whyItMatters && (
-          <div className="mt-1.5 p-2 rounded-md text-[12px]" style={{ background: "oklch(0.58 0.16 75 / 4%)" }}>
+          <div className="mt-1.5 p-2 rounded-md text-[14px]" style={{ background: "oklch(0.58 0.16 75 / 4%)" }}>
             <span className="font-semibold" style={{ color: "var(--score-mid)" }}>Why it matters: </span>
             <span className="text-foreground/55">{finding.whyItMatters}</span>
           </div>
         )}
         {finding.recommendedFix && (
-          <div className="mt-1.5 p-2 rounded-md text-[12px]" style={{ background: "oklch(0.52 0.14 155 / 4%)" }}>
+          <div className="mt-1.5 p-2 rounded-md text-[14px]" style={{ background: "oklch(0.52 0.14 155 / 4%)" }}>
             <span className="font-semibold" style={{ color: "var(--score-high)" }}>Fix: </span>
             <span className="text-foreground/55">{finding.recommendedFix}</span>
           </div>
@@ -2034,24 +2034,24 @@ function HeroRewrite({ rewrite, locked }: { rewrite: UXAuditResult["rewrite"]; l
     <div className="rounded-xl border overflow-hidden mb-4" style={{ background: "var(--s1)" }}>
       <div className="flex items-center gap-2.5 px-4 py-3" style={{ background: "var(--s2)" }}>
         <span className="font-semibold text-[14px]">Hero Rewrite</span>
-        <span className="text-[12px] px-2 py-0.5 rounded tracking-wide" style={{ color: "var(--brand)", background: "var(--brand-dim)" }}>AI OPTIMIZED</span>
+        <span className="text-[14px] px-2 py-0.5 rounded tracking-wide" style={{ color: "var(--brand)", background: "var(--brand-dim)" }}>AI OPTIMIZED</span>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2">
         <div className="p-4">
-          <p className="text-[12px] uppercase tracking-[1.5px] text-foreground/50 mb-2.5">Before</p>
+          <p className="text-[14px] uppercase tracking-[1.5px] text-foreground/50 mb-2.5">Before</p>
           <p className="text-[16px] leading-tight mb-2 text-foreground/50 line-through">{rewrite.beforeHeadline || "\u2014"}</p>
-          <p className="text-[12px] text-foreground/65 leading-relaxed mb-2.5">{rewrite.beforeSubheadline || "\u2014"}</p>
-          <span className="inline-block px-4 py-2 rounded-md text-[12px] font-semibold text-foreground/50 line-through" style={{ background: "var(--s2)" }}>{rewrite.beforeCTA || "\u2014"}</span>
+          <p className="text-[14px] text-foreground/65 leading-relaxed mb-2.5">{rewrite.beforeSubheadline || "\u2014"}</p>
+          <span className="inline-block px-4 py-2 rounded-md text-[14px] font-semibold text-foreground/50 line-through" style={{ background: "var(--s2)" }}>{rewrite.beforeCTA || "\u2014"}</span>
         </div>
         <div className="p-4 relative">
-          <p className="text-[12px] uppercase tracking-[1.5px] text-foreground/50 mb-2.5">After</p>
+          <p className="text-[14px] uppercase tracking-[1.5px] text-foreground/50 mb-2.5">After</p>
           {locked ? (
             <LockedOverlay message="AI-optimized copy is available on paid plans" />
           ) : (
             <>
               <p className="text-[16px] leading-tight mb-2 text-foreground">{rewrite.afterHeadline || "\u2014"}</p>
-              <p className="text-[12px] text-foreground/70 leading-relaxed mb-2.5">{rewrite.afterSubheadline || "\u2014"}</p>
-              <span className="inline-block px-4 py-2 rounded-md text-[12px] font-bold" style={{ background: "var(--brand)", color: "var(--brand-fg)" }}>{rewrite.afterCTA || "\u2014"}</span>
+              <p className="text-[14px] text-foreground/70 leading-relaxed mb-2.5">{rewrite.afterSubheadline || "\u2014"}</p>
+              <span className="inline-block px-4 py-2 rounded-md text-[14px] font-bold" style={{ background: "var(--brand)", color: "var(--brand-fg)" }}>{rewrite.afterCTA || "\u2014"}</span>
             </>
           )}
         </div>
@@ -2066,29 +2066,29 @@ function SectionRewriteBlock({ rewrite }: { rewrite: SectionRewrite }) {
     return (
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-[12px] uppercase tracking-[2px] text-foreground/50">AI Rewrite</span>
-          <span className="text-[12px] px-1.5 py-0.5 rounded tracking-wide" style={{ color: "var(--brand)", background: "var(--brand-dim)" }}>COPY-READY</span>
+          <span className="text-[14px] uppercase tracking-[2px] text-foreground/50">AI Rewrite</span>
+          <span className="text-[14px] px-1.5 py-0.5 rounded tracking-wide" style={{ color: "var(--brand)", background: "var(--brand-dim)" }}>COPY-READY</span>
         </div>
         <div className="flex flex-col gap-3">
           {rewrite.items.map((item, i) => (
             <div key={i} className="rounded-lg border overflow-hidden" style={{ background: "var(--s1)" }}>
               <div className="px-3.5 py-2" style={{ background: "var(--s2)" }}>
-                <span className="text-[12px] font-semibold text-foreground/65">{item.label}</span>
+                <span className="text-[14px] font-semibold text-foreground/65">{item.label}</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2">
                 <div className="p-3.5">
-                  <p className="text-[10px] uppercase tracking-[1.5px] text-foreground/45 mb-1.5">Before</p>
-                  <p className="text-[12px] text-foreground/55 leading-relaxed line-through">{item.before}</p>
+                  <p className="text-[14px] uppercase tracking-[1.5px] text-foreground/45 mb-1.5">Before</p>
+                  <p className="text-[14px] text-foreground/55 leading-relaxed line-through">{item.before}</p>
                 </div>
                 <div className="p-3.5">
-                  <p className="text-[10px] uppercase tracking-[1.5px] text-foreground/45 mb-1.5">After</p>
-                  <p className="text-[12px] text-foreground/70 leading-relaxed">{item.after}</p>
+                  <p className="text-[14px] uppercase tracking-[1.5px] text-foreground/45 mb-1.5">After</p>
+                  <p className="text-[14px] text-foreground/70 leading-relaxed">{item.after}</p>
                 </div>
               </div>
             </div>
           ))}
         </div>
-        {rewrite.rationale && <p className="text-[12px] text-foreground/50 leading-relaxed mt-3 px-1">{rewrite.rationale}</p>}
+        {rewrite.rationale && <p className="text-[14px] text-foreground/50 leading-relaxed mt-3 px-1">{rewrite.rationale}</p>}
       </div>
     );
   }
@@ -2096,16 +2096,16 @@ function SectionRewriteBlock({ rewrite }: { rewrite: SectionRewrite }) {
   return (
     <div>
       <div className="flex items-center gap-2 mb-3">
-        <span className="text-[12px] uppercase tracking-[2px] text-foreground/50">AI Structure Rewrite</span>
-        <span className="text-[12px] px-1.5 py-0.5 rounded tracking-wide" style={{ color: "var(--brand)", background: "var(--brand-dim)" }}>SUGGESTED</span>
+        <span className="text-[14px] uppercase tracking-[2px] text-foreground/50">AI Structure Rewrite</span>
+        <span className="text-[14px] px-1.5 py-0.5 rounded tracking-wide" style={{ color: "var(--brand)", background: "var(--brand-dim)" }}>SUGGESTED</span>
       </div>
       {rewrite.suggestedOrder.length > 0 && (
         <div className="mb-3">
-          <p className="text-[12px] font-semibold text-foreground/55 mb-2">Suggested order</p>
+          <p className="text-[14px] font-semibold text-foreground/55 mb-2">Suggested order</p>
           <div className="flex flex-col gap-1.5">
             {rewrite.suggestedOrder.map((item, i) => (
-              <div key={i} className="flex items-center gap-2.5 text-[12px] text-foreground/65 px-3 py-2 rounded-[7px]" style={{ background: "var(--s1)" }}>
-                <span className="font-mono text-[12px] font-bold min-w-[18px]" style={{ color: "var(--brand)" }}>{i + 1}</span>
+              <div key={i} className="flex items-center gap-2.5 text-[14px] text-foreground/65 px-3 py-2 rounded-[7px]" style={{ background: "var(--s1)" }}>
+                <span className="font-mono text-[14px] font-bold min-w-[18px]" style={{ color: "var(--brand)" }}>{i + 1}</span>
                 <span>{item}</span>
               </div>
             ))}
@@ -2114,11 +2114,11 @@ function SectionRewriteBlock({ rewrite }: { rewrite: SectionRewrite }) {
       )}
       {rewrite.additions.length > 0 && (
         <div className="mb-3">
-          <p className="text-[12px] font-semibold mb-2" style={{ color: "var(--score-high)" }}>Add</p>
+          <p className="text-[14px] font-semibold mb-2" style={{ color: "var(--score-high)" }}>Add</p>
           <div className="flex flex-col gap-1.5">
             {rewrite.additions.map((item, i) => (
-              <div key={i} className="flex items-center gap-2.5 text-[12px] text-foreground/65 px-3 py-2 rounded-[7px] border-l-2" style={{ background: "oklch(0.52 0.14 155 / 5%)", borderColor: "var(--score-high)" }}>
-                <span className="text-[12px] shrink-0" style={{ color: "var(--score-high)" }}>+</span>
+              <div key={i} className="flex items-center gap-2.5 text-[14px] text-foreground/65 px-3 py-2 rounded-[7px] border-l-2" style={{ background: "oklch(0.52 0.14 155 / 5%)", borderColor: "var(--score-high)" }}>
+                <span className="text-[14px] shrink-0" style={{ color: "var(--score-high)" }}>+</span>
                 <span>{item}</span>
               </div>
             ))}
@@ -2127,18 +2127,18 @@ function SectionRewriteBlock({ rewrite }: { rewrite: SectionRewrite }) {
       )}
       {rewrite.removals.length > 0 && (
         <div className="mb-3">
-          <p className="text-[12px] font-semibold mb-2" style={{ color: "var(--score-low)" }}>Remove / Reword</p>
+          <p className="text-[14px] font-semibold mb-2" style={{ color: "var(--score-low)" }}>Remove / Reword</p>
           <div className="flex flex-col gap-1.5">
             {rewrite.removals.map((item, i) => (
-              <div key={i} className="flex items-center gap-2.5 text-[12px] text-foreground/65 px-3 py-2 rounded-[7px] border-l-2" style={{ background: "oklch(0.55 0.17 20 / 5%)", borderColor: "var(--score-low)" }}>
-                <span className="text-[12px] shrink-0" style={{ color: "var(--score-low)" }}>-</span>
+              <div key={i} className="flex items-center gap-2.5 text-[14px] text-foreground/65 px-3 py-2 rounded-[7px] border-l-2" style={{ background: "oklch(0.55 0.17 20 / 5%)", borderColor: "var(--score-low)" }}>
+                <span className="text-[14px] shrink-0" style={{ color: "var(--score-low)" }}>-</span>
                 <span>{item}</span>
               </div>
             ))}
           </div>
         </div>
       )}
-      {rewrite.rationale && <p className="text-[12px] text-foreground/50 leading-relaxed mt-2 px-1">{rewrite.rationale}</p>}
+      {rewrite.rationale && <p className="text-[14px] text-foreground/50 leading-relaxed mt-2 px-1">{rewrite.rationale}</p>}
     </div>
   );
 }
@@ -2146,7 +2146,7 @@ function SectionRewriteBlock({ rewrite }: { rewrite: SectionRewrite }) {
 /* ── Report Divider ── */
 function ReportDivider({ label }: { label: string }) {
   return (
-    <div className="flex items-center gap-4 my-6 text-foreground/35 text-[12px] uppercase tracking-[2px]">
+    <div className="flex items-center gap-4 my-6 text-foreground/35 text-[14px] uppercase tracking-[2px]">
       <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
       {label}
       <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
@@ -2189,14 +2189,14 @@ function HumanAuditCTA({ url, onRequested }: { url: string; onRequested: (url: s
             </div>
             <h3 className="text-[14px] font-semibold tracking-tight">Want a deeper review?</h3>
           </div>
-          <p className="text-[12px] text-foreground/55 leading-relaxed max-w-xs">Get a detailed report from a senior UX professional, delivered within 2-3 business days.</p>
-          <p className="mt-2 text-[20px] font-bold tracking-tight">$300 <span className="text-[12px] font-normal text-foreground/50">one-time</span></p>
+          <p className="text-[14px] text-foreground/55 leading-relaxed max-w-xs">Get a detailed report from a senior UX professional, delivered within 2-3 business days.</p>
+          <p className="mt-2 text-[20px] font-bold tracking-tight">$300 <span className="text-[14px] font-normal text-foreground/50">one-time</span></p>
         </div>
         <form onSubmit={handleSubmit} className="w-full sm:w-64 shrink-0 space-y-2.5">
           <div className="focus-glow rounded-lg border transition-all duration-200" style={{ borderColor: "var(--border2)", background: "var(--background)" }}>
             <input type="email" placeholder="you@example.com" value={email} onChange={(e) => { setEmail(e.target.value); if (error) setError(""); }} className="h-10 w-full rounded-lg bg-transparent px-4 text-[14px] text-foreground placeholder:text-foreground/50 focus:outline-none" />
           </div>
-          {error && <p className="text-[12px] text-destructive animate-fade-in pl-1">{error}</p>}
+          {error && <p className="text-[14px] text-destructive animate-fade-in pl-1">{error}</p>}
           <button type="submit" disabled={!email.trim() || sending} className="inline-flex w-full h-10 items-center justify-center gap-2 rounded-lg px-5 text-[14px] font-bold transition-all duration-150 hover:opacity-90 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none" style={{ background: "var(--brand)", color: "var(--brand-fg)" }}>
             {sending ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Sending...</> : <>Request Human Audit <ArrowRight className="h-3.5 w-3.5" /></>}
           </button>
