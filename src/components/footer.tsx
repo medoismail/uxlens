@@ -20,18 +20,24 @@ export function Footer() {
 
   return (
     <footer
-      className="border-t py-8 relative z-[1]"
+      className="border-t py-10 relative z-[1]"
       style={{ borderColor: "var(--border)" }}
     >
-      <div className="max-w-[960px] mx-auto px-7 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="max-w-[960px] mx-auto px-7 flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Brand */}
-        <span className="text-[12px] text-foreground/40 font-mono">
-          UXLens &mdash; Diagnostic Engine v0.7
-        </span>
+        <div className="flex flex-col sm:flex-row items-center gap-2">
+          <span className="text-[13px] font-medium text-foreground/60">
+            UXLens
+          </span>
+          <span className="hidden sm:inline text-foreground/20">&middot;</span>
+          <span className="text-[11px] text-foreground/40 font-mono">
+            Diagnostic Engine v0.7
+          </span>
+        </div>
 
-        {/* Counter — always show once loaded */}
+        {/* Counter */}
         {count !== null && (
-          <div className="flex items-center gap-1.5 text-[12px] text-foreground/45 font-mono animate-fade-in">
+          <div className="flex items-center gap-1.5 text-[12px] text-foreground/50 font-mono animate-fade-in">
             <Users className="h-3 w-3" />
             <span>
               <AnimatedNumber value={count} /> users
@@ -40,14 +46,14 @@ export function Footer() {
         )}
 
         {/* Links */}
-        <nav aria-label="Footer navigation" className="flex items-center gap-4 text-[12px] text-foreground/45 font-mono">
-          <Link href="/" className="hover:text-foreground/40 transition-colors">
+        <nav aria-label="Footer navigation" className="flex items-center gap-5 text-[12px] text-foreground/50">
+          <Link href="/" className="hover:text-foreground/70 transition-colors">
             Home
           </Link>
-          <Link href="/pricing" className="hover:text-foreground/40 transition-colors">
+          <Link href="/pricing" className="hover:text-foreground/70 transition-colors">
             Pricing
           </Link>
-          <Link href="/dashboard" className="hover:text-foreground/40 transition-colors">
+          <Link href="/dashboard" className="hover:text-foreground/70 transition-colors">
             Dashboard
           </Link>
         </nav>

@@ -1123,12 +1123,15 @@ export function FeatureSection({
   tier,
 }: FeatureSectionProps) {
   return (
-    <section className="max-w-[960px] mx-auto px-7 py-12 sm:py-16">
-      <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center`}>
+    <section className="max-w-[960px] mx-auto px-7 py-14 sm:py-20">
+      <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-center`}>
         {/* Copy side */}
         <ScrollReveal className={`space-y-4 ${reversed ? "lg:order-2" : ""}`}>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-foreground/45">{label}</span>
+            <span
+              className="text-[10px] font-medium tracking-widest uppercase px-2 py-0.5 rounded-full border"
+              style={{ color: "var(--brand)", borderColor: "var(--brand-glow)", background: "var(--brand-dim)" }}
+            >{label}</span>
             {tier && (
               <span
                 className="text-[10px] font-mono px-1.5 py-0.5 rounded font-bold"
@@ -1138,10 +1141,10 @@ export function FeatureSection({
               </span>
             )}
           </div>
-          <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground leading-tight">
+          <h2 className="text-[clamp(24px,3.5vw,36px)] font-bold tracking-[-1px] text-foreground leading-tight">
             {headline}
           </h2>
-          <p className="text-[14px] text-foreground/45 leading-relaxed max-w-md">{description}</p>
+          <p className="text-[15px] text-foreground/55 leading-relaxed max-w-md">{description}</p>
           <motion.ul
             className="space-y-2 pt-1"
             initial="hidden"
@@ -1158,7 +1161,7 @@ export function FeatureSection({
             {bullets.map((b) => (
               <motion.li
                 key={b}
-                className="flex items-center gap-2 text-[12px] text-foreground/40"
+                className="flex items-center gap-2 text-[13px] text-foreground/55"
                 variants={{
                   hidden: { opacity: 0, x: -8 },
                   visible: {

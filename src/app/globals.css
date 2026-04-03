@@ -182,95 +182,95 @@
    ═══════════════════════════════════════════════════════════ */
 
 .dark, [data-theme="dark"] {
-  /* ── Backgrounds — Linear-style barely-visible shifts ── */
-  --background: #0F0E11;       /* neutral-base: deepest */
-  --foreground: #EFEDF2;       /* neutral-primary */
+  /* ── Backgrounds — richer depth with subtle warmth ── */
+  --background: #09090b;       /* deeper, true dark */
+  --foreground: #f4f4f5;       /* brighter foreground for contrast */
 
-  --card: #141316;             /* just barely lighter than bg */
-  --card-foreground: #EFEDF2;
-  --popover: #19181C;          /* subtle elevation */
-  --popover-foreground: #EFEDF2;
+  --card: #111113;             /* lifted from bg */
+  --card-foreground: #f4f4f5;
+  --popover: #161618;          /* subtle elevation */
+  --popover-foreground: #f4f4f5;
 
   /* ── Brand purple — same accent, higher contrast for dark ── */
-  --primary: oklch(0.55 0.262 276.1);  /* accent-dm: L+6, C-8 */
+  --primary: oklch(0.60 0.262 276.1);  /* accent-dm: brighter for visibility */
   --primary-foreground: #ffffff;
 
-  --secondary: #1E1D21;        /* neutral-elevated */
-  --secondary-foreground: #B7B5BA;  /* neutral-tertiary */
+  --secondary: #1c1c1f;        /* neutral-elevated */
+  --secondary-foreground: #c4c4c8;  /* neutral-tertiary — brighter */
 
-  --muted: #252327;            /* neutral-card */
-  --muted-foreground: #716F73; /* neutral-placeholder */
+  --muted: #222225;            /* neutral-card */
+  --muted-foreground: #8a8a8e; /* neutral-placeholder — raised from 716F73 */
 
-  --accent: #1E1D21;
-  --accent-foreground: #B7B5BA;
+  --accent: #1c1c1f;
+  --accent-foreground: #c4c4c8;
 
   /* ── Error ── */
-  --destructive: #D23C49;
+  --destructive: #ef4444;
 
-  /* ── Borders & Inputs — barely visible, Linear-style ── */
-  --border: #222125;           /* very subtle separator */
-  --input: #2D2B2F;
-  --ring: oklch(0.504 0.282 276.1 / 35%);
+  /* ── Borders & Inputs — slightly more visible ── */
+  --border: #27272a;           /* raised from #222125 */
+  --input: #303033;
+  --ring: oklch(0.55 0.262 276.1 / 40%);
 
   /* ── Charts ── */
-  --chart-1: oklch(0.55 0.262 276.1);
-  --chart-2: oklch(0.55 0.16 155);
-  --chart-3: oklch(0.58 0.16 75);
-  --chart-4: oklch(0.60 0.14 245);
-  --chart-5: oklch(0.55 0.17 20);
+  --chart-1: oklch(0.60 0.262 276.1);
+  --chart-2: oklch(0.60 0.16 155);
+  --chart-3: oklch(0.62 0.16 75);
+  --chart-4: oklch(0.62 0.14 245);
+  --chart-5: oklch(0.58 0.17 20);
 
-  /* ── Sidebar — same as bg (Linear-style) ── */
-  --sidebar: #0F0E11;
-  --sidebar-foreground: #EFEDF2;
-  --sidebar-primary: oklch(0.55 0.262 276.1);
+  /* ── Sidebar ── */
+  --sidebar: #09090b;
+  --sidebar-foreground: #f4f4f5;
+  --sidebar-primary: oklch(0.60 0.262 276.1);
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1E1D21;
-  --sidebar-accent-foreground: #B7B5BA;
-  --sidebar-border: #2D2B2F;
-  --sidebar-ring: oklch(0.504 0.282 276.1 / 35%);
+  --sidebar-accent: #1c1c1f;
+  --sidebar-accent-foreground: #c4c4c8;
+  --sidebar-border: #303033;
+  --sidebar-ring: oklch(0.55 0.262 276.1 / 35%);
 
-  /* ── Surface levels — barely-there shifts (Linear-style) ── */
-  --s1: #141316;               /* bg + 2% white */
-  --s2: #19181C;               /* bg + 4% */
-  --s3: #1E1D21;               /* bg + 6% */
-  --border2: #2D2B2F;
+  /* ── Surface levels — more perceptible lifts ── */
+  --s1: #111113;               /* bg + 3% */
+  --s2: #161618;               /* bg + 5% */
+  --s3: #1c1c1f;               /* bg + 8% */
+  --border2: #303033;
 
   /* ── Brand palette (dark mode adjustments) ── */
-  --brand: oklch(0.55 0.262 276.1);   /* accent-dm — brighter for contrast */
-  --brand-dim: oklch(0.504 0.282 276.1 / 10%);
-  --brand-glow: oklch(0.504 0.282 276.1 / 16%);
+  --brand: oklch(0.60 0.262 276.1);   /* brighter for dark surfaces */
+  --brand-dim: oklch(0.55 0.262 276.1 / 12%);
+  --brand-glow: oklch(0.55 0.262 276.1 / 20%);
   --brand-fg: #ffffff;
-  --brand-strong: oklch(0.60 0.238 276.1);
+  --brand-strong: oklch(0.65 0.238 276.1);
 
-  /* ── Score / semantic colors (same hues, adjusted L for dark) ── */
-  --score-high: oklch(0.58 0.16 155);
-  --score-mid: oklch(0.62 0.18 75);
-  --score-low: oklch(0.58 0.19 20);
-  --accent-purple: oklch(0.60 0.238 276.1);
-  --accent-blue: oklch(0.62 0.14 245);
+  /* ── Score / semantic colors (brighter for dark bg) ── */
+  --score-high: oklch(0.65 0.18 155);
+  --score-mid: oklch(0.68 0.20 75);
+  --score-low: oklch(0.62 0.20 20);
+  --accent-purple: oklch(0.65 0.238 276.1);
+  --accent-blue: oklch(0.65 0.14 245);
 
-  /* ── Neutral text tokens (dark mode) ── */
-  --neutral-secondary: #8D8B90;   /* LCH L:58 C:3 H:306 */
-  --neutral-placeholder: #716F73; /* LCH L:47 C:3 H:306 */
+  /* ── Neutral text tokens (dark mode — higher contrast) ── */
+  --neutral-secondary: #a1a1a6;   /* brighter */
+  --neutral-placeholder: #71717a; /* brighter */
 
   /* ── Semantic colors ── */
-  --error: #D23C49;
-  --error-subtle-bg: #331817;
-  --success: #1F853B;
-  --success-subtle-bg: #112413;
-  --warning: #A27B00;
-  --warning-subtle-bg: #281E07;
-  --info: #007DC7;
-  --info-subtle-bg: #062234;
+  --error: #ef4444;
+  --error-subtle-bg: #3b1113;
+  --success: #22c55e;
+  --success-subtle-bg: #0f2918;
+  --warning: #eab308;
+  --warning-subtle-bg: #2e2307;
+  --info: #3b82f6;
+  --info-subtle-bg: #0c2445;
 
   /* ── Interaction states ── */
-  --hover-overlay: rgba(255, 255, 255, 0.08);
+  --hover-overlay: rgba(255, 255, 255, 0.06);
   --pressed-overlay: rgba(0, 0, 0, 0.12);
-  --focus-ring: oklch(0.504 0.282 276.1 / 50%);
+  --focus-ring: oklch(0.55 0.262 276.1 / 50%);
   --disabled-opacity: 0.38;
-  --selected-bg: oklch(0.504 0.282 276.1 / 12%);
+  --selected-bg: oklch(0.55 0.262 276.1 / 14%);
 
-  /* ── Elevation shadows (softer in dark mode) ── */
+  /* ── Elevation shadows ── */
   color-scheme: dark;
 }
 
@@ -566,21 +566,18 @@
   }
 }
 
-/* Before revealed — hidden state */
+/* Before revealed — hidden state (subtle, not laggy) */
 .scroll-reveal {
   opacity: 0;
-  transform: translate3d(0, 32px, 0);
-  filter: blur(2px);
-  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-              filter 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate3d(0, 20px, 0);
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, transform;
 }
 
 .scroll-reveal.revealed {
   opacity: 1;
   transform: translate3d(0, 0, 0);
-  filter: blur(0);
 }
 
 /* Stagger delays for child elements */
@@ -709,4 +706,136 @@
   .perspective-tilt {
     transform: perspective(1200px) rotateX(2deg);
   }
+}
+
+/* ── Hero gradient mesh background ─────────────────────── */
+.hero-mesh {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+.hero-mesh::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  left: 50%;
+  width: 800px;
+  height: 800px;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse at center,
+    oklch(0.504 0.282 276.1 / 15%) 0%,
+    oklch(0.504 0.282 276.1 / 5%) 40%,
+    transparent 70%
+  );
+  animation: meshPulse 8s ease-in-out infinite;
+}
+.hero-mesh::after {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  left: 50%;
+  width: 600px;
+  height: 400px;
+  transform: translateX(-30%);
+  background: radial-gradient(
+    ellipse at center,
+    oklch(0.60 0.14 245 / 10%) 0%,
+    transparent 70%
+  );
+  animation: meshPulse2 12s ease-in-out infinite;
+}
+
+@keyframes meshPulse {
+  0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.1); }
+}
+@keyframes meshPulse2 {
+  0%, 100% { opacity: 0.4; transform: translateX(-30%) scale(1); }
+  50% { opacity: 0.7; transform: translateX(-30%) scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-mesh::before,
+  .hero-mesh::after { animation: none; }
+}
+
+/* ── Dot grid pattern ───────────────────────────────────── */
+.dot-grid {
+  background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.dark .dot-grid,
+[data-theme="dark"] .dot-grid {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+}
+
+/* ── Glass morphism ────────────────────────────────────── */
+.glass {
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(180%);
+}
+.dark .glass,
+[data-theme="dark"] .glass {
+  background: rgba(9, 9, 11, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+:root .glass {
+  background: rgba(255, 255, 255, 0.75) !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ── Animated gradient border ──────────────────────────── */
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes gradientRotate {
+  to { --gradient-angle: 360deg; }
+}
+.gradient-border {
+  position: relative;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--gradient-angle),
+    oklch(0.55 0.262 276.1 / 30%),
+    oklch(0.60 0.14 245 / 20%),
+    oklch(0.55 0.262 276.1 / 10%),
+    oklch(0.55 0.262 276.1 / 30%)
+  );
+  z-index: -1;
+  animation: gradientRotate 6s linear infinite;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: xor;
+  -webkit-mask-composite: xor;
+  padding: 1px;
+}
+
+/* ── Glow text utility ─────────────────────────────────── */
+.text-glow {
+  text-shadow: 0 0 60px oklch(0.504 0.282 276.1 / 25%);
+}
+.dark .text-glow,
+[data-theme="dark"] .text-glow {
+  text-shadow: 0 0 80px oklch(0.55 0.262 276.1 / 35%),
+               0 0 120px oklch(0.55 0.262 276.1 / 15%);
+}
+
+/* ── Section alternate bg ──────────────────────────────── */
+.section-alt {
+  background: var(--s1);
+}
+.dark .section-alt,
+[data-theme="dark"] .section-alt {
+  background: #0c0c0e;
 }

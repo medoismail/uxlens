@@ -174,7 +174,7 @@ export function Header() {
         y: { type: "spring", stiffness: 300, damping: 30 },
       }}
       className="w-full sticky top-0 z-50"
-      style={{ background: "var(--background)" }}
+      style={{ background: "transparent" }}
     >
       <nav aria-label="Main navigation" className="mx-auto flex h-14 max-w-[960px] items-center justify-between px-7">
         <div className="flex items-center gap-6">

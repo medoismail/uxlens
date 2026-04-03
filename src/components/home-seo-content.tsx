@@ -44,7 +44,7 @@ function SocialProofBar() {
   return (
     <ScrollReveal>
       <div
-        className="border-y py-5"
+        className="border-y border-dashed py-5"
         style={{ borderColor: "var(--border)" }}
       >
         <div className="max-w-[960px] mx-auto px-7 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[12px] text-foreground/50">
@@ -200,15 +200,18 @@ export function HomeSEOContent() {
       <SocialProofBar />
 
       {/* ── Product Preview (the big visual hero) ── */}
-      <section className="max-w-[960px] mx-auto px-7 pt-14 pb-20">
-        <ScrollReveal className="text-center mb-8">
-          <p className="text-[10px] text-foreground/45 mb-2">
-            Sample Audit Report
-          </p>
-          <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
+      <section className="max-w-[960px] mx-auto px-7 pt-16 pb-24">
+        <ScrollReveal className="text-center mb-10">
+          <span
+            className="inline-block text-[10px] font-medium tracking-widest uppercase px-2.5 py-1 rounded-full border mb-4"
+            style={{ color: "var(--brand)", borderColor: "var(--brand-glow)", background: "var(--brand-dim)" }}
+          >
+            Sample Report
+          </span>
+          <h2 className="text-[clamp(24px,3.5vw,36px)] font-bold tracking-[-1px] text-foreground">
             See exactly what you get
           </h2>
-          <p className="mt-2 text-[14px] text-foreground/40 max-w-md mx-auto leading-relaxed">
+          <p className="mt-3 text-[15px] text-foreground/55 max-w-md mx-auto leading-relaxed">
             Every audit delivers a comprehensive report with scores, heatmaps,
             conversion killers, and actionable fixes.
           </p>
@@ -220,65 +223,76 @@ export function HomeSEOContent() {
       </section>
 
       {/* ── How It Works ── */}
-      <Divider label="How it works" />
-
-      <section className="max-w-[960px] mx-auto px-7 py-14 sm:py-20">
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-3 gap-8"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={{
-            hidden: { opacity: 0 },
-            visible: {
-              opacity: 1,
-              transition: { staggerChildren: 0.12, delayChildren: 0.1 },
-            },
-          }}
-        >
-          {STEPS.map((step, i) => (
-            <motion.div
-              key={step.num}
-              className="space-y-3.5"
-              variants={{
-                hidden: { opacity: 0, y: 16, filter: "blur(4px)" },
-                visible: {
-                  opacity: 1,
-                  y: 0,
-                  filter: "blur(0px)",
-                  transition: {
-                    y: { type: "spring", stiffness: 200, damping: 24 },
-                    filter: { duration: 0.3 },
-                  },
-                },
-              }}
+      <section className="section-alt py-16 sm:py-24">
+        <div className="max-w-[960px] mx-auto px-7">
+          <ScrollReveal className="text-center mb-12">
+            <span
+              className="inline-block text-[10px] font-medium tracking-widest uppercase px-2.5 py-1 rounded-full border mb-4"
+              style={{ color: "var(--foreground)", borderColor: "var(--border)", background: "var(--s2)" }}
             >
-              <motion.span
-                className="inline-block text-[12px] font-mono font-bold px-2.5 py-1 rounded-md"
-                style={{
-                  background: "var(--brand-dim)",
-                  color: "var(--brand)",
+              How it works
+            </span>
+            <h2 className="text-[clamp(24px,3.5vw,36px)] font-bold tracking-[-1px] text-foreground">
+              Three steps. Under 30 seconds.
+            </h2>
+          </ScrollReveal>
+
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-3 gap-6"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: { staggerChildren: 0.12, delayChildren: 0.1 },
+              },
+            }}
+          >
+            {STEPS.map((step) => (
+              <motion.div
+                key={step.num}
+                className="relative rounded-xl border p-6 space-y-3"
+                style={{ borderColor: "var(--border)", background: "var(--background)" }}
+                variants={{
+                  hidden: { opacity: 0, y: 16 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    transition: {
+                      y: { type: "spring", stiffness: 200, damping: 24 },
+                    },
+                  },
                 }}
                 whileHover={{
-                  scale: 1.08,
-                  transition: { type: "spring", stiffness: 400, damping: 17 },
+                  y: -4,
+                  transition: { type: "spring", stiffness: 300, damping: 20 },
                 }}
               >
-                {step.num}
-              </motion.span>
-              <h3 className="text-[15px] font-semibold text-foreground tracking-tight">
-                {step.title}
-              </h3>
-              <p className="text-[12px] text-foreground/55 leading-relaxed">
-                {step.desc}
-              </p>
-            </motion.div>
-          ))}
-        </motion.div>
+                <span
+                  className="inline-flex items-center justify-center w-8 h-8 text-[12px] font-mono font-bold rounded-lg"
+                  style={{
+                    background: "var(--brand-dim)",
+                    color: "var(--brand)",
+                    border: "1px solid var(--brand-glow)",
+                  }}
+                >
+                  {step.num}
+                </span>
+                <h3 className="text-[15px] font-semibold text-foreground tracking-tight">
+                  {step.title}
+                </h3>
+                <p className="text-[13px] text-foreground/55 leading-relaxed">
+                  {step.desc}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
       </section>
 
       {/* ── Feature Sections (alternating layout) ── */}
-      <Divider label="Features" />
 
       {/* Feature 1: AI Vision Heatmap */}
       <FeatureSection
@@ -356,7 +370,6 @@ export function HomeSEOContent() {
       </FeatureSection>
 
       {/* ── Before / After Rewrite ── */}
-      <Divider label="AI Copy Optimization" />
 
       <section className="max-w-[960px] mx-auto px-7 py-12 sm:py-16">
         <ScrollReveal className="text-center mb-8">
@@ -375,14 +388,19 @@ export function HomeSEOContent() {
       </section>
 
       {/* ── Who Is It For ── */}
-      <Divider label="Built for" />
-
-      <section className="max-w-[960px] mx-auto px-7 py-12 sm:py-16">
-        <ScrollReveal className="text-center mb-10">
-          <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
+      <section className="section-alt py-16 sm:py-24">
+        <div className="max-w-[960px] mx-auto px-7">
+        <ScrollReveal className="text-center mb-12">
+          <span
+            className="inline-block text-[10px] font-medium tracking-widest uppercase px-2.5 py-1 rounded-full border mb-4"
+            style={{ color: "var(--foreground)", borderColor: "var(--border)", background: "var(--s2)" }}
+          >
+            Built for
+          </span>
+          <h2 className="text-[clamp(24px,3.5vw,36px)] font-bold tracking-[-1px] text-foreground">
             Built for teams that ship
           </h2>
-          <p className="mt-2 text-[14px] text-foreground/40 max-w-lg mx-auto leading-relaxed">
+          <p className="mt-3 text-[15px] text-foreground/50 max-w-lg mx-auto leading-relaxed">
             Whether you&apos;re a solo founder or an agency managing dozens of
             clients, UXLens gives you the insights to fix conversion issues
             fast.
@@ -423,36 +441,45 @@ export function HomeSEOContent() {
                 },
               }}
               whileHover={{
-                y: -3,
+                y: -4,
                 borderColor: "var(--brand-glow)",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-                transition: { type: "spring", stiffness: 400, damping: 25 },
+                transition: { type: "spring", stiffness: 300, damping: 20 },
               }}
             >
-              <uc.icon
-                className="h-4 w-4 mb-3.5"
-                style={{ color: "var(--brand)" }}
-              />
-              <h3 className="text-[14px] font-semibold text-foreground mb-2">
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center mb-4"
+                style={{ background: "var(--brand-dim)", border: "1px solid var(--brand-glow)" }}
+              >
+                <uc.icon
+                  className="h-4 w-4"
+                  style={{ color: "var(--brand)" }}
+                />
+              </div>
+              <h3 className="text-[15px] font-semibold text-foreground mb-2">
                 {uc.title}
               </h3>
-              <p className="text-[12px] text-foreground/55 leading-relaxed">
+              <p className="text-[13px] text-foreground/55 leading-relaxed">
                 {uc.desc}
               </p>
             </motion.div>
           ))}
         </motion.div>
+        </div>
       </section>
 
       {/* ── Pricing Preview ── */}
-      <Divider label="Pricing" />
-
-      <section className="max-w-[960px] mx-auto px-7 py-12 sm:py-16">
-        <ScrollReveal className="text-center mb-10">
-          <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
+      <section className="max-w-[960px] mx-auto px-7 py-16 sm:py-24">
+        <ScrollReveal className="text-center mb-12">
+          <span
+            className="inline-block text-[10px] font-medium tracking-widest uppercase px-2.5 py-1 rounded-full border mb-4"
+            style={{ color: "var(--foreground)", borderColor: "var(--border)", background: "var(--s2)" }}
+          >
+            Pricing
+          </span>
+          <h2 className="text-[clamp(24px,3.5vw,36px)] font-bold tracking-[-1px] text-foreground">
             Simple, transparent pricing
           </h2>
-          <p className="mt-2 text-[14px] text-foreground/40 max-w-md mx-auto leading-relaxed">
+          <p className="mt-3 text-[15px] text-foreground/50 max-w-md mx-auto leading-relaxed">
             Start free. Upgrade when you need more audits and advanced features.
           </p>
         </ScrollReveal>
@@ -492,14 +519,14 @@ export function HomeSEOContent() {
                   /mo
                 </span>
               </p>
-              <p className="text-[12px] text-foreground/55 mb-4">
+              <p className="text-[12px] text-foreground/50 mb-4">
                 {plan.audits}
               </p>
-              <ul className="space-y-2">
+              <ul className="space-y-2.5">
                 {plan.features.map((f) => (
                   <li
                     key={f}
-                    className="flex items-center gap-2 text-[12px] text-foreground/45"
+                    className="flex items-center gap-2 text-[12px] text-foreground/55"
                   >
                     <Check
                       className="h-3 w-3 shrink-0"
@@ -527,18 +554,17 @@ export function HomeSEOContent() {
       </section>
 
       {/* ── CTA Banner ── */}
-      <ScrollReveal className="max-w-[960px] mx-auto px-7 pb-20">
+      <ScrollReveal className="max-w-[960px] mx-auto px-7 pb-24">
         <div
-          className="rounded-xl border p-10 text-center"
+          className="rounded-2xl border p-12 text-center gradient-border relative overflow-hidden"
           style={{
             background: "var(--brand-dim)",
-            borderColor: "var(--brand-glow)",
           }}
         >
-          <h2 className="text-[20px] font-bold tracking-tight text-foreground mb-2">
+          <h2 className="text-[clamp(20px,3vw,28px)] font-bold tracking-[-0.5px] text-foreground mb-3">
             Stop guessing. Start auditing.
           </h2>
-          <p className="text-[14px] text-foreground/40 mb-5 max-w-md mx-auto leading-relaxed">
+          <p className="text-[15px] text-foreground/50 mb-6 max-w-md mx-auto leading-relaxed">
             Run your first AI-powered UX audit in 30 seconds. Free, no credit
             card, no signup required.
           </p>
@@ -569,20 +595,21 @@ export function HomeSEOContent() {
       </ScrollReveal>
 
       {/* ── FAQ ── */}
-      <section className="max-w-[960px] mx-auto px-7 pb-20">
-        <ScrollReveal className="text-center mb-10">
-          <h2 className="text-[clamp(22px,3vw,32px)] font-bold tracking-[-0.5px] text-foreground">
+      <section className="section-alt py-16 sm:py-24">
+        <div className="max-w-[960px] mx-auto px-7">
+        <ScrollReveal className="text-center mb-12">
+          <h2 className="text-[clamp(24px,3.5vw,36px)] font-bold tracking-[-1px] text-foreground">
             Frequently asked questions
           </h2>
         </ScrollReveal>
 
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div className="max-w-2xl mx-auto space-y-8">
           {FAQS.map((faq) => (
             <ScrollReveal key={faq.q}>
-              <h3 className="text-[14px] font-semibold text-foreground mb-2">
+              <h3 className="text-[15px] font-semibold text-foreground mb-2">
                 {faq.q}
               </h3>
-              <p className="text-[12px] text-foreground/40 leading-relaxed">
+              <p className="text-[13px] text-foreground/55 leading-relaxed">
                 {faq.a}
                 {faq.q.includes("free") && (
                   <>
@@ -602,10 +629,10 @@ export function HomeSEOContent() {
 
         {/* SEO context */}
         <div
-          className="max-w-2xl mx-auto mt-10 pt-8"
+          className="max-w-2xl mx-auto mt-12 pt-8"
           style={{ borderTop: "1px solid var(--border)" }}
         >
-          <p className="text-[12px] text-foreground/45 leading-relaxed text-center">
+          <p className="text-[13px] text-foreground/50 leading-relaxed text-center">
             UXLens applies{" "}
             <a
               href="https://www.nngroup.com/articles/ten-usability-heuristics/"
@@ -631,6 +658,7 @@ export function HomeSEOContent() {
             </Link>{" "}
             today.
           </p>
+        </div>
         </div>
       </section>
     </div>
