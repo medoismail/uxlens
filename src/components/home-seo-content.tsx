@@ -200,7 +200,7 @@ export function HomeSEOContent() {
       <SocialProofBar />
 
       {/* ── Product Preview (the big visual hero) ── */}
-      <section className="max-w-[960px] mx-auto px-7 pt-16 pb-24">
+      <section className="max-w-[960px] mx-auto px-7 pt-16 pb-0">
         <ScrollReveal className="text-center mb-10">
           <span
             className="inline-block text-[10px] font-medium tracking-widest uppercase px-2.5 py-1 rounded-full border mb-4"

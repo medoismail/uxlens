@@ -1,6 +1,6 @@
 "use client";
 
-import { Sparkles, Check, Link2, Share2, Copy } from "lucide-react";
+import { Sparkles, Check, Link2, Share2, Copy, Crown } from "lucide-react";
 import { ScrollReveal } from "@/components/scroll-reveal";
 import {
   motion,
@@ -1063,41 +1063,147 @@ export function RewriteMock() {
    ════════════════════════════════════════════════════════════ */
 
 export function ProductPreviewMock() {
-  return (
-    <motion.div
-      className="relative"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.6, y: { type: "spring", stiffness: 150, damping: 20 } }}
-    >
-      <div
-        className="rounded-lg overflow-hidden mock-card"
-      >
-        {/* Top bar — minimal, no browser dots */}
-        <div
-          className="flex items-center gap-2 px-4 py-2 border-b"
-          style={{ borderColor: "var(--border)" }}
-        >
-          <span className="text-[10px] font-mono text-foreground/30">
-            uxlens.pro/audit/demo-landing-page
-          </span>
-        </div>
+  /* ─────────────────────────────────────────────────────────
+   * ANIMATION STORYBOARD
+   *
+   *  idle     mock is tilted back in perspective (rotateX 12deg)
+   *           with a dreamy blur (6px) and slightly faded
+   *  scroll   as it enters viewport, straightens to 0deg,
+   *           blur clears, opacity goes to 1
+   *  crop     container has max-height + overflow hidden so
+   *           the bottom fades into nothing
+   * ───────────────────────────────────────────────────────── */
 
-          {/* Dashboard Content */}
-          <div className="p-4 sm:p-5 space-y-3">
-            <div className="text-center mb-1">
-              <p className="text-[10px] text-foreground/45 mb-1">
-                Diagnostic Engine v0.7 — UX Dashboard
-              </p>
-              <p className="text-[14px] font-semibold text-foreground">demo-landing-page.com</p>
+  const MOCK_AUDITS = [
+    { domain: "acme-saas.com", score: 82, grade: "B+", date: "Mar 28, 2026", color: "var(--score-high)" },
+    { domain: "freshfoods.co", score: 67, grade: "C+", date: "Mar 25, 2026", color: "var(--score-mid)" },
+    { domain: "designstudio.io", score: 91, grade: "A", date: "Mar 22, 2026", color: "var(--score-high)" },
+    { domain: "startupkit.dev", score: 45, grade: "D", date: "Mar 20, 2026", color: "var(--score-low)" },
+    { domain: "cloudhost.app", score: 73, grade: "B-", date: "Mar 18, 2026", color: "var(--score-mid)" },
+    { domain: "portfolio.me", score: 88, grade: "A-", date: "Mar 15, 2026", color: "var(--score-high)" },
+  ];
+
+  return (
+    <div className="relative" style={{ maxHeight: 520, overflow: "hidden" }}>
+      <motion.div
+        className="relative origin-top"
+        initial={{ opacity: 0.4, rotateX: 12, scale: 0.95, filter: "blur(6px)" }}
+        whileInView={{ opacity: 1, rotateX: 0, scale: 1, filter: "blur(0px)" }}
+        viewport={{ once: true, amount: 0.15 }}
+        transition={{
+          duration: 1,
+          rotateX: { type: "spring", stiffness: 80, damping: 20 },
+          scale: { type: "spring", stiffness: 80, damping: 20 },
+          filter: { duration: 0.8 },
+          opacity: { duration: 0.6 },
+        }}
+        style={{ perspective: 1200, transformStyle: "preserve-3d" }}
+      >
+        <div className="rounded-xl overflow-hidden mock-card">
+          {/* Browser chrome */}
+          <div
+            className="flex items-center gap-2 px-4 py-2.5 border-b"
+            style={{ borderColor: "var(--border)" }}
+          >
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full" style={{ background: "var(--score-low)", opacity: 0.6 }} />
+              <span className="w-2.5 h-2.5 rounded-full" style={{ background: "var(--score-mid)", opacity: 0.6 }} />
+              <span className="w-2.5 h-2.5 rounded-full" style={{ background: "var(--score-high)", opacity: 0.6 }} />
+            </div>
+            <div
+              className="flex-1 text-center text-[10px] font-mono text-foreground/35 px-3 py-1 rounded-md mx-8"
+              style={{ background: "var(--s2)" }}
+            >
+              uxlens.pro/dashboard
+            </div>
+          </div>
+
+          {/* Dashboard content */}
+          <div className="p-5 sm:p-7">
+            {/* Dashboard header */}
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-[16px] font-bold text-foreground">Your Audits</h3>
+                <p className="text-[11px] text-foreground/40 mt-0.5">47 audits total</p>
+              </div>
+              <span
+                className="text-[11px] font-medium px-3.5 py-1.5 rounded-lg"
+                style={{ background: "var(--brand)", color: "var(--brand-fg)" }}
+              >
+                New Audit
+              </span>
             </div>
 
-            <ExecutiveSummaryMock />
-            <BarChartMock />
+            {/* Plan card */}
+            <div
+              className="rounded-xl p-4 mb-6"
+              style={{ background: "var(--brand-dim)" }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-8 h-8 rounded-lg grid place-items-center"
+                    style={{ background: "var(--brand-glow)" }}
+                  >
+                    <Crown className="w-3.5 h-3.5" style={{ color: "var(--brand)" }} />
+                  </div>
+                  <div>
+                    <span className="text-[12px] font-bold" style={{ color: "var(--brand)" }}>Pro Plan</span>
+                    <p className="text-[10px] text-foreground/40">47 of 200 audits this month</p>
+                  </div>
+                </div>
+                <div className="w-24 hidden sm:block">
+                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "var(--brand-glow)" }}>
+                    <div className="h-full rounded-full" style={{ width: "24%", background: "var(--brand)" }} />
+                  </div>
+                  <p className="text-[9px] text-foreground/40 mt-1 text-right">24% used</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Audit grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {MOCK_AUDITS.map((audit) => (
+                <div
+                  key={audit.domain}
+                  className="rounded-xl border p-4"
+                  style={{ background: "var(--background)", borderColor: "var(--border)" }}
+                >
+                  {/* Thumbnail placeholder */}
+                  <div
+                    className="rounded-lg mb-3 h-20 overflow-hidden"
+                    style={{ background: "var(--s2)" }}
+                  >
+                    <div className="w-full h-full" style={{
+                      background: `linear-gradient(135deg, var(--s2) 0%, var(--s3) 100%)`,
+                      opacity: 0.8,
+                    }} />
+                  </div>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-[12px] font-medium text-foreground truncate">{audit.domain}</p>
+                      <p className="text-[10px] text-foreground/35 mt-0.5">{audit.date}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <span className="text-[14px] font-bold tabular-nums" style={{ color: audit.color }}>{audit.score}</span>
+                      <p className="text-[9px] font-mono text-foreground/35">{audit.grade}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-      </div>
-    </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Bottom fade-out gradient */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none z-10"
+        style={{
+          background: "linear-gradient(to top, var(--background), transparent)",
+        }}
+      />
+    </div>
   );
 }
 
