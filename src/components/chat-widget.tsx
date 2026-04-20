@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, Loader2, Sparkles, ArrowRight } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, Sparkles, ArrowRight, ArrowUp } from "lucide-react";
 import Link from "next/link";
 import type { ChatMessage } from "@/lib/types";
 import { ChatMarkdown } from "@/components/chat-markdown";
@@ -9,10 +9,12 @@ import { ChatMarkdown } from "@/components/chat-markdown";
 interface ChatWidgetProps {
   auditId: string;
   plan: string;
+  /** Render inline (fills parent) instead of floating */
+  inline?: boolean;
 }
 
-export function ChatWidget({ auditId, plan }: ChatWidgetProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function ChatWidget({ auditId, plan, inline }: ChatWidgetProps) {
+  const [isOpen, setIsOpen] = useState(!!inline);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -29,12 +31,12 @@ export function ChatWidget({ auditId, plan }: ChatWidgetProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-  // Load chat history when opened
+  // Load chat history when opened (inline = load immediately)
   useEffect(() => {
-    if (isOpen && !historyLoaded) {
+    if ((isOpen || inline) && !historyLoaded) {
       loadHistory();
     }
-  }, [isOpen, historyLoaded]);
+  }, [isOpen, inline, historyLoaded]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -178,6 +180,198 @@ export function ChatWidget({ auditId, plan }: ChatWidgetProps) {
     return null;
   }
 
+  /* ------------------------------------------------------------------ */
+  /*  INLINE MODE — ChatGPT-style centered layout                       */
+  /* ------------------------------------------------------------------ */
+  if (inline) {
+    const suggestions = [
+      "What should I fix first?",
+      "Explain my trust score",
+      "Summarize top issues",
+      "Rewrite my headline",
+    ];
+
+    return (
+      <div
+        className="flex flex-col w-full h-full overflow-hidden"
+        style={{ background: "var(--background)" }}
+      >
+        {/* Messages area */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="mx-auto w-full max-w-[640px] px-5 py-6">
+            {/* Empty state */}
+            {messages.length === 0 && !isLoading && (
+              <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
+                <p
+                  className="text-[16px] font-medium mb-6"
+                  style={{ color: "var(--foreground)", opacity: 0.4 }}
+                >
+                  Ask anything about your audit
+                </p>
+                <div className="flex flex-wrap gap-2 justify-center max-w-[480px]">
+                  {suggestions.map((q) => (
+                    <button
+                      key={q}
+                      onClick={() => {
+                        setInput(q);
+                        inputRef.current?.focus();
+                      }}
+                      className="text-[13px] px-4 py-2 rounded-xl border transition-all duration-150 hover:border-foreground/20"
+                      style={{
+                        borderColor: "var(--border)",
+                        color: "var(--foreground)",
+                        opacity: 0.5,
+                        background: "transparent",
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLButtonElement).style.opacity = "0.8";
+                        (e.currentTarget as HTMLButtonElement).style.background = "var(--s1)";
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLButtonElement).style.opacity = "0.5";
+                        (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+                      }}
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Message list */}
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex mb-5 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+              >
+                {msg.role === "user" ? (
+                  /* User bubble — right-aligned, s2 background */
+                  <div
+                    className="max-w-[80%] rounded-xl px-4 py-3 text-[14px] leading-relaxed"
+                    style={{
+                      background: "var(--s2)",
+                      color: "var(--foreground)",
+                    }}
+                  >
+                    {msg.content}
+                  </div>
+                ) : (
+                  /* AI message — left-aligned, no background */
+                  <div
+                    className="max-w-[90%] text-[14px] leading-relaxed"
+                    style={{ color: "var(--foreground)", opacity: 0.7 }}
+                  >
+                    {!msg.content ? (
+                      /* Streaming indicator — pulsing dot */
+                      <span className="inline-flex items-center gap-2">
+                        <span
+                          className="inline-block h-2 w-2 rounded-full animate-pulse"
+                          style={{ background: "var(--foreground)", opacity: 0.4 }}
+                        />
+                      </span>
+                    ) : (
+                      <ChatMarkdown content={msg.content} />
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+
+            <div ref={messagesEndRef} />
+          </div>
+        </div>
+
+        {/* Error bar */}
+        {error && (
+          <div className="mx-auto w-full max-w-[640px] px-5">
+            <div
+              className="rounded-xl px-4 py-2.5 mb-2 text-[12px] text-center"
+              style={{
+                color: "var(--score-low)",
+                background: "oklch(0.55 0.17 20 / 5%)",
+                border: "1px solid oklch(0.55 0.17 20 / 10%)",
+              }}
+            >
+              {error}
+              {error.includes("Pro") && (
+                <Link href="/pricing" className="ml-1 underline font-medium" style={{ color: "var(--brand)" }}>
+                  Upgrade <ArrowRight className="inline h-3 w-3" />
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Credits exhausted */}
+        {remaining !== null && remaining <= 0 && (
+          <div className="mx-auto w-full max-w-[640px] px-5 pb-4 text-center">
+            <p className="text-[12px] text-foreground/40 mb-1">Monthly chat limit reached</p>
+            {plan !== "agency" && (
+              <Link href="/pricing" className="text-[12px] font-medium underline" style={{ color: "var(--brand)" }}>
+                Upgrade for more messages
+              </Link>
+            )}
+          </div>
+        )}
+
+        {/* Input bar — bottom, full width within container */}
+        {(remaining === null || remaining > 0) && (
+          <div className="shrink-0 pb-4 pt-2 px-5">
+            <div className="mx-auto w-full max-w-[640px]">
+              <div
+                className="relative flex items-end rounded-xl border transition-colors focus-within:border-foreground/15"
+                style={{
+                  borderColor: "var(--border)",
+                  background: "var(--s1)",
+                }}
+              >
+                <textarea
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Ask about your audit..."
+                  rows={1}
+                  className="flex-1 resize-none bg-transparent px-4 py-3 pr-12 text-[14px] text-foreground placeholder:text-foreground/30 focus:outline-none"
+                  style={{
+                    maxHeight: "120px",
+                    minHeight: "48px",
+                  }}
+                />
+                <button
+                  onClick={handleSend}
+                  disabled={!input.trim() || isStreaming || isLoading}
+                  className="absolute right-2 bottom-2 flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-150 hover:opacity-80 active:scale-95 disabled:opacity-20 disabled:pointer-events-none"
+                  style={{ background: "var(--foreground)", color: "var(--background)" }}
+                >
+                  {isStreaming ? (
+                    <span
+                      className="inline-block h-2 w-2 rounded-full animate-pulse"
+                      style={{ background: "var(--background)" }}
+                    />
+                  ) : (
+                    <ArrowUp className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+
+              {/* Credits counter */}
+              {remaining !== null && remaining > 0 && (
+                <p className="text-[11px] text-center mt-2" style={{ color: "var(--foreground)", opacity: 0.25 }}>
+                  {remaining} messages remaining
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  /* ------------------------------------------------------------------ */
+  /*  FLOATING MODE — original design, unchanged                        */
+  /* ------------------------------------------------------------------ */
   return (
     <>
       {/* Floating toggle button */}

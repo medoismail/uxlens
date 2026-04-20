@@ -250,6 +250,8 @@ export const uxAuditSchema = z.object({
 export const analyzeRequestSchema = z.object({
   url: urlSchema,
   email: z.string().email().optional(),
+  /** Source of the request — "web" (default) or "extension" */
+  source: z.enum(["web", "extension"]).optional(),
 });
 
 /* ── AI Vision Schemas ────────────────────────────────── */

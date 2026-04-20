@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+**/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -42,3 +43,13 @@ next-env.d.ts
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# internal docs (not for public repo)
+AUDIT-IA.md
+DESIGN-CHANGES.md
+
+# extension build output
+packages/extension/dist/
+
+# component backups
+*.backup.tsx

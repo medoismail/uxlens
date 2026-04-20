@@ -8,7 +8,16 @@ const isProtectedRoute = createRouteMatcher([
   "/api/keys(.*)",
 ]);
 
+// Extension routes handle their own Bearer token auth — skip Clerk protection
+const isExtensionRoute = createRouteMatcher([
+  "/api/extension(.*)",
+  "/extension(.*)",
+]);
+
 export default clerkMiddleware(async (auth, req) => {
+  // Extension routes use Bearer token auth, not Clerk session
+  if (isExtensionRoute(req)) return;
+
   if (isProtectedRoute(req)) {
     await auth.protect();
   }

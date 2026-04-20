@@ -42,29 +42,19 @@ function SocialProofBar() {
   }, []);
 
   return (
-    <ScrollReveal>
-      <div
-        className="border-y border-dashed py-5"
-        style={{ borderColor: "var(--border)" }}
+    <div className="max-w-[960px] mx-auto px-7 -mt-8 mb-10 relative z-[2]">
+      <motion.p
+        className="text-center text-[11px] text-foreground/25 tracking-wide"
+        style={{ fontVariantNumeric: "tabular-nums" }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.4, duration: 0.6 }}
       >
-        <div className="max-w-[960px] mx-auto px-7 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[12px] text-foreground/50">
-          {count !== null && (
-            <span className="flex items-center gap-1.5 font-medium text-foreground/50">
-              <Users className="h-3.5 w-3.5" />
-              {count.toLocaleString()}+ audits completed
-            </span>
-          )}
-          <span className="flex items-center gap-1.5">
-            <Zap className="h-3 w-3" style={{ color: "var(--brand)" }} />
-            Results in under 30 seconds
-          </span>
-          <span className="flex items-center gap-1.5">
-            <Shield className="h-3 w-3" style={{ color: "var(--score-high)" }} />
-            Free to start — no credit card
-          </span>
-        </div>
-      </div>
-    </ScrollReveal>
+        {count !== null ? `${count.toLocaleString()} audits` : ""}
+        {count !== null && " · "}
+        10 layers · &lt;30s
+      </motion.p>
+    </div>
   );
 }
 
@@ -253,8 +243,7 @@ export function HomeSEOContent() {
             {STEPS.map((step) => (
               <motion.div
                 key={step.num}
-                className="relative rounded-xl border p-6 space-y-3"
-                style={{ borderColor: "var(--border)", background: "var(--background)" }}
+                className="relative rounded-2xl p-6 space-y-3 glass-card"
                 variants={{
                   hidden: { opacity: 0, y: 16 },
                   visible: {
@@ -423,11 +412,7 @@ export function HomeSEOContent() {
           {USE_CASES.map((uc, i) => (
             <motion.div
               key={uc.title}
-              className="rounded-xl border p-6"
-              style={{
-                borderColor: "var(--border)",
-                background: "var(--s1)",
-              }}
+              className="rounded-2xl p-6 glass-card"
               variants={{
                 hidden: { opacity: 0, y: 12, scale: 0.97 },
                 visible: {
@@ -489,14 +474,12 @@ export function HomeSEOContent() {
           {PLANS.map((plan) => (
             <div
               key={plan.name}
-              className="rounded-xl border p-6 relative"
+              className={`rounded-2xl p-6 relative ${plan.popular ? 'glass-card' : 'glass-card'}`}
               style={{
-                borderColor: plan.popular
-                  ? "var(--brand-glow)"
-                  : "var(--border)",
+                borderColor: plan.popular ? "var(--brand-glow)" : undefined,
                 background: plan.popular
-                  ? "linear-gradient(135deg, var(--brand-dim), var(--s1))"
-                  : "var(--s1)",
+                  ? "linear-gradient(135deg, var(--brand-dim), transparent)"
+                  : undefined,
               }}
             >
               {plan.popular && (

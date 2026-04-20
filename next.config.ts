@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: import.meta.dirname!,
+  },
   serverExternalPackages: ["@sparticuz/chromium-min"],
 
   images: {
@@ -15,6 +18,26 @@ const nextConfig: NextConfig = {
 
   async headers() {
     return [
+      // CORS headers for extension API routes
+      {
+        source: "/api/extension/:path*",
+        headers: [
+          { key: "Access-Control-Allow-Origin", value: "*" },
+          { key: "Access-Control-Allow-Methods", value: "GET, POST, OPTIONS" },
+          { key: "Access-Control-Allow-Headers", value: "Content-Type, Authorization" },
+          { key: "Access-Control-Max-Age", value: "86400" },
+        ],
+      },
+      // CORS for analyze endpoint (extension sends Bearer token)
+      {
+        source: "/api/analyze",
+        headers: [
+          { key: "Access-Control-Allow-Origin", value: "*" },
+          { key: "Access-Control-Allow-Methods", value: "POST, OPTIONS" },
+          { key: "Access-Control-Allow-Headers", value: "Content-Type, Authorization" },
+          { key: "Access-Control-Max-Age", value: "86400" },
+        ],
+      },
       {
         source: "/(.*)",
         headers: [

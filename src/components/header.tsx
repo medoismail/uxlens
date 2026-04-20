@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "motion/react";
 import { Show, UserButton, SignInButton } from "@clerk/nextjs";
 import { useSubscription } from "@/hooks/use-subscription";
@@ -26,9 +27,19 @@ function ThemeToggle() {
 
   const toggle = useCallback(() => {
     const next = theme === "light" ? "dark" : "light";
+    /* Kill all transitions during theme swap to prevent flash */
+    document.documentElement.style.setProperty("--theme-transition", "none");
+    document.documentElement.classList.add("theme-switching");
     setTheme(next);
     document.documentElement.classList.toggle("dark", next === "dark");
     localStorage.setItem("uxlens-theme", next);
+    /* Re-enable transitions after paint */
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.documentElement.classList.remove("theme-switching");
+        document.documentElement.style.removeProperty("--theme-transition");
+      });
+    });
   }, [theme]);
 
   return (
@@ -39,8 +50,8 @@ function ThemeToggle() {
         borderColor: "var(--border)",
         background: "var(--s1)",
       }}
-      whileHover={{ scale: 1.08, transition: { type: "spring", stiffness: 400, damping: 17 } }}
-      whileTap={{ scale: 0.92 }}
+      whileHover={{ opacity: 0.8 }}
+      whileTap={{ scale: 0.95 }}
       aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
       title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
     >
@@ -112,7 +123,7 @@ function PlanBadge() {
   const config = PLAN_LABELS[plan] || PLAN_LABELS.free;
 
   return (
-    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+    <motion.div whileHover={{ opacity: 0.8 }} whileTap={{ scale: 0.97 }}>
       <Link
         href={plan === "free" ? "/pricing" : "/dashboard"}
         className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md border transition-all hover:opacity-80"
@@ -157,6 +168,7 @@ function Logo({ height = 26 }: { height?: number }) {
 export function Header() {
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
+  const pathname = usePathname();
 
   useMotionValueEvent(scrollY, "change", (current) => {
     const previous = scrollY.getPrevious() ?? 0;
@@ -167,19 +179,29 @@ export function Header() {
     }
   });
 
+  const handleLogoClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (pathname === "/") {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    },
+    [pathname]
+  );
+
   return (
     <motion.header
       animate={{ y: hidden ? "-100%" : "0%" }}
       transition={{
         y: { type: "spring", stiffness: 300, damping: 30 },
       }}
-      className="w-full sticky top-0 z-50"
-      style={{ background: "transparent" }}
+      className="w-full sticky top-0 z-50 glass-nav"
     >
       <nav aria-label="Main navigation" className="mx-auto flex h-14 max-w-[960px] items-center justify-between px-7">
         <div className="flex items-center gap-6">
           <Link
             href="/"
+            onClick={handleLogoClick}
             className="flex items-center gap-2 transition-opacity hover:opacity-70"
             aria-label="UXLens — Home"
           >
@@ -223,7 +245,7 @@ export function Header() {
           <Show when="signed-out">
             <SignInButton mode="modal">
               <motion.button
-                whileHover={{ scale: 1.04 }}
+                whileHover={{ opacity: 0.85 }}
                 whileTap={{ scale: 0.97 }}
                 className="text-[12px] font-medium px-3.5 py-1.5 rounded-lg border transition-colors duration-150"
                 style={{ borderColor: "var(--brand-glow)", color: "var(--brand)", background: "var(--brand-dim)" }}

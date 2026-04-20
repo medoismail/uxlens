@@ -88,8 +88,7 @@ export function UrlForm({ onSubmit, onScreenshotSubmit, isLoading }: UrlFormProp
           borderColor: dragOver ? "var(--brand)" : "var(--border)",
         }}
         transition={{ duration: 0.2 }}
-        className="relative overflow-hidden rounded-xl border"
-        style={{ background: "var(--s1)" }}
+        className="relative overflow-hidden rounded-2xl glass-form"
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
@@ -102,7 +101,7 @@ export function UrlForm({ onSubmit, onScreenshotSubmit, isLoading }: UrlFormProp
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="absolute inset-0 z-10 grid place-items-center rounded-xl"
+              className="absolute inset-0 z-10 grid place-items-center rounded-2xl"
               style={{ background: "var(--brand-dim)" }}
             >
               <motion.div
@@ -124,7 +123,7 @@ export function UrlForm({ onSubmit, onScreenshotSubmit, isLoading }: UrlFormProp
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isLoading}
-            whileHover={{ scale: 1.1 }}
+            whileHover={{ opacity: 0.7 }}
             whileTap={{ scale: 0.92 }}
             className="shrink-0 w-8 h-8 rounded-lg grid place-items-center disabled:opacity-30"
             style={{ background: "var(--brand-dim)" }}
@@ -161,7 +160,7 @@ export function UrlForm({ onSubmit, onScreenshotSubmit, isLoading }: UrlFormProp
                 <motion.button
                   type="button"
                   onClick={clearFile}
-                  whileHover={{ scale: 1.15, backgroundColor: "var(--hover-overlay)" }}
+                  whileHover={{ opacity: 0.7 }}
                   whileTap={{ scale: 0.9 }}
                   className="shrink-0 w-6 h-6 rounded-md grid place-items-center text-foreground/30 hover:text-foreground/60 transition-colors"
                 >
@@ -194,12 +193,10 @@ export function UrlForm({ onSubmit, onScreenshotSubmit, isLoading }: UrlFormProp
             type="submit"
             disabled={isLoading || !canSubmit}
             whileHover={{
-              scale: 1.03,
-              y: -1,
               boxShadow: canSubmit ? "0 4px 20px var(--brand-glow)" : "none",
             }}
-            whileTap={{ scale: 0.97 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ duration: 0.15 }}
             className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-[14px] font-bold disabled:opacity-25 disabled:pointer-events-none shrink-0"
             style={{
               background: "var(--brand)",

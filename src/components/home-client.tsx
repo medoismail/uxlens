@@ -6,7 +6,7 @@ import { Hero } from "@/components/hero";
 import { LoadingState } from "@/components/loading-state";
 import { ErrorState } from "@/components/error-state";
 import { LimitReached } from "@/components/limit-reached";
-import { ResultsReport } from "@/components/results-report";
+import { ReportShell } from "@/components/report/report-shell";
 import { HumanAuditConfirmation } from "@/components/human-audit-confirmation";
 import { Footer } from "@/components/footer";
 import { HomeSEOContent } from "@/components/home-seo-content";
@@ -495,7 +495,7 @@ export function HomeClient() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+      {state.status !== "success" && <Header />}
       <main id="main-content" className="flex-1 mx-auto w-full max-w-[960px]">
         {state.status === "idle" && (
           <Hero onSubmit={handleAnalyze} onScreenshotSubmit={handleScreenshotAnalyze} isLoading={false} />
@@ -519,7 +519,7 @@ export function HomeClient() {
           />
         )}
         {state.status === "success" && (
-          <ResultsReport
+          <ReportShell
             data={state.data}
             url={state.url}
             onReset={handleReset}

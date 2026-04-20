@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import { ResultsReport } from "@/components/results-report";
+import { ReportShell } from "@/components/report/report-shell";
 import { PLAN_FEATURES } from "@/lib/types";
 import type { UXAuditResult, PlanTier, HeatmapZone, CompetitorAnalysis, VisualAnalysis } from "@/lib/types";
 
@@ -112,7 +112,7 @@ export function AuditViewClient({ audit, plan, shareToken: initialShareToken, is
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <main className="flex-1 w-full">
-        <ResultsReport
+        <ReportShell
           data={audit.result}
           url={audit.url}
           onReset={handleReset}

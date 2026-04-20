@@ -108,7 +108,7 @@
   --chart-4: oklch(0.60 0.14 245);
   --chart-5: oklch(0.55 0.17 20);
 
-  --radius: 0.625rem;  /* 10px base — professional, not bubbly */
+  --radius: 0.875rem;  /* 14px — rounder, softer, Apple-like */
 
   /* ── Sidebar — neutral ── */
   --sidebar: oklch(0.985 0.002 264);
@@ -306,6 +306,15 @@
   html {
     scroll-behavior: smooth;
   }
+}
+
+/* Kill ALL transitions during theme switch to prevent flash */
+html.theme-switching,
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition-duration: 0s !important;
+  animation-duration: 0s !important;
 }
 
 /* ── Monospace utility ─────────────────────────────────── */
@@ -507,43 +516,32 @@
   50% { opacity: 0; }
 }
 
-/* Soft elevation system — barely-there, border-first approach */
+/* Elevation — light: border only, dark: subtle shadow */
 .shadow-elevation-1 {
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.03),
-    0 1px 4px rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border);
 }
-
 .shadow-elevation-2 {
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.04),
-    0 2px 8px rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border);
 }
-
 .shadow-elevation-3 {
-  box-shadow:
-    0 2px 6px rgba(0, 0, 0, 0.05),
-    0 4px 16px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
-/* Dark mode: subtle depth, not heavy */
 .dark .shadow-elevation-1,
 [data-theme="dark"] .shadow-elevation-1 {
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.15),
-    0 1px 4px rgba(0, 0, 0, 0.1);
+  border-color: transparent;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04), 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 .dark .shadow-elevation-2,
 [data-theme="dark"] .shadow-elevation-2 {
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.2),
-    0 2px 8px rgba(0, 0, 0, 0.12);
+  border-color: transparent;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 .dark .shadow-elevation-3,
 [data-theme="dark"] .shadow-elevation-3 {
-  box-shadow:
-    0 2px 6px rgba(0, 0, 0, 0.25),
-    0 4px 16px rgba(0, 0, 0, 0.15);
+  border-color: transparent;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 /* Score color utilities */
@@ -693,12 +691,20 @@
 .mock-card {
   background: linear-gradient(180deg, var(--s2) 0%, var(--background) 40%);
   border: 1px solid var(--border);
-  /* Subtle inner glow at the top edge — simulates a light source from above */
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.3),
+    0 1px 2px rgba(0,0,0,0.03),
+    0 4px 12px rgba(0,0,0,0.02);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  backdrop-filter: blur(12px) saturate(1.2);
+  border-radius: var(--radius);
 }
 .dark .mock-card,
 [data-theme="dark"] .mock-card {
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 1px 3px rgba(0,0,0,0.2),
+    0 4px 12px rgba(0,0,0,0.1);
 }
 
 /* Landing page mock utilities */
@@ -721,40 +727,40 @@
   position: absolute;
   top: -40%;
   left: 50%;
-  width: 800px;
-  height: 800px;
+  width: 1000px;
+  height: 1000px;
   transform: translateX(-50%);
   background: radial-gradient(
     ellipse at center,
-    oklch(0.504 0.282 276.1 / 15%) 0%,
-    oklch(0.504 0.282 276.1 / 5%) 40%,
-    transparent 70%
+    oklch(0.504 0.282 276.1 / 8%) 0%,
+    oklch(0.504 0.282 276.1 / 3%) 40%,
+    transparent 65%
   );
-  animation: meshPulse 8s ease-in-out infinite;
+  animation: meshPulse 12s ease-in-out infinite;
 }
 .hero-mesh::after {
   content: '';
   position: absolute;
-  bottom: -20%;
+  bottom: -30%;
   left: 50%;
-  width: 600px;
-  height: 400px;
-  transform: translateX(-30%);
+  width: 900px;
+  height: 500px;
+  transform: translateX(-40%);
   background: radial-gradient(
     ellipse at center,
-    oklch(0.60 0.14 245 / 10%) 0%,
-    transparent 70%
+    oklch(0.60 0.14 245 / 5%) 0%,
+    transparent 65%
   );
-  animation: meshPulse2 12s ease-in-out infinite;
+  animation: meshPulse2 16s ease-in-out infinite;
 }
 
 @keyframes meshPulse {
-  0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
-  50% { opacity: 1; transform: translateX(-50%) scale(1.1); }
+  0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+  50% { opacity: 0.8; transform: translateX(-50%) scale(1.05); }
 }
 @keyframes meshPulse2 {
-  0%, 100% { opacity: 0.4; transform: translateX(-30%) scale(1); }
-  50% { opacity: 0.7; transform: translateX(-30%) scale(1.08); }
+  0%, 100% { opacity: 0.3; transform: translateX(-40%) scale(1); }
+  50% { opacity: 0.5; transform: translateX(-40%) scale(1.04); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -764,27 +770,35 @@
 
 /* ── Dot grid pattern ───────────────────────────────────── */
 .dot-grid {
-  background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+  background-image: radial-gradient(circle, oklch(0.2 0.01 264 / 0.25) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 .dark .dot-grid,
 [data-theme="dark"] .dot-grid {
-  background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
 }
 
-/* ── Glass morphism ────────────────────────────────────── */
+/* ── Glass morphism — Soft Glass treatment ──────────────── */
 .glass {
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  backdrop-filter: blur(24px) saturate(1.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    0 1px 2px rgba(0,0,0,0.04),
+    0 4px 12px rgba(0,0,0,0.03);
 }
 .dark .glass,
 [data-theme="dark"] .glass {
-  background: rgba(9, 9, 11, 0.8) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  background: rgba(9, 9, 11, 0.75) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 1px 3px rgba(0,0,0,0.3),
+    0 8px 24px rgba(0,0,0,0.15);
 }
 :root .glass {
-  background: rgba(255, 255, 255, 0.75) !important;
-  border-color: rgba(0, 0, 0, 0.06) !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+  border-color: rgba(0, 0, 0, 0.05) !important;
 }
 
 /* ── Animated gradient border ──────────────────────────── */
@@ -819,6 +833,63 @@
   mask-composite: xor;
   -webkit-mask-composite: xor;
   padding: 1px;
+}
+
+/* ── Glass nav bar ─────────────────────────────────────── */
+.glass-nav {
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  backdrop-filter: blur(24px) saturate(1.5);
+  background: rgba(255,255,255,0.6);
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+.dark .glass-nav,
+[data-theme="dark"] .glass-nav {
+  background: rgba(9, 9, 11, 0.65);
+  border-bottom-color: rgba(255,255,255,0.04);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* ── Glass form (hero input) ──────────────────────────── */
+.glass-form {
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  backdrop-filter: blur(20px) saturate(1.3);
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.5),
+    0 2px 8px rgba(0,0,0,0.04),
+    0 8px 24px rgba(0,0,0,0.03);
+}
+.dark .glass-form,
+[data-theme="dark"] .glass-form {
+  background: rgba(17, 17, 19, 0.6);
+  border-color: rgba(255,255,255,0.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 2px 8px rgba(0,0,0,0.2),
+    0 8px 24px rgba(0,0,0,0.12);
+}
+
+/* ── Glass card (content sections) ────────────────────── */
+.glass-card {
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  background: rgba(255,255,255,0.5);
+  border: 1px solid rgba(0,0,0,0.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.4),
+    0 1px 2px rgba(0,0,0,0.03),
+    0 4px 12px rgba(0,0,0,0.02);
+}
+.dark .glass-card,
+[data-theme="dark"] .glass-card {
+  background: rgba(17, 17, 19, 0.5);
+  border-color: rgba(255,255,255,0.05);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.03),
+    0 1px 3px rgba(0,0,0,0.25),
+    0 4px 12px rgba(0,0,0,0.1);
 }
 
 /* ── Glow text utility ─────────────────────────────────── */

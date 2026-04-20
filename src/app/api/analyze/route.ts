@@ -8,6 +8,7 @@ import { fetchPageHTML } from "@/lib/fetch-html";
 import { checkServerUsage, incrementServerUsage } from "@/lib/server-usage";
 import { getUserByClerkId, upsertUser } from "@/lib/db/users";
 import { saveAudit } from "@/lib/db/audits";
+import { resolveClerkUserId } from "@/lib/extension-auth";
 import type { AnalysisError, AnalyzeSSEEvent } from "@/lib/types";
 
 // Vercel Pro allows up to 300s; SSE keeps connection alive during streaming
@@ -38,9 +39,10 @@ export async function POST(request: Request) {
 
     const [authResult, html] = await Promise.all([
       (async () => {
+        // Support both cookie-based auth and Bearer token (extension)
         try {
-          const { userId } = await auth();
-          if (userId) clerkUserId = userId;
+          const resolved = await resolveClerkUserId(request);
+          if (resolved) clerkUserId = resolved;
         } catch {
           // Anonymous
         }

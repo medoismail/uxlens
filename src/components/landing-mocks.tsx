@@ -187,16 +187,25 @@ function AnimatedBar({
 
 /* ════════════════════════════════════════════════════════════
    Executive Summary Mock
-   — Animated 5-card metric row with spring counters
+   — Matches new report overview: score ring + verdict,
+     6 category mini-bars in 3-col grid, numbered top fixes
    ════════════════════════════════════════════════════════════ */
 
 const MOCK_SCORE = 82;
 const MOCK_GRADE = "B+";
 
+const MOCK_VERDICT = "Strong conversion architecture but trust signals need attention. Adding social proof above the fold would significantly improve credibility.";
+
+const MOCK_TOP_FIXES = [
+  { title: "Add social proof above the fold", lift: "+12%" },
+  { title: "Simplify navigation to reduce cognitive load", lift: "+8%" },
+  { title: "Add trust badges near the primary CTA", lift: "+6%" },
+];
+
 export function ExecutiveSummaryMock() {
   return (
     <motion.div
-      className="grid grid-cols-5 gap-2"
+      className="flex flex-col gap-5"
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.3 }}
@@ -204,61 +213,94 @@ export function ExecutiveSummaryMock() {
         hidden: { opacity: 0 },
         visible: {
           opacity: 1,
-          transition: { staggerChildren: 0.06, delayChildren: 0.1 },
+          transition: { staggerChildren: 0.08, delayChildren: 0.1 },
         },
       }}
     >
-      {/* UX Score — large gauge card */}
+      {/* Score ring + verdict — side by side */}
       <motion.div
-        className="col-span-2 sm:col-span-1 dash-card rounded-xl border p-3 flex flex-col items-center justify-center"
-        style={{ background: "var(--s1)" }}
+        className="flex items-start gap-4"
         variants={{
-          hidden: { opacity: 0, y: 12, scale: 0.95 },
+          hidden: { opacity: 0, y: 12 },
           visible: {
             opacity: 1,
             y: 0,
-            scale: 1,
-            transition: {
-              y: { type: "spring", stiffness: 300, damping: 24 },
-              scale: { type: "spring", stiffness: 300, damping: 20 },
-            },
+            transition: { type: "spring", stiffness: 300, damping: 24 },
           },
         }}
       >
-        <div className="mb-1.5">
-          <AnimatedScoreRing score={MOCK_SCORE} />
+        <div className="shrink-0">
+          <AnimatedScoreRing score={MOCK_SCORE} size={72} strokeWidth={6} />
         </div>
-        <span className="text-[10px] text-foreground/40 font-medium">UX Score</span>
-        <span className="text-[10px] text-foreground/45">{MOCK_GRADE}</span>
+        <div className="pt-1 min-w-0">
+          <p className="text-[13px] text-foreground/50 leading-relaxed line-clamp-3">
+            {MOCK_VERDICT}
+          </p>
+          <p className="text-[10px] text-foreground/20 mt-1.5">
+            7 issues · Weakest: <span className="text-foreground/30">Trust Signals</span> (70)
+          </p>
+        </div>
       </motion.div>
 
-      {/* Conv. Risk */}
-      <MiniMetricCard label="Conv. Risk" value={22} suffix="%" color={scoreColor(78)} />
-      {/* Readability */}
-      <MiniMetricCard label="Readability" value={72} suffix="%" color={scoreColor(72)} />
-      {/* Trust */}
-      <MiniMetricCard label="Trust" value={70} suffix="/100" color={scoreColor(70)} />
-      {/* Complexity */}
+      {/* 6 category mini-bars — 3-column grid with tiny 3px bars */}
       <motion.div
-        className="dash-card rounded-xl border p-2.5 flex flex-col items-center justify-center text-center"
-        style={{ background: "var(--s1)" }}
+        className="grid grid-cols-3 gap-x-4 gap-y-2"
         variants={{
-          hidden: { opacity: 0, y: 12, scale: 0.95 },
+          hidden: { opacity: 0, y: 8 },
           visible: {
             opacity: 1,
             y: 0,
-            scale: 1,
-            transition: {
-              y: { type: "spring", stiffness: 300, damping: 24 },
-              scale: { type: "spring", stiffness: 300, damping: 20 },
-            },
+            transition: { type: "spring", stiffness: 300, damping: 24 },
           },
         }}
       >
-        <span className="text-[14px] font-bold mb-0.5" style={{ color: "var(--score-mid)" }}>
-          Medium
-        </span>
-        <span className="text-[10px] text-foreground/40 font-medium">Complexity</span>
+        {MOCK_CATEGORIES.map((cat, i) => (
+          <div key={cat.label} className="flex items-center gap-1.5">
+            <span className="text-[9px] text-foreground/30 w-[52px] truncate shrink-0">{cat.label}</span>
+            <div className="flex-1 h-[3px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
+              <motion.div
+                className="h-full rounded-full"
+                style={{ background: scoreColor(cat.score) }}
+                initial={{ width: "0%" }}
+                whileInView={{ width: `${cat.score}%` }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, ease: [0.33, 1, 0.68, 1], delay: 0.3 + i * 0.05 }}
+              />
+            </div>
+            <span className="text-[9px] font-mono font-bold w-4 text-right tabular-nums" style={{ color: scoreColor(cat.score) }}>
+              {cat.score}
+            </span>
+          </div>
+        ))}
+      </motion.div>
+
+      {/* Top fixes — numbered list */}
+      <motion.div
+        className="flex flex-col gap-0"
+        variants={{
+          hidden: { opacity: 0, y: 8 },
+          visible: {
+            opacity: 1,
+            y: 0,
+            transition: { type: "spring", stiffness: 300, damping: 24 },
+          },
+        }}
+      >
+        <p className="text-[9px] font-semibold uppercase tracking-wider text-foreground/20 mb-1.5">Top fixes</p>
+        {MOCK_TOP_FIXES.map((fix, i) => (
+          <div key={i} className="flex items-center gap-2 py-1.5">
+            <span
+              className="w-4 h-4 rounded-md grid place-items-center text-[8px] font-bold shrink-0"
+              style={{ background: "var(--s2)", color: "var(--foreground)", opacity: 0.35 }}
+            >
+              {i + 1}
+            </span>
+            <span className="text-[11px] text-foreground/40 flex-1 truncate">{fix.title}</span>
+            <span className="text-[9px] font-medium shrink-0" style={{ color: "var(--score-high)", opacity: 0.6 }}>
+              {fix.lift}
+            </span>
+          </div>
+        ))}
       </motion.div>
     </motion.div>
   );
@@ -277,7 +319,7 @@ function MiniMetricCard({
 }) {
   return (
     <motion.div
-      className="dash-card rounded-xl border p-2.5 flex flex-col items-center justify-center text-center"
+      className="rounded-xl shadow-elevation-1 p-2.5 flex flex-col items-center justify-center text-center"
       style={{ background: "var(--s1)" }}
       variants={{
         hidden: { opacity: 0, y: 12, scale: 0.95 },
@@ -296,7 +338,7 @@ function MiniMetricCard({
         <AnimatedNumber value={value} color={color} size={16} />
         {suffix && <span className="text-[10px] text-foreground/50">{suffix}</span>}
       </div>
-      <span className="text-[10px] text-foreground/40 font-medium">{label}</span>
+      <span className="text-[10px] text-foreground/30 font-medium">{label}</span>
     </motion.div>
   );
 }
@@ -317,7 +359,7 @@ const MOCK_CATEGORIES = [
 export function BarChartMock() {
   return (
     <motion.div
-      className="flex flex-col gap-2"
+      className="grid grid-cols-3 gap-x-5 gap-y-2.5"
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.3 }}
@@ -325,7 +367,7 @@ export function BarChartMock() {
         hidden: { opacity: 0 },
         visible: {
           opacity: 1,
-          transition: { staggerChildren: 0.06, delayChildren: 0.2 },
+          transition: { staggerChildren: 0.04, delayChildren: 0.15 },
         },
       }}
     >
@@ -334,23 +376,32 @@ export function BarChartMock() {
           key={cat.label}
           className="flex items-center gap-2"
           variants={{
-            hidden: { opacity: 0, x: -8 },
+            hidden: { opacity: 0, y: 6 },
             visible: {
               opacity: 1,
-              x: 0,
+              y: 0,
               transition: {
-                x: { type: "spring", stiffness: 300, damping: 24 },
+                y: { type: "spring", stiffness: 300, damping: 24 },
               },
             },
           }}
         >
-          <span className="text-[10px] text-foreground/40 w-[90px] sm:w-[110px] shrink-0 truncate">
+          <span className="text-[10px] text-foreground/35 w-[70px] shrink-0 truncate">
             {cat.label}
           </span>
-          <AnimatedBar width={cat.score} color={cat.color} delay={i} />
+          <div className="flex-1 h-[3px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
+            <motion.div
+              className="h-full rounded-full"
+              style={{ background: scoreColor(cat.score) }}
+              initial={{ width: "0%" }}
+              whileInView={{ width: `${cat.score}%` }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease: [0.33, 1, 0.68, 1], delay: 0.2 + i * 0.05 }}
+            />
+          </div>
           <span
-            className="text-[12px] font-bold font-mono w-6 text-right tabular-nums"
-            style={{ color: cat.color }}
+            className="text-[10px] font-bold font-mono w-5 text-right tabular-nums"
+            style={{ color: scoreColor(cat.score) }}
           >
             {cat.score}
           </span>
@@ -408,7 +459,7 @@ export function MetricGridMock() {
         return (
           <motion.div
             key={cat.label}
-            className="dash-card rounded-lg border p-2.5"
+            className="rounded-xl shadow-elevation-1 p-2.5"
             style={{ background: "var(--s1)" }}
             variants={{
               hidden: { opacity: 0, y: 10, scale: 0.95 },
@@ -427,7 +478,7 @@ export function MetricGridMock() {
             }}
           >
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[10px] text-foreground/55 truncate">{cat.label}</span>
+              <span className="text-[10px] text-foreground/50 truncate">{cat.label}</span>
               <AnimatedNumber value={cat.score} color={cat.color} size={14} />
             </div>
             {/* Mini sparkline — animated bars */}
@@ -1347,37 +1398,42 @@ export function ShareMock() {
 
         {/* Mini shared report preview */}
         <motion.div
-          className="rounded-xl overflow-hidden border"
-          style={{ borderColor: "var(--border)", background: "var(--s1)" }}
+          className="rounded-xl overflow-hidden shadow-elevation-1"
+          style={{ background: "var(--s1)" }}
           initial={{ opacity: 0, y: 10 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
           transition={{ type: "spring", stiffness: 200, damping: 24, delay: 0.35 }}
         >
           <div className="p-3.5 space-y-2.5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[12px] font-semibold text-foreground">demo-landing.com</p>
-                <p className="text-[10px] text-foreground/40">Shared report &bull; Public link</p>
+            <div className="flex items-center gap-3">
+              <div className="shrink-0">
+                <AnimatedScoreRing score={82} size={36} strokeWidth={3} />
               </div>
-              <div
-                className="px-2 py-1 rounded-lg text-[11px] font-bold tabular-nums"
-                style={{ background: "oklch(0.52 0.14 155 / 8%)", color: "var(--score-high)" }}
-              >
-                82/100
+              <div className="min-w-0">
+                <p className="text-[12px] font-semibold text-foreground">demo-landing.com</p>
+                <p className="text-[10px] text-foreground/30">Shared report · Public link</p>
               </div>
             </div>
 
-            {/* Mini bar chart */}
-            <div className="space-y-1.5">
+            {/* Mini category bars — 3-col grid with tiny 3px bars */}
+            <div className="grid grid-cols-3 gap-x-3 gap-y-1.5">
               {[
-                { label: "Clarity", w: 88, c: "var(--brand)" },
-                { label: "Trust", w: 70, c: "oklch(0.62 0.15 160)" },
-                { label: "Conversion", w: 79, c: "oklch(0.65 0.16 55)" },
+                { label: "Clarity", w: 88, c: scoreColor(88) },
+                { label: "Trust", w: 70, c: scoreColor(70) },
+                { label: "Conv.", w: 79, c: scoreColor(79) },
               ].map((bar, i) => (
-                <div key={bar.label} className="flex items-center gap-2">
-                  <span className="text-[9px] text-foreground/35 w-[60px] truncate">{bar.label}</span>
-                  <AnimatedBar width={bar.w} color={bar.c} delay={i + 5} />
-                  <span className="text-[10px] font-mono font-bold text-foreground/40 w-5 text-right tabular-nums">
+                <div key={bar.label} className="flex items-center gap-1">
+                  <span className="text-[8px] text-foreground/25 w-[32px] truncate">{bar.label}</span>
+                  <div className="flex-1 h-[3px] rounded-full overflow-hidden" style={{ background: "var(--s3)" }}>
+                    <motion.div
+                      className="h-full rounded-full"
+                      style={{ background: bar.c }}
+                      initial={{ width: "0%" }}
+                      animate={isInView ? { width: `${bar.w}%` } : { width: "0%" }}
+                      transition={{ duration: 0.6, ease: [0.33, 1, 0.68, 1], delay: 0.5 + i * 0.05 }}
+                    />
+                  </div>
+                  <span className="text-[8px] font-mono font-bold w-4 text-right tabular-nums" style={{ color: bar.c }}>
                     {bar.w}
                   </span>
                 </div>
@@ -1386,10 +1442,10 @@ export function ShareMock() {
           </div>
 
           <div
-            className="px-3.5 py-2 flex items-center justify-between border-t"
-            style={{ borderColor: "var(--border)", background: "var(--s2)" }}
+            className="px-3.5 py-2 flex items-center justify-between"
+            style={{ background: "var(--s2)" }}
           >
-            <div className="flex items-center gap-1.5 text-[10px] text-foreground/40">
+            <div className="flex items-center gap-1.5 text-[10px] text-foreground/30">
               <motion.div
                 className="w-1.5 h-1.5 rounded-full bg-green-500"
                 animate={{ scale: [1, 1.3, 1] }}

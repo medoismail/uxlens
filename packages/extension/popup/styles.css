@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Score ring animation */
+@keyframes score-fill {
+  from { stroke-dashoffset: 251.2; }
+}
+
+.score-ring {
+  animation: score-fill 1s ease-out forwards;
+}
+
+/* Progress bar glow */
+.progress-glow {
+  box-shadow: 0 0 8px rgba(76, 44, 255, 0.4);
+}
+
+/* Subtle pulse for active stage */
+@keyframes subtle-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.stage-active {
+  animation: subtle-pulse 1.5s ease-in-out infinite;
+}

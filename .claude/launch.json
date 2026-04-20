@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "uxlens-dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeExecutable": "/usr/local/bin/npm",
+      "runtimeArgs": ["run", "dev:legacy", "--", "--port", "3000"],
       "port": 3000
     }
   ]
