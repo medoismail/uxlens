@@ -11,7 +11,9 @@ import { currentUser } from "@clerk/nextjs/server";
 // Allow up to 60s for streaming responses
 export const maxDuration = 60;
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+function getOpenAI() {
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+}
 
 /**
  * Condense audit data into a compact context for the chat model.
@@ -159,7 +161,7 @@ export async function POST(request: Request) {
     });
 
     // Call OpenAI with streaming
-    const stream = await openai.chat.completions.create({
+    const stream = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini",
       messages,
       max_tokens: 800,

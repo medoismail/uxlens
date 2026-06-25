@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+function getOpenAI() {
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+}
 
 /**
  * POST /api/pdf-translate
@@ -16,7 +18,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing data" }, { status: 400 });
     }
 
-    const result = await openai.chat.completions.create({
+    const result = await getOpenAI().chat.completions.create({
       model: "gpt-4o-mini",
       temperature: 0.1,
       response_format: { type: "json_object" },

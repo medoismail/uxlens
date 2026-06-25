@@ -298,11 +298,24 @@ async function dismissPopups(page: import("puppeteer-core").Page): Promise<void>
 }
 
 /**
+ * Loads a Node-only module via a non-literal specifier so the Cloudflare Worker
+ * bundler (esbuild, via OpenNext) does not trace into it. These resolve normally
+ * under `next dev`; production never reaches this path (it uses Microlink).
+ */
+function loadNodeModule<T = unknown>(specifier: string): Promise<T> {
+  return import(/* webpackIgnore: true */ specifier) as Promise<T>;
+}
+
+/**
  * Puppeteer fallback (local development only).
  */
 async function captureWithPuppeteer(url: string): Promise<ScreenshotResult> {
-  const chromium = (await import("@sparticuz/chromium-min")).default;
-  const puppeteer = (await import("puppeteer-core")).default;
+  const chromium = (
+    await loadNodeModule<typeof import("@sparticuz/chromium-min")>("@sparticuz/chromium-min")
+  ).default;
+  const puppeteer = (
+    await loadNodeModule<typeof import("puppeteer-core")>("puppeteer-core")
+  ).default;
 
   const CHROMIUM_BINARY_URL =
     "https://github.com/nicholasgasior/chromium-binaries/releases/download/v143.0.0/chromium-v143.0.0-pack.tar";

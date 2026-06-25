@@ -1,10 +1,14 @@
 import type { NextConfig } from "next";
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
 const nextConfig: NextConfig = {
   turbopack: {
     root: import.meta.dirname!,
   },
-  serverExternalPackages: ["@sparticuz/chromium-min"],
+  // puppeteer-core + chromium are only used by the dev-gated screenshot path
+  // (prod uses Microlink). Keep them external so they aren't bundled into the
+  // Cloudflare Worker, where Puppeteer's internal lazy imports can't resolve.
+  serverExternalPackages: ["@sparticuz/chromium-min", "puppeteer-core"],
 
   images: {
     remotePatterns: [
@@ -69,3 +73,6 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+// Enables getCloudflareContext() during `next dev`; no-op in production builds.
+initOpenNextCloudflareForDev();
