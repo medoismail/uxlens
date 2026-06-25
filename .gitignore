@@ -43,6 +43,9 @@ yarn-error.log*
 .dev.vars
 cloudflare-env.d.ts
 
+# netlify (temporary host)
+.netlify/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

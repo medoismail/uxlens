@@ -1,0 +1,12 @@
+# Temporary host: Netlify free tier, until UXLens moves to Cloudflare Workers
+# (Paid plan). The Cloudflare config (wrangler.jsonc, open-next.config.ts) is
+# unaffected and stays the destination. Netlify ignores those files.
+[build]
+  command = "next build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
