@@ -127,10 +127,10 @@ const CLOSE_BUTTON_SELECTORS = [
 /**
  * Capture a full-page screenshot using the Microlink API.
  *
- * Cheaper and more reliable than Puppeteer on Vercel:
+ * Cheaper and more reliable than running a browser in a serverless runtime:
  * - No Chromium binary download on cold starts
  * - No serverless compute for browser rendering
- * - Works on all Vercel plan tiers
+ * - Required on Cloudflare Workers, which can't run Puppeteer/Chromium
  *
  * Falls back to Puppeteer only in local development.
  */

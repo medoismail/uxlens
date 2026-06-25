@@ -1173,10 +1173,6 @@
       "source": "public/next.svg",
       "description": "Next.js logo, #000"
     },
-    "vercel": {
-      "source": "public/vercel.svg",
-      "description": "Vercel triangle, #fff"
-    },
     "logo-full": {
       "source": "src/components/header.tsx (inline Logo component)",
       "description": "Full UXLens logo — fan rotor icon + 'UXLens' wordmark, viewBox 0 0 2141 617, #4C2CFF icon + currentColor text"

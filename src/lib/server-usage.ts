@@ -18,8 +18,10 @@ function getCurrentMonth(): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
-/** Extract client IP from request headers (works on Vercel) */
+/** Extract client IP from request headers (Cloudflare sets cf-connecting-ip) */
 function getClientIP(request: Request): string {
+  const cf = request.headers.get("cf-connecting-ip");
+  if (cf) return cf.trim();
   const forwarded = request.headers.get("x-forwarded-for");
   if (forwarded) return forwarded.split(",")[0].trim();
   const real = request.headers.get("x-real-ip");

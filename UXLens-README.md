@@ -92,7 +92,7 @@ UXLens is a SaaS platform that performs automated, AI-powered UX audits on any l
 | **MCP** | @modelcontextprotocol/sdk 1.27.1 |
 | **Validation** | Zod 4.3 |
 | **HTML Parsing** | Cheerio |
-| **Deployment** | Vercel (serverless) |
+| **Deployment** | Cloudflare Workers (OpenNext) |
 
 ---
 
@@ -123,7 +123,7 @@ DATA PERSISTENCE
 +-- Upstash Redis (rate limits, plan cache, chat credits)
 
 EXTERNAL SERVICES
-+-- Clerk (auth) | LemonSqueezy (payments) | Microlink (screenshots) | Vercel (hosting)
++-- Clerk (auth) | Gumroad (payments) | Microlink (screenshots) | Cloudflare Workers (hosting)
 ```
 
 ### Request Flow: `/api/analyze`
@@ -505,11 +505,12 @@ npm start
 
 ## Deployment
 
-- **Platform:** Vercel (recommended)
-- **Build Command:** `next build`
-- **Max Duration:** 60s configured for long-running API routes (analyze, screenshot, MCP)
-- **Environment Variables:** Set all required vars in Vercel dashboard
-- **Webhooks:** Configure Clerk and LemonSqueezy webhook URLs to point to `/api/webhooks/clerk` and `/api/webhooks/lemonsqueezy`
+- **Platform:** Cloudflare Workers via OpenNext (`@opennextjs/cloudflare`)
+- **Build Command:** `npm run cf:build` (`opennextjs-cloudflare build`)
+- **Deploy Command:** `npm run deploy` (`wrangler deploy`)
+- **Node:** >=20.9.0
+- **Environment Variables:** Set all required vars as secrets in the Cloudflare Worker settings (not committed `.env.local`)
+- **Webhooks:** Configure Clerk and Gumroad webhook URLs to point to `/api/webhooks/clerk` and `/api/webhooks/gumroad`
 - **Custom Domain:** `www.uxlens.pro`
 
 ### Performance Notes

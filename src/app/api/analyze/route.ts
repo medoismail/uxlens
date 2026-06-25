@@ -11,7 +11,8 @@ import { saveAudit } from "@/lib/db/audits";
 import { resolveClerkUserId } from "@/lib/extension-auth";
 import type { AnalysisError, AnalyzeSSEEvent } from "@/lib/types";
 
-// Vercel Pro allows up to 300s; SSE keeps connection alive during streaming
+// SSE keeps the connection alive during streaming. maxDuration is a Next route
+// hint; on Cloudflare Workers, duration is governed by the Worker's CPU limits.
 export const maxDuration = 120;
 
 function errorResponse(error: string, code: AnalysisError["code"], status = 400) {

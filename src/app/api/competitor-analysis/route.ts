@@ -226,7 +226,9 @@ export async function POST(request: Request) {
       competitorsWithContent
     );
 
-    // 8. Save to Supabase if auditId provided (must await — Vercel kills function after response)
+    // 8. Save to Supabase if auditId provided. Must await before responding, since
+    //    serverless runtimes (including Cloudflare Workers) may not run async work
+    //    after the response is sent unless explicitly kept alive.
     if (auditId && clerkUserId) {
       try {
         await updateCompetitorAnalysis(auditId, clerkUserId, analysis);
