@@ -92,11 +92,18 @@ The SYSTEM_PROMPT in `src/lib/openai.ts` defines a professional UX auditor perso
 When modifying the AI prompt, maintain the professional auditor tone and never weaken the prompt with generic advice patterns.
 
 ## Build & Deploy
+Hosting is Cloudflare Workers via the OpenNext adapter (`@opennextjs/cloudflare`). Requires Node >=20.9.0.
 ```bash
 npm run dev          # Development
 npm run build        # Production build (always verify before committing)
-git push origin main # Auto-deploys to Vercel
+npm run cf:build     # OpenNext Workers build (.open-next/worker.js)
+npm run preview      # Build + run the Worker locally on workerd
+npm run deploy       # Build + wrangler deploy to Cloudflare
 ```
+Runtime secrets (OPENAI_API_KEY, Clerk, Supabase, Upstash, Gumroad, Microlink) live in the
+Cloudflare Worker settings, not in `.env.local` (that file is local-only). `puppeteer-core` and
+`@sparticuz/chromium-min` are dev-only and kept out of the Worker bundle; production screenshots
+use the Microlink path.
 
 ## Commit Convention
 Use descriptive commit messages. Always run `npm run build` before committing to catch type errors.
